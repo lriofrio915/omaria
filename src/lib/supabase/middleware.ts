@@ -29,26 +29,40 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Proteger rutas del dashboard
-  const isAuthRoute = request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/register");
-  const isDashboardRoute = request.nextUrl.pathname.startsWith("/admin") ||
-    request.nextUrl.pathname.startsWith("/employee") ||
-    request.nextUrl.pathname.startsWith("/employees") ||
-    request.nextUrl.pathname.startsWith("/documents") ||
-    request.nextUrl.pathname.startsWith("/payroll") ||
-    request.nextUrl.pathname.startsWith("/organigram") ||
-    request.nextUrl.pathname.startsWith("/ai-agent");
+  const role = user?.user_metadata?.role as string | undefined;
+  const path = request.nextUrl.pathname;
 
-  if (!user && isDashboardRoute) {
+  const isAuthRoute = path === "/login" || path === "/register";
+  const isRoot = path === "/";
+  const isAdminOnlyRoute =
+    path.startsWith("/admin") || path.startsWith("/employees");
+  const isDashboardRoute =
+    path.startsWith("/admin") ||
+    path.startsWith("/employee") ||
+    path.startsWith("/employees") ||
+    path.startsWith("/documents") ||
+    path.startsWith("/payroll") ||
+    path.startsWith("/organigram") ||
+    path.startsWith("/ai-agent");
+
+  // No autenticado → redirigir a login
+  if (!user && (isDashboardRoute || isRoot)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  if (user && isAuthRoute) {
+  // Autenticado en auth routes o root → redirigir al dashboard correspondiente
+  if (user && (isAuthRoute || isRoot)) {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    url.pathname = role === "ADMIN" ? "/admin" : "/employee";
+    return NextResponse.redirect(url);
+  }
+
+  // Empleado intentando acceder a rutas solo-admin
+  if (user && role === "EMPLOYEE" && isAdminOnlyRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/employee";
     return NextResponse.redirect(url);
   }
 
