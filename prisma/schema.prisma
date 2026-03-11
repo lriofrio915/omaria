@@ -61,18 +61,37 @@ enum ContractType {
 // CORE MODELS
 // ─────────────────────────────────────────────
 
+model Company {
+  id             String   @id @default(cuid())
+  name           String   @unique
+  slug           String   @unique
+  description    String?
+  logoUrl        String?
+  primaryColor   String   @default("#1B3D5C")
+  secondaryColor String?
+  isActive       Boolean  @default(true)
+  departments    Department[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("companies")
+}
+
 model Department {
-  id          String   @id @default(cuid())
-  name        String   @unique
+  id          String      @id @default(cuid())
+  name        String
   description String?
+  companyId   String?
+  company     Company?    @relation(fields: [companyId], references: [id])
   parentId    String?
   parent      Department?  @relation("DepartmentHierarchy", fields: [parentId], references: [id])
   children    Department[] @relation("DepartmentHierarchy")
   positions   Position[]
   employees   Employee[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
+  @@unique([name, companyId])
   @@map("departments")
 }
 

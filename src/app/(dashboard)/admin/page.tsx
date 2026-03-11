@@ -1,6 +1,7 @@
 import { Users, FileText, DollarSign, UserCheck } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma/client";
+import { CompanyGrid } from "@/components/companies/CompanyGrid";
 
 async function getStats() {
   try {
@@ -14,6 +15,17 @@ async function getStats() {
     return { totalEmployees, activeEmployees, totalDocuments, pendingPayrolls };
   } catch {
     return { totalEmployees: 0, activeEmployees: 0, totalDocuments: 0, pendingPayrolls: 0 };
+  }
+}
+
+async function getCompanies() {
+  try {
+    return await prisma.company.findMany({
+      where: { isActive: true },
+      orderBy: { name: "asc" },
+    });
+  } catch {
+    return [];
   }
 }
 
@@ -49,40 +61,57 @@ const stats = [
 ] as const;
 
 export default async function AdminDashboard() {
-  const data = await getStats();
+  const [data, companies] = await Promise.all([getStats(), getCompanies()]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
         <p className="text-sm text-slate-500 mt-1">
-          Resumen general de Talento Humano — SG Consulting Group
+          SG Consulting Group — Gestión de Talento Humano
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <Card key={stat.key} className="border-slate-200">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-slate-600">
-                  {stat.label}
-                </CardTitle>
-                <div className={`rounded-lg p-2 ${stat.bg}`}>
-                  <Icon className={`h-4 w-4 ${stat.color}`} />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold text-slate-900">
-                  {data[stat.key]}
-                </p>
-              </CardContent>
-            </Card>
-          );
-        })}
+      {/* Empresas del holding */}
+      <div className="space-y-3">
+        <div>
+          <h2 className="text-base font-semibold text-slate-800">Empresas del holding</h2>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Selecciona una empresa para ver su organigrama
+          </p>
+        </div>
+        <CompanyGrid companies={companies} />
       </div>
 
+      {/* Estadísticas globales */}
+      <div className="space-y-3">
+        <h2 className="text-base font-semibold text-slate-800">Resumen general</h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <Card key={stat.key} className="border-slate-200">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-slate-600">
+                    {stat.label}
+                  </CardTitle>
+                  <div className={`rounded-lg p-2 ${stat.bg}`}>
+                    <Icon className={`h-4 w-4 ${stat.color}`} />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-bold text-slate-900">
+                    {data[stat.key]}
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Acciones rápidas y OmarIA */}
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="border-slate-200">
           <CardHeader>
@@ -95,7 +124,7 @@ export default async function AdminDashboard() {
               { label: "Agregar empleado", href: "/employees/new" },
               { label: "Subir documento", href: "/documents" },
               { label: "Registrar nómina", href: "/payroll" },
-              { label: "Ver organigrama", href: "/organigram" },
+              { label: "Ver organigramas", href: "/organigram" },
             ].map((a) => (
               <a
                 key={a.href}

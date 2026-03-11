@@ -2,6 +2,19 @@
 
 export type UserRole = "ADMIN" | "EMPLOYEE";
 
+export interface Company {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  logoUrl?: string | null;
+  primaryColor: string;
+  secondaryColor?: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface AuthUser {
   id: string;
   email: string;
