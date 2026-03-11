@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { LogOut, User } from "lucide-react";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -33,8 +34,8 @@ export function Navbar({ email, role }: NavbarProps) {
   const initials = email.slice(0, 2).toUpperCase();
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6">
-      <div />
+    <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 px-6">
+      <ThemeToggle />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="gap-2 px-2">
