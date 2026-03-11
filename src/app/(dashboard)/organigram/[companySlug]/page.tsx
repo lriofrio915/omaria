@@ -2,45 +2,66 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma/client";
-import { ArrowLeft, GitBranch, Users, Construction } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft, Users, GitBranch, Briefcase, AlertTriangle } from "lucide-react";
+import { OrganigramContent } from "@/components/organigram/OrganigramContent";
 
 interface Props {
   params: Promise<{ companySlug: string }>;
 }
 
-async function getCompany(slug: string) {
+const LEVELS: Record<string, number> = { NONE: 0, BASIC: 1, INTERMEDIATE: 2, ADVANCED: 3, EXPERT: 4 };
+
+async function getCompanyData(slug: string) {
   try {
-    return await prisma.company.findUnique({
+    const company = await prisma.company.findUnique({
       where: { slug },
       include: {
         departments: {
           include: {
-            _count: { select: { employees: true, positions: true } },
+            positions: {
+              include: {
+                competencies: { include: { competency: true } },
+                employees: {
+                  where: { status: "ACTIVE" },
+                  include: {
+                    competencies: { include: { competency: true } },
+                  },
+                  take: 1,
+                },
+              },
+            },
           },
           orderBy: { name: "asc" },
         },
       },
     });
-  } catch {
-    return null;
-  }
+    return company;
+  } catch { return null; }
 }
 
 export default async function CompanyOrganigramPage({ params }: Props) {
   const { companySlug } = await params;
-  const company = await getCompany(companySlug);
-
+  const company = await getCompanyData(companySlug);
   if (!company) notFound();
 
-  const totalEmployees = company.departments.reduce(
-    (sum, d) => sum + d._count.employees,
-    0
-  );
-  const totalPositions = company.departments.reduce(
-    (sum, d) => sum + d._count.positions,
-    0
-  );
+  // Calcular stats
+  let totalEmployees = 0;
+  let totalPositions = 0;
+  let withGaps = 0;
+
+  for (const dept of company.departments) {
+    for (const pos of dept.positions) {
+      totalPositions++;
+      for (const emp of pos.employees) {
+        totalEmployees++;
+        const hasGap = pos.competencies.some((req) => {
+          const empComp = emp.competencies.find((ec) => ec.competencyId === req.competencyId);
+          return (LEVELS[empComp?.currentLevel ?? "NONE"] ?? 0) < LEVELS[req.requiredLevel];
+        });
+        if (hasGap) withGaps++;
+      }
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -57,85 +78,48 @@ export default async function CompanyOrganigramPage({ params }: Props) {
       <div
         className="relative overflow-hidden rounded-2xl p-6"
         style={{
-          background: `linear-gradient(135deg, ${company.primaryColor}15 0%, ${company.primaryColor}05 100%)`,
+          background: `linear-gradient(135deg, ${company.primaryColor}12 0%, ${company.primaryColor}04 100%)`,
           borderLeft: `4px solid ${company.primaryColor}`,
         }}
       >
-        <div className="flex items-center gap-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
           {company.logoUrl ? (
-            <div className="relative h-16 w-32 shrink-0">
-              <Image
-                src={company.logoUrl}
-                alt={`Logo ${company.name}`}
-                fill
-                className="object-contain"
-                sizes="128px"
-              />
+            <div className="relative h-14 w-28 shrink-0">
+              <Image src={company.logoUrl} alt={company.name} fill className="object-contain" sizes="112px" />
             </div>
           ) : (
             <div
-              className="flex h-14 w-14 items-center justify-center rounded-xl text-2xl font-bold text-white shrink-0"
+              className="flex h-12 w-12 items-center justify-center rounded-xl text-xl font-bold text-white shrink-0"
               style={{ backgroundColor: company.primaryColor }}
             >
               {company.name[0]}
             </div>
           )}
-          <div>
+          <div className="flex-1">
             <h1 className="text-2xl font-bold text-slate-900">{company.name}</h1>
-            {company.description && (
-              <p className="text-sm text-slate-500 mt-0.5">{company.description}</p>
-            )}
-            <div className="flex items-center gap-4 mt-2">
-              <span className="flex items-center gap-1.5 text-xs text-slate-500">
-                <Users className="h-3.5 w-3.5" />
-                {totalEmployees} empleados
-              </span>
-              <span className="flex items-center gap-1.5 text-xs text-slate-500">
-                <GitBranch className="h-3.5 w-3.5" />
-                {company.departments.length} departamentos · {totalPositions} cargos
-              </span>
+            {company.description && <p className="text-sm text-slate-500 mt-0.5">{company.description}</p>}
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1 mt-2">
+              {[
+                { icon: Users, label: `${totalEmployees} colaboradores` },
+                { icon: GitBranch, label: `${company.departments.length} departamentos` },
+                { icon: Briefcase, label: `${totalPositions} cargos` },
+                { icon: AlertTriangle, label: `${withGaps} con brecha`, warn: withGaps > 0 },
+              ].map(({ icon: Icon, label, warn }) => (
+                <span
+                  key={label}
+                  className={`flex items-center gap-1.5 text-xs ${warn ? "text-amber-600" : "text-slate-500"}`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {label}
+                </span>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Organigrama — en construcción (Sprint 2) */}
-      <Card className="border-dashed border-2 border-slate-200 bg-slate-50/50">
-        <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-sm mb-4">
-            <Construction className="h-7 w-7 text-amber-500" />
-          </div>
-          <h3 className="text-base font-semibold text-slate-800">
-            Organigrama en construcción
-          </h3>
-          <p className="text-sm text-slate-500 mt-1 max-w-sm">
-            El árbol visual con puestos, empleados y descriptivos de cargo estará
-            disponible en la próxima actualización.
-          </p>
-
-          {/* Previsualización de departamentos */}
-          {company.departments.length > 0 && (
-            <div className="mt-8 w-full max-w-lg">
-              <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-3">
-                Departamentos registrados
-              </p>
-              <div className="grid gap-2 sm:grid-cols-2 text-left">
-                {company.departments.map((dept) => (
-                  <div
-                    key={dept.id}
-                    className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2.5"
-                  >
-                    <span className="text-sm font-medium text-slate-700">{dept.name}</span>
-                    <span className="text-xs text-slate-400">
-                      {dept._count.employees} emp.
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {/* Organigrama interactivo */}
+      <OrganigramContent company={company} />
     </div>
   );
 }

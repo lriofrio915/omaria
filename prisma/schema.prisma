@@ -27,13 +27,13 @@ enum EmployeeStatus {
 }
 
 enum DocumentType {
-  JOB_ANALYSIS       // Análisis de puestos
-  ORGANIGRAM         // Organigrama
-  FLOWCHART          // Flujograma
-  MANUAL             // Manual
-  CONTRACT           // Contrato
-  POLICY             // Política
-  PROCEDURE          // Procedimiento
+  JOB_ANALYSIS
+  ORGANIGRAM
+  FLOWCHART
+  MANUAL
+  CONTRACT
+  POLICY
+  PROCEDURE
   OTHER
 }
 
@@ -51,10 +51,18 @@ enum PayrollStatus {
 }
 
 enum ContractType {
-  INDEFINITE         // Indefinido
-  FIXED_TERM         // Plazo fijo
-  PART_TIME          // Medio tiempo
+  INDEFINITE
+  FIXED_TERM
+  PART_TIME
   FREELANCE
+}
+
+enum CompetencyLevel {
+  NONE
+  BASIC
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
 }
 
 // ─────────────────────────────────────────────
@@ -62,85 +70,132 @@ enum ContractType {
 // ─────────────────────────────────────────────
 
 model Company {
-  id             String   @id @default(cuid())
-  name           String   @unique
-  slug           String   @unique
+  id             String       @id @default(cuid())
+  name           String       @unique
+  slug           String       @unique
   description    String?
   logoUrl        String?
-  primaryColor   String   @default("#1B3D5C")
+  primaryColor   String       @default("#1B3D5C")
   secondaryColor String?
-  isActive       Boolean  @default(true)
+  isActive       Boolean      @default(true)
   departments    Department[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
   @@map("companies")
 }
 
 model Department {
-  id          String      @id @default(cuid())
+  id          String       @id @default(cuid())
   name        String
   description String?
   companyId   String?
-  company     Company?    @relation(fields: [companyId], references: [id])
+  company     Company?     @relation(fields: [companyId], references: [id])
   parentId    String?
   parent      Department?  @relation("DepartmentHierarchy", fields: [parentId], references: [id])
   children    Department[] @relation("DepartmentHierarchy")
   positions   Position[]
   employees   Employee[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   @@unique([name, companyId])
   @@map("departments")
 }
 
 model Position {
-  id            String     @id @default(cuid())
-  title         String
-  description   String?
-  departmentId  String
-  department    Department @relation(fields: [departmentId], references: [id])
-  level         Int        @default(1) // jerarquía en el organigrama
-  employees     Employee[]
-  jobAnalysis   Document[] @relation("PositionDocuments")
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  id               String              @id @default(cuid())
+  title            String
+  description      String?
+  purpose          String?             @db.Text
+  responsibilities String[]
+  education        String?
+  experience       String?
+  skills           String[]
+  departmentId     String
+  department       Department          @relation(fields: [departmentId], references: [id])
+  level            Int                 @default(1)
+  employees        Employee[]
+  competencies     PositionCompetency[]
+  jobAnalysis      Document[]          @relation("PositionDocuments")
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
 
   @@map("positions")
 }
 
 model Employee {
-  id             String         @id @default(cuid())
-  userId         String         @unique // Supabase auth user ID
-  employeeCode   String         @unique
+  id             String               @id @default(cuid())
+  userId         String               @unique
+  employeeCode   String               @unique
   firstName      String
   lastName       String
-  email          String         @unique
+  email          String               @unique
   phone          String?
+  bio            String?              @db.Text
   birthDate      DateTime?
   hireDate       DateTime
   endDate        DateTime?
-  contractType   ContractType   @default(INDEFINITE)
-  status         EmployeeStatus @default(ACTIVE)
-  salary         Decimal?       @db.Decimal(10, 2)
+  contractType   ContractType         @default(INDEFINITE)
+  status         EmployeeStatus       @default(ACTIVE)
+  salary         Decimal?             @db.Decimal(10, 2)
   departmentId   String
-  department     Department     @relation(fields: [departmentId], references: [id])
+  department     Department           @relation(fields: [departmentId], references: [id])
   positionId     String
-  position       Position       @relation(fields: [positionId], references: [id])
+  position       Position             @relation(fields: [positionId], references: [id])
   managerId      String?
-  manager        Employee?      @relation("EmployeeHierarchy", fields: [managerId], references: [id])
-  subordinates   Employee[]     @relation("EmployeeHierarchy")
-  documents      Document[]     @relation("EmployeeDocuments")
+  manager        Employee?            @relation("EmployeeHierarchy", fields: [managerId], references: [id])
+  subordinates   Employee[]           @relation("EmployeeHierarchy")
+  documents      Document[]           @relation("EmployeeDocuments")
   payrollRecords PayrollRecord[]
+  competencies   EmployeeCompetency[]
   avatarUrl      String?
   address        String?
   city           String?
   notes          String?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
 
   @@map("employees")
+}
+
+model Competency {
+  id                   String               @id @default(cuid())
+  name                 String               @unique
+  description          String?
+  category             String               // "Directiva", "Tecnica", "Blanda"
+  positionRequirements PositionCompetency[]
+  employeeCompetencies EmployeeCompetency[]
+  createdAt            DateTime             @default(now())
+
+  @@map("competencies")
+}
+
+model PositionCompetency {
+  id            String          @id @default(cuid())
+  positionId    String
+  position      Position        @relation(fields: [positionId], references: [id], onDelete: Cascade)
+  competencyId  String
+  competency    Competency      @relation(fields: [competencyId], references: [id])
+  requiredLevel CompetencyLevel
+  isCritical    Boolean         @default(false)
+
+  @@unique([positionId, competencyId])
+  @@map("position_competencies")
+}
+
+model EmployeeCompetency {
+  id           String          @id @default(cuid())
+  employeeId   String
+  employee     Employee        @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  competencyId String
+  competency   Competency      @relation(fields: [competencyId], references: [id])
+  currentLevel CompetencyLevel
+  assessedAt   DateTime        @default(now())
+  notes        String?
+
+  @@unique([employeeId, competencyId])
+  @@map("employee_competencies")
 }
 
 model Document {
@@ -149,18 +204,17 @@ model Document {
   description  String?
   type         DocumentType
   status       DocumentStatus @default(DRAFT)
-  fileUrl      String         // Supabase Storage URL
+  fileUrl      String
   fileName     String
   fileSize     Int?
   mimeType     String?
   version      Int            @default(1)
   tags         String[]
-  // Relaciones opcionales
   employeeId   String?
   employee     Employee?      @relation("EmployeeDocuments", fields: [employeeId], references: [id])
   positionId   String?
   position     Position?      @relation("PositionDocuments", fields: [positionId], references: [id])
-  uploadedById String         // Supabase user ID del que subió
+  uploadedById String
   isPublic     Boolean        @default(false)
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
@@ -172,7 +226,7 @@ model PayrollRecord {
   id             String        @id @default(cuid())
   employeeId     String
   employee       Employee      @relation(fields: [employeeId], references: [id])
-  period         String        // e.g. "2025-01" (YYYY-MM)
+  period         String
   periodStart    DateTime
   periodEnd      DateTime
   paymentDate    DateTime?
@@ -181,10 +235,10 @@ model PayrollRecord {
   bonuses        Decimal       @default(0) @db.Decimal(10, 2)
   netSalary      Decimal       @db.Decimal(10, 2)
   status         PayrollStatus @default(PENDING)
-  receiptUrl     String?       // Supabase Storage URL del recibo
+  receiptUrl     String?
   receiptName    String?
   notes          String?
-  processedById  String?       // Supabase user ID
+  processedById  String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -194,11 +248,11 @@ model PayrollRecord {
 
 model AuditLog {
   id         String   @id @default(cuid())
-  userId     String   // Supabase user ID
-  action     String   // CREATE, UPDATE, DELETE, VIEW
-  entity     String   // nombre de la tabla/modelo
+  userId     String
+  action     String
+  entity     String
   entityId   String?
-  changes    Json?    // { before: {}, after: {} }
+  changes    Json?
   ipAddress  String?
   userAgent  String?
   createdAt  DateTime @default(now())
@@ -208,7 +262,7 @@ model AuditLog {
 
 model ChatSession {
   id        String        @id @default(cuid())
-  userId    String        // Supabase user ID
+  userId    String
   title     String?
   messages  ChatMessage[]
   createdAt DateTime      @default(now())
@@ -221,7 +275,7 @@ model ChatMessage {
   id        String      @id @default(cuid())
   sessionId String
   session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  role      String      // "user" | "assistant"
+  role      String
   content   String      @db.Text
   createdAt DateTime    @default(now())
 

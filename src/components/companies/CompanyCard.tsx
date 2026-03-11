@@ -12,11 +12,22 @@ interface Company {
   secondaryColor?: string | null;
 }
 
-export function CompanyCard({ company }: { company: Company }) {
+interface CompanyCardProps {
+  company: Company;
+  href?: string;
+  isSelected?: boolean;
+}
+
+export function CompanyCard({ company, href, isSelected }: CompanyCardProps) {
+  const to = href ?? `/organigram/${company.slug}`;
+
   return (
     <Link
-      href={`/organigram/${company.slug}`}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1"
+      href={to}
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1 ${
+        isSelected ? "ring-2 shadow-lg -translate-y-1" : "border-slate-200"
+      }`}
+      style={isSelected ? { borderColor: company.primaryColor } : {}}
     >
       {/* Barra de color de marca */}
       <div className="h-1.5 w-full" style={{ backgroundColor: company.primaryColor }} />
@@ -47,7 +58,9 @@ export function CompanyCard({ company }: { company: Company }) {
       <div className="flex items-center justify-between border-t border-slate-100 px-5 py-4">
         <div>
           <p className="font-semibold text-slate-900">{company.name}</p>
-          <p className="text-xs text-slate-400 mt-0.5">Ver organigrama</p>
+          <p className="text-xs text-slate-400 mt-0.5">
+            {isSelected ? "Seleccionada" : "Ver detalle"}
+          </p>
         </div>
         <div
           className="flex h-8 w-8 items-center justify-center rounded-full transition-all group-hover:scale-110"
@@ -59,6 +72,14 @@ export function CompanyCard({ company }: { company: Company }) {
           />
         </div>
       </div>
+
+      {/* Indicador de selección */}
+      {isSelected && (
+        <div
+          className="absolute bottom-0 left-0 h-0.5 w-full"
+          style={{ backgroundColor: company.primaryColor }}
+        />
+      )}
     </Link>
   );
 }

@@ -12,21 +12,24 @@ interface Company {
 
 interface CompanyGridProps {
   companies: Company[];
+  hrefPrefix?: string;
+  selectedSlug?: string;
 }
 
-export function CompanyGrid({ companies }: CompanyGridProps) {
+export function CompanyGrid({ companies, hrefPrefix, selectedSlug }: CompanyGridProps) {
   if (companies.length === 0) {
-    return (
-      <p className="text-sm text-slate-500 py-4">
-        No hay empresas registradas.
-      </p>
-    );
+    return <p className="text-sm text-slate-500 py-4">No hay empresas registradas.</p>;
   }
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {companies.map((company) => (
-        <CompanyCard key={company.id} company={company} />
+        <CompanyCard
+          key={company.id}
+          company={company}
+          href={hrefPrefix ? `${hrefPrefix}=${company.slug}` : undefined}
+          isSelected={selectedSlug === company.slug}
+        />
       ))}
     </div>
   );
