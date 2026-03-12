@@ -24,8 +24,8 @@ export function CompanyCard({ company, href, isSelected }: CompanyCardProps) {
   return (
     <Link
       href={to}
-      className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1 ${
-        isSelected ? "ring-2 shadow-lg -translate-y-1" : "border-slate-200"
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1 ${
+        isSelected ? "ring-2 shadow-lg -translate-y-1" : "border-border"
       }`}
       style={isSelected ? { borderColor: company.primaryColor } : {}}
     >
@@ -33,14 +33,14 @@ export function CompanyCard({ company, href, isSelected }: CompanyCardProps) {
       <div className="h-1.5 w-full" style={{ backgroundColor: company.primaryColor }} />
 
       {/* Área del logo */}
-      <div className="flex items-center justify-center p-8 min-h-[140px] bg-slate-50/60">
+      <div className="flex items-center justify-center p-8 min-h-[140px] bg-muted/50">
         {company.logoUrl ? (
           <div className="relative h-20 w-40">
             <Image
               src={company.logoUrl}
               alt={`Logo ${company.name}`}
               fill
-              className="object-contain"
+              className="object-contain dark:brightness-90"
               sizes="160px"
             />
           </div>
@@ -55,10 +55,10 @@ export function CompanyCard({ company, href, isSelected }: CompanyCardProps) {
       </div>
 
       {/* Info + acción */}
-      <div className="flex items-center justify-between border-t border-slate-100 px-5 py-4">
+      <div className="flex items-center justify-between border-t border-border px-5 py-4">
         <div>
-          <p className="font-semibold text-slate-900">{company.name}</p>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="font-semibold text-foreground">{company.name}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
             {isSelected ? "Seleccionada" : "Ver detalle"}
           </p>
         </div>

@@ -44,7 +44,6 @@ export default async function CompanyOrganigramPage({ params }: Props) {
   const company = await getCompanyData(companySlug);
   if (!company) notFound();
 
-  // Calcular stats
   let totalEmployees = 0;
   let totalPositions = 0;
   let withGaps = 0;
@@ -68,7 +67,7 @@ export default async function CompanyOrganigramPage({ params }: Props) {
       {/* Breadcrumb */}
       <Link
         href="/organigram"
-        className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800 transition-colors"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
         Todas las empresas
@@ -76,7 +75,7 @@ export default async function CompanyOrganigramPage({ params }: Props) {
 
       {/* Header de empresa */}
       <div
-        className="relative overflow-hidden rounded-2xl p-6"
+        className="relative overflow-hidden rounded-2xl p-6 border border-border"
         style={{
           background: `linear-gradient(135deg, ${company.primaryColor}12 0%, ${company.primaryColor}04 100%)`,
           borderLeft: `4px solid ${company.primaryColor}`,
@@ -85,7 +84,7 @@ export default async function CompanyOrganigramPage({ params }: Props) {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
           {company.logoUrl ? (
             <div className="relative h-14 w-28 shrink-0">
-              <Image src={company.logoUrl} alt={company.name} fill className="object-contain" sizes="112px" />
+              <Image src={company.logoUrl} alt={company.name} fill className="object-contain dark:brightness-90" sizes="112px" />
             </div>
           ) : (
             <div
@@ -96,8 +95,8 @@ export default async function CompanyOrganigramPage({ params }: Props) {
             </div>
           )}
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-slate-900">{company.name}</h1>
-            {company.description && <p className="text-sm text-slate-500 mt-0.5">{company.description}</p>}
+            <h1 className="text-2xl font-bold text-foreground">{company.name}</h1>
+            {company.description && <p className="text-sm text-muted-foreground mt-0.5">{company.description}</p>}
             <div className="flex flex-wrap items-center gap-x-5 gap-y-1 mt-2">
               {[
                 { icon: Users, label: `${totalEmployees} colaboradores` },
@@ -107,7 +106,11 @@ export default async function CompanyOrganigramPage({ params }: Props) {
               ].map(({ icon: Icon, label, warn }) => (
                 <span
                   key={label}
-                  className={`flex items-center gap-1.5 text-xs ${warn ? "text-amber-600" : "text-slate-500"}`}
+                  className={`flex items-center gap-1.5 text-xs ${
+                    warn
+                      ? "text-amber-600 dark:text-amber-400"
+                      : "text-muted-foreground"
+                  }`}
                 >
                   <Icon className="h-3.5 w-3.5" />
                   {label}

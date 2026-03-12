@@ -37,10 +37,10 @@ interface Employee {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  ACTIVE: "bg-green-100 text-green-700",
-  INACTIVE: "bg-slate-100 text-slate-600",
-  ON_LEAVE: "bg-yellow-100 text-yellow-700",
-  TERMINATED: "bg-red-100 text-red-700",
+  ACTIVE: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400",
+  INACTIVE: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
+  ON_LEAVE: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400",
+  TERMINATED: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -94,7 +94,7 @@ export function EmployeeList() {
       {/* Toolbar */}
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar empleado..."
             value={search}
@@ -111,54 +111,54 @@ export function EmployeeList() {
       </div>
 
       {/* Table */}
-      <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+      <div className="rounded-lg border border-border bg-card overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="bg-slate-50">
-              <TableHead className="font-semibold text-slate-700">Código</TableHead>
-              <TableHead className="font-semibold text-slate-700">Empleado</TableHead>
-              <TableHead className="font-semibold text-slate-700">Cargo</TableHead>
-              <TableHead className="font-semibold text-slate-700">Departamento</TableHead>
-              <TableHead className="font-semibold text-slate-700">Estado</TableHead>
-              <TableHead className="text-right font-semibold text-slate-700">Acciones</TableHead>
+            <TableRow className="bg-muted/50 hover:bg-muted/50">
+              <TableHead className="font-semibold text-foreground">Código</TableHead>
+              <TableHead className="font-semibold text-foreground">Empleado</TableHead>
+              <TableHead className="font-semibold text-foreground">Cargo</TableHead>
+              <TableHead className="font-semibold text-foreground">Departamento</TableHead>
+              <TableHead className="font-semibold text-foreground">Estado</TableHead>
+              <TableHead className="text-right font-semibold text-foreground">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-slate-400">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   Cargando empleados...
                 </TableCell>
               </TableRow>
             ) : employees.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-slate-400">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   {search ? "No se encontraron empleados" : "No hay empleados registrados"}
                 </TableCell>
               </TableRow>
             ) : (
               employees.map((emp) => (
-                <TableRow key={emp.id} className="hover:bg-slate-50">
-                  <TableCell className="font-mono text-xs text-slate-500">
+                <TableRow key={emp.id} className="hover:bg-muted/40">
+                  <TableCell className="font-mono text-xs text-muted-foreground">
                     {emp.employeeCode}
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p className="font-medium text-slate-900">
+                      <p className="font-medium text-foreground">
                         {emp.firstName} {emp.lastName}
                       </p>
-                      <p className="text-xs text-slate-400">{emp.email}</p>
+                      <p className="text-xs text-muted-foreground">{emp.email}</p>
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm text-slate-600">
+                  <TableCell className="text-sm text-muted-foreground">
                     {emp.position.title}
                   </TableCell>
-                  <TableCell className="text-sm text-slate-600">
+                  <TableCell className="text-sm text-muted-foreground">
                     {emp.department.name}
                   </TableCell>
                   <TableCell>
                     <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[emp.status] ?? "bg-slate-100 text-slate-600"}`}
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[emp.status] ?? "bg-muted text-muted-foreground"}`}
                     >
                       {STATUS_LABELS[emp.status] ?? emp.status}
                     </span>
@@ -168,7 +168,7 @@ export function EmployeeList() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0 text-slate-500 hover:text-blue-600"
+                        className="h-8 w-8 p-0 text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400"
                         onClick={() => router.push(`/employees/${emp.id}`)}
                       >
                         <Eye className="h-4 w-4" />
@@ -176,7 +176,7 @@ export function EmployeeList() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0 text-slate-500 hover:text-blue-600"
+                        className="h-8 w-8 p-0 text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400"
                         onClick={() => router.push(`/employees/${emp.id}/edit`)}
                       >
                         <Edit className="h-4 w-4" />
@@ -184,7 +184,7 @@ export function EmployeeList() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0 text-slate-500 hover:text-red-600"
+                        className="h-8 w-8 p-0 text-muted-foreground hover:text-red-600 dark:hover:text-red-400"
                         onClick={() => setDeleteId(emp.id)}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -198,7 +198,7 @@ export function EmployeeList() {
         </Table>
       </div>
 
-      <p className="text-sm text-slate-400">
+      <p className="text-sm text-muted-foreground">
         {employees.length} empleado{employees.length !== 1 ? "s" : ""}
       </p>
 

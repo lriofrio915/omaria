@@ -19,12 +19,12 @@ export default async function OrganigramPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
-          <GitBranch className="h-5 w-5 text-blue-600" />
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-900/30">
+          <GitBranch className="h-5 w-5 text-blue-600 dark:text-blue-400" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Organigramas</h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <h1 className="text-2xl font-bold text-foreground">Organigramas</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
             Selecciona una empresa para explorar su estructura organizacional
           </p>
         </div>

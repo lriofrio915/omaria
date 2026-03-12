@@ -37,7 +37,6 @@ async function getStats(companySlug?: string) {
       }),
     ]);
 
-    // Detectar empleados con al menos una brecha de competencias
     const LEVELS: Record<string, number> = { NONE: 0, BASIC: 1, INTERMEDIATE: 2, ADVANCED: 3, EXPERT: 4 };
     let conBrecha = 0;
     for (const emp of employees) {
@@ -76,32 +75,32 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
       label: "Colaboradores",
       value: stats.totalColaboradores,
       icon: Users,
-      color: "text-blue-600",
-      bg: "bg-blue-50",
+      color: "text-blue-600 dark:text-blue-400",
+      bg: "bg-blue-50 dark:bg-blue-900/30",
       hint: companySlug ? `en ${selectedCompany?.name}` : "en todo el holding",
     },
     {
       label: "Departamentos",
       value: stats.totalDepartamentos,
       icon: GitBranch,
-      color: "text-violet-600",
-      bg: "bg-violet-50",
+      color: "text-violet-600 dark:text-violet-400",
+      bg: "bg-violet-50 dark:bg-violet-900/30",
       hint: "unidades organizacionales",
     },
     {
       label: "Cargos definidos",
       value: stats.totalCargos,
       icon: Briefcase,
-      color: "text-emerald-600",
-      bg: "bg-emerald-50",
+      color: "text-emerald-600 dark:text-emerald-400",
+      bg: "bg-emerald-50 dark:bg-emerald-900/30",
       hint: "puestos con perfil",
     },
     {
       label: "Con brecha de competencias",
       value: stats.conBrecha,
       icon: AlertTriangle,
-      color: "text-amber-600",
-      bg: "bg-amber-50",
+      color: "text-amber-600 dark:text-amber-400",
+      bg: "bg-amber-50 dark:bg-amber-900/30",
       hint: "requieren plan de desarrollo",
     },
   ];
@@ -110,8 +109,8 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-        <p className="text-sm text-slate-500 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+        <p className="text-sm text-muted-foreground mt-1">
           SG Consulting Group — Gestión de Talento Humano
         </p>
       </div>
@@ -120,8 +119,8 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-base font-semibold text-slate-800">Empresas del holding</h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <h2 className="text-base font-semibold text-foreground">Empresas del holding</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
               {companySlug
                 ? `Mostrando métricas de ${selectedCompany?.name ?? companySlug}`
                 : "Selecciona una empresa para filtrar las métricas"}
@@ -130,7 +129,7 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
           {companySlug && (
             <Link
               href="/admin"
-              className="text-xs text-slate-400 hover:text-slate-700 transition-colors"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               Mostrar todo el holding
             </Link>
@@ -152,7 +151,7 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
               style={{ backgroundColor: primaryColor }}
             />
           )}
-          <h2 className="text-base font-semibold text-slate-800">
+          <h2 className="text-base font-semibold text-foreground">
             {selectedCompany ? `Métricas — ${selectedCompany.name}` : "Resumen general del holding"}
           </h2>
         </div>
@@ -160,9 +159,9 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
           {statCards.map((stat) => {
             const Icon = stat.icon;
             return (
-              <Card key={stat.label} className="border-slate-200">
+              <Card key={stat.label}>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-slate-600">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
                     {stat.label}
                   </CardTitle>
                   <div className={`rounded-lg p-2 ${stat.bg}`}>
@@ -170,8 +169,8 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-3xl font-bold text-slate-900">{stat.value}</p>
-                  <p className="text-xs text-slate-400 mt-1">{stat.hint}</p>
+                  <p className="text-3xl font-bold text-foreground">{stat.value}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{stat.hint}</p>
                 </CardContent>
               </Card>
             );
@@ -181,9 +180,9 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
 
       {/* Acciones rápidas y OmarIA */}
       <div className="grid gap-4 md:grid-cols-2">
-        <Card className="border-slate-200">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-base font-semibold text-slate-900">Acciones rápidas</CardTitle>
+            <CardTitle className="text-base font-semibold text-foreground">Acciones rápidas</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {[
@@ -195,10 +194,10 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
               <a
                 key={a.href}
                 href={a.href}
-                className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                className="flex items-center justify-between rounded-lg border border-border bg-muted/50 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-900/20 dark:hover:text-blue-400 transition-colors"
               >
                 {a.label}
-                <span className="text-slate-400">→</span>
+                <span className="text-muted-foreground">→</span>
               </a>
             ))}
             {companySlug && (
@@ -218,12 +217,12 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-base font-semibold text-slate-900">OmarIA — Agente IA</CardTitle>
+            <CardTitle className="text-base font-semibold text-foreground">OmarIA — Agente IA</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-slate-500 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               Consulta información de empleados, documentos y políticas de RRHH.
               Analiza brechas de competencias y genera planes de desarrollo.
             </p>
