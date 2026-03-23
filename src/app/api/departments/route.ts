@@ -2,15 +2,19 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma/client";
 
-export async function GET() {
+export async function GET(request: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
+  const { searchParams } = new URL(request.url);
+  const companyId = searchParams.get("companyId");
+
   try {
     const departments = await prisma.department.findMany({
+      where: companyId ? { companyId } : undefined,
       orderBy: { name: "asc" },
-      select: { id: true, name: true },
+      select: { id: true, name: true, companyId: true },
     });
     return NextResponse.json(departments);
   } catch {

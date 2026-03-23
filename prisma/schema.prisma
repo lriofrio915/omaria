@@ -149,6 +149,9 @@ model Employee {
   documents      Document[]           @relation("EmployeeDocuments")
   payrollRecords PayrollRecord[]
   competencies   EmployeeCompetency[]
+  personalEmail  String?
+  corporateEmail String?
+  bloodType      String?
   avatarUrl      String?
   address        String?
   city           String?

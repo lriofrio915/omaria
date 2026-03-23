@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { Building2, User, Briefcase, ShieldCheck, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,16 +20,22 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+// ── Schema ────────────────────────────────────────────────────────────────────
+
 const employeeSchema = z.object({
   firstName: z.string().min(1, "Requerido"),
   lastName: z.string().min(1, "Requerido"),
   email: z.string().email("Correo inválido"),
+  personalEmail: z.string().email("Correo inválido").optional().or(z.literal("")),
+  corporateEmail: z.string().email("Correo inválido").optional().or(z.literal("")),
+  bloodType: z.string().optional(),
   phone: z.string().optional(),
   birthDate: z.string().optional(),
   hireDate: z.string().min(1, "Requerido"),
   contractType: z.enum(["INDEFINITE", "FIXED_TERM", "PART_TIME", "FREELANCE"]),
   status: z.enum(["ACTIVE", "INACTIVE", "ON_LEAVE", "TERMINATED"]),
   salary: z.string().optional(),
+  companyId: z.string().min(1, "Requerido"),
   departmentId: z.string().min(1, "Requerido"),
   positionId: z.string().min(1, "Requerido"),
   managerId: z.string().optional(),
@@ -42,14 +49,19 @@ const employeeSchema = z.object({
 
 type FormData = z.infer<typeof employeeSchema>;
 
-interface Department { id: string; name: string }
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+interface Company { id: string; name: string; primaryColor: string }
+interface Department { id: string; name: string; companyId: string | null }
 interface Position { id: string; title: string; departmentId: string }
-interface Employee { id: string; firstName: string; lastName: string }
+interface EmployeeOption { id: string; firstName: string; lastName: string }
 
 interface EmployeeFormProps {
   initialData?: Partial<FormData & { id: string }>;
   mode: "create" | "edit";
 }
+
+// ── Constants ─────────────────────────────────────────────────────────────────
 
 const CONTRACT_LABELS: Record<string, string> = {
   INDEFINITE: "Indefinido",
@@ -65,12 +77,87 @@ const STATUS_LABELS: Record<string, string> = {
   TERMINATED: "Terminado",
 };
 
+const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
+// ── Phone formatter ───────────────────────────────────────────────────────────
+
+function formatEcuadorPhone(input: string): string {
+  const allDigits = input.replace(/\D/g, "");
+  let local = allDigits;
+  if (local.startsWith("593")) local = local.slice(3);
+  else if (local.startsWith("0")) local = local.slice(1);
+  local = local.slice(0, 9);
+  if (local.length === 0) return "";
+  let result = "+593 " + local.slice(0, 2);
+  if (local.length > 2) result += " " + local.slice(2, 5);
+  if (local.length > 5) result += " " + local.slice(5);
+  return result;
+}
+
+// ── Section wrapper ───────────────────────────────────────────────────────────
+
+function Section({
+  icon: Icon,
+  title,
+  children,
+}: {
+  icon: React.ElementType;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Card className="border-border shadow-sm">
+      <CardHeader className="pb-4 border-b border-border/60">
+        <CardTitle className="flex items-center gap-2.5 text-sm font-semibold text-foreground">
+          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-600/10">
+            <Icon className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+          </div>
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-5">{children}</CardContent>
+    </Card>
+  );
+}
+
+// ── Field wrapper ─────────────────────────────────────────────────────────────
+
+function Field({
+  label,
+  required,
+  error,
+  children,
+  hint,
+}: {
+  label: string;
+  required?: boolean;
+  error?: string;
+  children: React.ReactNode;
+  hint?: string;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-xs font-medium text-foreground/80">
+        {label}
+        {required && <span className="text-red-500 ml-0.5">*</span>}
+      </Label>
+      {children}
+      {hint && !error && <p className="text-xs text-muted-foreground">{hint}</p>}
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
+
 export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
-  const [managers, setManagers] = useState<Employee[]>([]);
+  const [managers, setManagers] = useState<EmployeeOption[]>([]);
   const [createAccount, setCreateAccount] = useState(false);
 
   const {
@@ -90,39 +177,69 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
     },
   });
 
+  const selectedCompany = watch("companyId");
   const selectedDepartment = watch("departmentId");
+  const phoneValue = watch("phone") ?? "";
 
+  // Load companies + managers once
   useEffect(() => {
-    fetch("/api/departments")
+    fetch("/api/companies")
       .then((r) => r.json())
-      .then(setDepartments);
+      .then((data: Company[]) => setCompanies(data))
+      .catch(() => {});
+
     fetch("/api/employees")
       .then((r) => r.json())
-      .then((data: Employee[]) => setManagers(data));
+      .then((data: EmployeeOption[]) => setManagers(data))
+      .catch(() => {});
   }, []);
 
+  // Load departments when company changes
+  const loadDepartments = useCallback(async (companyId: string) => {
+    const res = await fetch(`/api/departments?companyId=${companyId}`);
+    if (res.ok) {
+      const data: Department[] = await res.json();
+      setDepartments(data);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (selectedCompany) {
+      loadDepartments(selectedCompany);
+      setValue("departmentId", "");
+      setValue("positionId", "");
+      setPositions([]);
+    }
+  }, [selectedCompany, loadDepartments, setValue]);
+
+  // Load positions when department changes
   useEffect(() => {
     if (selectedDepartment) {
       fetch(`/api/positions?departmentId=${selectedDepartment}`)
         .then((r) => r.json())
-        .then(setPositions);
+        .then((data: Position[]) => setPositions(data))
+        .catch(() => setPositions([]));
     }
   }, [selectedDepartment]);
 
+  // Submit
   async function onSubmit(data: FormData) {
     setLoading(true);
+    const { companyId: _companyId, ...rest } = data;
 
     const payload = {
-      ...data,
-      salary: data.salary ? parseFloat(data.salary) : undefined,
-      managerId: data.managerId || undefined,
+      ...rest,
+      salary: rest.salary ? parseFloat(rest.salary) : undefined,
+      managerId: rest.managerId || undefined,
+      personalEmail: rest.personalEmail || undefined,
+      corporateEmail: rest.corporateEmail || undefined,
+      bloodType: rest.bloodType || undefined,
       createAccount,
     };
 
-    const url =
-      mode === "edit" && initialData?.id
-        ? `/api/employees/${initialData.id}`
-        : "/api/employees";
+    const url = mode === "edit" && initialData?.id
+      ? `/api/employees/${initialData.id}`
+      : "/api/employees";
     const method = mode === "edit" ? "PUT" : "POST";
 
     const res = await fetch(url, {
@@ -130,175 +247,262 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-
     const result = await res.json();
 
     if (!res.ok) {
-      toast.error(result.error ?? "Error al guardar el empleado");
+      toast.error(result.error ?? "Error al guardar el colaborador");
       setLoading(false);
       return;
     }
 
-    toast.success(
-      mode === "create" ? "Empleado creado correctamente" : "Empleado actualizado"
-    );
+    toast.success(mode === "create" ? "Colaborador creado correctamente" : "Cambios guardados");
     router.push("/employees");
     router.refresh();
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* Datos personales */}
-      <Card className="border-slate-200">
-        <CardHeader>
-          <CardTitle className="text-base text-slate-900">Datos personales</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label>Nombre *</Label>
-            <Input placeholder="Juan" {...register("firstName")} />
-            {errors.firstName && <p className="text-xs text-red-500">{errors.firstName.message}</p>}
-          </div>
-          <div className="space-y-1.5">
-            <Label>Apellido *</Label>
-            <Input placeholder="Pérez" {...register("lastName")} />
-            {errors.lastName && <p className="text-xs text-red-500">{errors.lastName.message}</p>}
-          </div>
-          <div className="space-y-1.5">
-            <Label>Correo electrónico *</Label>
-            <Input type="email" placeholder="juan@sgconsulting.com" {...register("email")} />
-            {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
-          </div>
-          <div className="space-y-1.5">
-            <Label>Teléfono</Label>
-            <Input placeholder="+593 9..." {...register("phone")} />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Fecha de nacimiento</Label>
-            <Input type="date" {...register("birthDate")} />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Ciudad</Label>
-            <Input placeholder="Quito" {...register("city")} />
-          </div>
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label>Dirección</Label>
-            <Input placeholder="Av. Amazonas..." {...register("address")} />
-          </div>
-        </CardContent>
-      </Card>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
-      {/* Datos laborales */}
-      <Card className="border-slate-200">
-        <CardHeader>
-          <CardTitle className="text-base text-slate-900">Datos laborales</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label>Fecha de ingreso *</Label>
-            <Input type="date" {...register("hireDate")} />
-            {errors.hireDate && <p className="text-xs text-red-500">{errors.hireDate.message}</p>}
-          </div>
-          <div className="space-y-1.5">
-            <Label>Salario (USD)</Label>
-            <Input type="number" step="0.01" placeholder="1200.00" {...register("salary")} />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Tipo de contrato *</Label>
+      {/* ── 1. DATOS PERSONALES ────────────────────────────────────────────── */}
+      <Section icon={User} title="Datos personales">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Nombres" required error={errors.firstName?.message}>
+            <Input placeholder="Juan Andrés" {...register("firstName")} className="cursor-text" />
+          </Field>
+          <Field label="Apellidos" required error={errors.lastName?.message}>
+            <Input placeholder="Pérez López" {...register("lastName")} className="cursor-text" />
+          </Field>
+
+          <Field label="Teléfono" hint="Formato: +593 9X XXX XXXX">
+            <Input
+              placeholder="+593 99 651 7455"
+              value={phoneValue}
+              onChange={(e) => setValue("phone", formatEcuadorPhone(e.target.value))}
+              className="cursor-text font-mono text-sm"
+            />
+          </Field>
+
+          <Field label="Fecha de nacimiento">
+            <Input type="date" {...register("birthDate")} className="cursor-pointer" />
+          </Field>
+
+          <Field label="Tipo de sangre">
             <Select
-              defaultValue={initialData?.contractType ?? "INDEFINITE"}
-              onValueChange={(v) => setValue("contractType", v as never)}
+              defaultValue={initialData?.bloodType ?? ""}
+              onValueChange={(v) => setValue("bloodType", v)}
             >
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {Object.entries(CONTRACT_LABELS).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>{v}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label>Estado *</Label>
-            <Select
-              defaultValue={initialData?.status ?? "ACTIVE"}
-              onValueChange={(v) => setValue("status", v as never)}
-            >
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {Object.entries(STATUS_LABELS).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>{v}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label>Departamento *</Label>
-            <Select
-              defaultValue={initialData?.departmentId}
-              onValueChange={(v) => { setValue("departmentId", v); setValue("positionId", ""); }}
-            >
-              <SelectTrigger>
+              <SelectTrigger className="cursor-pointer">
                 <SelectValue placeholder="Seleccionar..." />
               </SelectTrigger>
               <SelectContent>
-                {departments.map((d) => (
-                  <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
+                <SelectItem value="none" className="cursor-pointer">No especificado</SelectItem>
+                {BLOOD_TYPES.map((bt) => (
+                  <SelectItem key={bt} value={bt} className="cursor-pointer">{bt}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {errors.departmentId && <p className="text-xs text-red-500">{errors.departmentId.message}</p>}
-          </div>
-          <div className="space-y-1.5">
-            <Label>Cargo *</Label>
+          </Field>
+
+          <Field label="Ciudad">
+            <Input placeholder="Quito" {...register("city")} className="cursor-text" />
+          </Field>
+
+          <Field label="Dirección" >
+            <Input placeholder="Av. República del El Salvador N36-183..." {...register("address")} className="cursor-text sm:col-span-2" />
+          </Field>
+        </div>
+      </Section>
+
+      {/* ── 2. CONTACTO ───────────────────────────────────────────────────── */}
+      <Section icon={ShieldCheck} title="Correos electrónicos">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field
+            label="Email del sistema (acceso)"
+            required
+            error={errors.email?.message}
+            hint="Este email es el usuario de login"
+          >
+            <Input
+              type="email"
+              placeholder="jperez@sgconsultinggroup.com"
+              {...register("email")}
+              className="cursor-text"
+            />
+          </Field>
+
+          <Field label="Email corporativo adicional" error={errors.corporateEmail?.message}>
+            <Input
+              type="email"
+              placeholder="juan.perez@empresa.com"
+              {...register("corporateEmail")}
+              className="cursor-text"
+            />
+          </Field>
+
+          <Field label="Email personal" error={errors.personalEmail?.message}>
+            <Input
+              type="email"
+              placeholder="juanperez@gmail.com"
+              {...register("personalEmail")}
+              className="cursor-text"
+            />
+          </Field>
+        </div>
+      </Section>
+
+      {/* ── 3. DATOS LABORALES ────────────────────────────────────────────── */}
+      <Section icon={Briefcase} title="Datos laborales">
+        <div className="grid gap-4 sm:grid-cols-2">
+
+          {/* Empresa — selector que controla los departamentos */}
+          <Field label="Empresa" required error={errors.companyId?.message}>
             <Select
-              defaultValue={initialData?.positionId}
-              onValueChange={(v) => setValue("positionId", v)}
+              defaultValue={initialData?.companyId ?? ""}
+              onValueChange={(v) => setValue("companyId", v)}
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccionar departamento primero..." />
+              <SelectTrigger className="cursor-pointer">
+                <SelectValue placeholder="Seleccionar empresa..." />
+              </SelectTrigger>
+              <SelectContent>
+                {companies.map((c) => (
+                  <SelectItem key={c.id} value={c.id} className="cursor-pointer">
+                    <span className="flex items-center gap-2">
+                      <span
+                        className="inline-block h-2 w-2 rounded-full shrink-0"
+                        style={{ backgroundColor: c.primaryColor }}
+                      />
+                      {c.name}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+
+          {/* Departamento */}
+          <Field label="Área / Departamento" required error={errors.departmentId?.message}>
+            <Select
+              value={watch("departmentId") ?? ""}
+              onValueChange={(v) => { setValue("departmentId", v); setValue("positionId", ""); }}
+              disabled={!selectedCompany}
+            >
+              <SelectTrigger className={selectedCompany ? "cursor-pointer" : "cursor-not-allowed opacity-60"}>
+                <SelectValue placeholder={selectedCompany ? "Seleccionar área..." : "Selecciona empresa primero"} />
+              </SelectTrigger>
+              <SelectContent>
+                {departments.map((d) => (
+                  <SelectItem key={d.id} value={d.id} className="cursor-pointer">{d.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+
+          {/* Cargo */}
+          <Field label="Cargo" required error={errors.positionId?.message}>
+            <Select
+              value={watch("positionId") ?? ""}
+              onValueChange={(v) => setValue("positionId", v)}
+              disabled={!selectedDepartment}
+            >
+              <SelectTrigger className={selectedDepartment ? "cursor-pointer" : "cursor-not-allowed opacity-60"}>
+                <SelectValue placeholder={selectedDepartment ? "Seleccionar cargo..." : "Selecciona área primero"} />
               </SelectTrigger>
               <SelectContent>
                 {positions.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
+                  <SelectItem key={p.id} value={p.id} className="cursor-pointer">{p.title}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {errors.positionId && <p className="text-xs text-red-500">{errors.positionId.message}</p>}
-          </div>
-          <div className="space-y-1.5">
-            <Label>Jefe directo</Label>
+          </Field>
+
+          {/* Jefe directo */}
+          <Field label="Jefe directo">
             <Select
               defaultValue={initialData?.managerId ?? "none"}
               onValueChange={(v) => setValue("managerId", v === "none" ? undefined : v)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="cursor-pointer">
                 <SelectValue placeholder="Sin jefe directo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">Sin jefe directo</SelectItem>
+                <SelectItem value="none" className="cursor-pointer">Sin jefe directo</SelectItem>
                 {managers.map((m) => (
-                  <SelectItem key={m.id} value={m.id}>
+                  <SelectItem key={m.id} value={m.id} className="cursor-pointer">
                     {m.firstName} {m.lastName}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-          </div>
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label>Notas</Label>
-            <Textarea rows={3} placeholder="Observaciones adicionales..." {...register("notes")} />
-          </div>
-        </CardContent>
-      </Card>
+          </Field>
 
-      {/* Cuenta de acceso (solo en creación) */}
+          {/* Fecha de ingreso */}
+          <Field label="Fecha de ingreso" required error={errors.hireDate?.message}>
+            <Input type="date" {...register("hireDate")} className="cursor-pointer" />
+          </Field>
+
+          {/* Salario */}
+          <Field label="Salario mensual (USD)">
+            <Input
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="1.200,00"
+              {...register("salary")}
+              className="cursor-text"
+            />
+          </Field>
+
+          {/* Tipo de contrato */}
+          <Field label="Tipo de contrato" required>
+            <Select
+              defaultValue={initialData?.contractType ?? "INDEFINITE"}
+              onValueChange={(v) => setValue("contractType", v as never)}
+            >
+              <SelectTrigger className="cursor-pointer">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(CONTRACT_LABELS).map(([k, v]) => (
+                  <SelectItem key={k} value={k} className="cursor-pointer">{v}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+
+          {/* Estado */}
+          <Field label="Estado" required>
+            <Select
+              defaultValue={initialData?.status ?? "ACTIVE"}
+              onValueChange={(v) => setValue("status", v as never)}
+            >
+              <SelectTrigger className="cursor-pointer">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(STATUS_LABELS).map(([k, v]) => (
+                  <SelectItem key={k} value={k} className="cursor-pointer">{v}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+
+          {/* Notas */}
+          <Field label="Notas / Observaciones">
+            <Textarea
+              rows={3}
+              placeholder="Información adicional relevante..."
+              {...register("notes")}
+              className="cursor-text resize-none sm:col-span-2"
+            />
+          </Field>
+        </div>
+      </Section>
+
+      {/* ── 4. CUENTA DE ACCESO (solo creación) ───────────────────────────── */}
       {mode === "create" && (
-        <Card className="border-slate-200">
-          <CardHeader>
-            <CardTitle className="text-base text-slate-900">Cuenta de acceso</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-3">
+        <Section icon={ShieldCheck} title="Cuenta de acceso al sistema">
+          <div className="space-y-4">
+            <label className="flex items-start gap-3 cursor-pointer group">
               <input
                 type="checkbox"
                 id="createAccount"
@@ -307,50 +511,71 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
                   setCreateAccount(e.target.checked);
                   setValue("createAccount", e.target.checked);
                 }}
-                className="h-4 w-4 rounded border-slate-300 text-blue-600"
+                className="mt-0.5 h-4 w-4 rounded border-border text-blue-600 cursor-pointer"
               />
-              <Label htmlFor="createAccount" className="cursor-pointer">
-                Crear cuenta de acceso para este empleado
-              </Label>
-            </div>
+              <div>
+                <span className="text-sm font-medium text-foreground group-hover:text-blue-600 transition-colors">
+                  Crear cuenta de acceso
+                </span>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  El colaborador podrá iniciar sesión con el <strong>email del sistema</strong> y la contraseña temporal que definas aquí.
+                </p>
+              </div>
+            </label>
+
             {createAccount && (
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <Label>Contraseña temporal *</Label>
-                  <Input type="password" placeholder="••••••••" {...register("password")} />
+              <div className="rounded-lg border border-blue-200 bg-blue-50/50 dark:bg-blue-900/10 dark:border-blue-900/40 p-4 grid gap-4 sm:grid-cols-2">
+                <div className="sm:col-span-2 flex items-center gap-2 text-xs text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/20 rounded-md px-3 py-2">
+                  <ChevronRight className="h-3.5 w-3.5 shrink-0" />
+                  El <strong>usuario</strong> de login será el email del sistema indicado arriba.
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Rol *</Label>
+                <Field label="Contraseña temporal" hint="El colaborador podrá cambiarla al ingresar">
+                  <Input
+                    type="password"
+                    placeholder="Mínimo 8 caracteres"
+                    {...register("password")}
+                    className="cursor-text"
+                  />
+                </Field>
+                <Field label="Rol en el sistema">
                   <Select
                     defaultValue="EMPLOYEE"
                     onValueChange={(v) => setValue("role", v as "ADMIN" | "EMPLOYEE")}
                   >
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="cursor-pointer">
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="EMPLOYEE">Empleado</SelectItem>
-                      <SelectItem value="ADMIN">Administrador</SelectItem>
+                      <SelectItem value="EMPLOYEE" className="cursor-pointer">Colaborador</SelectItem>
+                      <SelectItem value="ADMIN" className="cursor-pointer">Administrador</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
+                </Field>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </Section>
       )}
 
-      <div className="flex justify-end gap-3">
+      {/* ── Actions ───────────────────────────────────────────────────────── */}
+      <div className="flex justify-end gap-3 pt-2">
         <Button
           type="button"
           variant="outline"
           onClick={() => router.push("/employees")}
+          className="cursor-pointer"
         >
           Cancelar
         </Button>
-        <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700">
+        <Button
+          type="submit"
+          disabled={loading}
+          className="bg-blue-600 hover:bg-blue-700 cursor-pointer min-w-[140px]"
+        >
           {loading
             ? "Guardando..."
             : mode === "create"
-            ? "Crear empleado"
+            ? "Crear colaborador"
             : "Guardar cambios"}
         </Button>
       </div>
