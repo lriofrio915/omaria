@@ -36,6 +36,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const search = searchParams.get("search") ?? "";
   const status = searchParams.get("status");
+  const companyId = searchParams.get("companyId");
   const departmentId = searchParams.get("departmentId");
 
   try {
@@ -47,19 +48,26 @@ export async function GET(request: Request) {
                 OR: [
                   { firstName: { contains: search, mode: "insensitive" } },
                   { lastName: { contains: search, mode: "insensitive" } },
-                  { email: { contains: search, mode: "insensitive" } },
+                  { lastName: { contains: search, mode: "insensitive" } },
                   { employeeCode: { contains: search, mode: "insensitive" } },
+                  { position: { title: { contains: search, mode: "insensitive" } } },
                 ],
               }
             : {},
           status ? { status: status as never } : {},
           departmentId ? { departmentId } : {},
+          companyId ? { department: { companyId } } : {},
         ],
       },
       include: {
-        department: { select: { id: true, name: true } },
+        department: {
+          select: {
+            id: true,
+            name: true,
+            company: { select: { id: true, name: true, slug: true, primaryColor: true } },
+          },
+        },
         position: { select: { id: true, title: true } },
-        manager: { select: { id: true, firstName: true, lastName: true } },
       },
       orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
     });
