@@ -149,6 +149,7 @@ model Employee {
   documents      Document[]           @relation("EmployeeDocuments")
   payrollRecords PayrollRecord[]
   competencies   EmployeeCompetency[]
+  profile        EmployeeProfile?
   personalEmail  String?
   corporateEmail String?
   bloodType      String?
@@ -261,6 +262,97 @@ model AuditLog {
   createdAt  DateTime @default(now())
 
   @@map("audit_logs")
+}
+
+model EmployeeProfile {
+  id             String                  @id @default(cuid())
+  employeeId     String                  @unique
+  employee       Employee                @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  headline       String?
+  summary        String?                 @db.Text
+  publicSlug     String?                 @unique
+  isPublic       Boolean                 @default(true)
+  linkedinUrl    String?
+  websiteUrl     String?
+  githubUrl      String?
+  cvUrl          String?
+  cvFileName     String?
+  education      EmployeeEducation[]
+  experience     EmployeeWorkExperience[]
+  skills         EmployeeSkill[]
+  languages      EmployeeLanguage[]
+  certifications EmployeeCertification[]
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+
+  @@map("employee_profiles")
+}
+
+model EmployeeEducation {
+  id          String          @id @default(cuid())
+  profileId   String
+  profile     EmployeeProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  institution String
+  degree      String
+  field       String
+  startYear   Int
+  endYear     Int?
+  current     Boolean         @default(false)
+  description String?
+  createdAt   DateTime        @default(now())
+
+  @@map("employee_education")
+}
+
+model EmployeeWorkExperience {
+  id          String          @id @default(cuid())
+  profileId   String
+  profile     EmployeeProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  company     String
+  position    String
+  location    String?
+  startDate   DateTime
+  endDate     DateTime?
+  current     Boolean         @default(false)
+  description String?         @db.Text
+  createdAt   DateTime        @default(now())
+
+  @@map("employee_work_experience")
+}
+
+model EmployeeSkill {
+  id        String          @id @default(cuid())
+  profileId String
+  profile   EmployeeProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  name      String
+  level     Int             @default(3)
+  category  String          @default("Técnica")
+
+  @@map("employee_skills")
+}
+
+model EmployeeLanguage {
+  id        String          @id @default(cuid())
+  profileId String
+  profile   EmployeeProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  language  String
+  level     String
+
+  @@map("employee_languages")
+}
+
+model EmployeeCertification {
+  id            String          @id @default(cuid())
+  profileId     String
+  profile       EmployeeProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  name          String
+  issuer        String
+  issueYear     Int?
+  expiryYear    Int?
+  credentialUrl String?
+  createdAt     DateTime        @default(now())
+
+  @@map("employee_certifications")
 }
 
 model ChatSession {

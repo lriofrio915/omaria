@@ -21,6 +21,7 @@ const adminNav = [
   { label: "Nóminas", href: "/payroll", icon: DollarSign },
   { label: "Organigrama", href: "/organigram", icon: GitBranch },
   { label: "OmarIA", href: "/ai-agent", icon: MessageSquare },
+  { label: "Mi Perfil", href: "/profile", icon: UserCircle },
 ];
 
 const employeeNav = [

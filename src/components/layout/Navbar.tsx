@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { LogOut, User, Menu } from "lucide-react";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { toast } from "sonner";
@@ -18,10 +19,12 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 interface NavbarProps {
   email: string;
   role: string;
+  avatarUrl?: string | null;
   onMenuToggle?: () => void;
 }
 
 export function Navbar({ email, role, onMenuToggle }: NavbarProps) {
+  const profileHref = role === "ADMIN" ? "/profile" : "/employee/profile";
   const router = useRouter();
 
   async function handleLogout() {
@@ -73,9 +76,11 @@ export function Navbar({ email, role, onMenuToggle }: NavbarProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem className="gap-2 text-muted-foreground">
-              <User className="h-4 w-4" />
-              Mi perfil
+            <DropdownMenuItem asChild>
+              <Link href={profileHref} className="gap-2 cursor-pointer">
+                <User className="h-4 w-4" />
+                Mi perfil
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
