@@ -28,7 +28,7 @@ export async function GET() {
 
   try {
     const employee = await prisma.employee.findFirst({
-      where: { email: user.email },
+      where: { OR: [{ userId: user.id }, { email: user.email! }] },
       include: {
         department: {
           select: {
@@ -62,7 +62,7 @@ export async function PUT(request: Request) {
 
   try {
     const body = await request.json();
-    const employee = await prisma.employee.findFirst({ where: { email: user.email } });
+    const employee = await prisma.employee.findFirst({ where: { OR: [{ userId: user.id }, { email: user.email! }] } });
     if (!employee) return NextResponse.json({ error: "Empleado no encontrado" }, { status: 404 });
 
     // Upsert profile

@@ -2,16 +2,16 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma/client";
 
-async function getProfileId(userEmail: string): Promise<string | null> {
+async function getProfileId(userId: string, userEmail: string): Promise<string | null> {
   const emp = await prisma.employee.findFirst({
-    where: { email: userEmail },
+    where: { OR: [{ userId }, { email: userEmail }] },
     include: { profile: { select: { id: true } } },
   });
   return emp?.profile?.id ?? null;
 }
 
-async function ensureProfile(userEmail: string): Promise<string> {
-  const emp = await prisma.employee.findFirst({ where: { email: userEmail } });
+async function ensureProfile(userId: string, userEmail: string): Promise<string> {
+  const emp = await prisma.employee.findFirst({ where: { OR: [{ userId }, { email: userEmail }] } });
   if (!emp) throw new Error("Empleado no encontrado");
   const profile = await prisma.employeeProfile.upsert({
     where: { employeeId: emp.id },
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const profileId = await ensureProfile(user.email!);
+    const profileId = await ensureProfile(user.id, user.email!);
     const item = await prisma.employeeEducation.create({
       data: {
         profileId,
@@ -63,7 +63,7 @@ export async function DELETE(request: Request) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "ID requerido" }, { status: 400 });
-    const profileId = await getProfileId(user.email!);
+    const profileId = await getProfileId(user.id, user.email!);
     const item = await prisma.employeeEducation.findUnique({ where: { id } });
     if (!item || item.profileId !== profileId) {
       return NextResponse.json({ error: "No encontrado" }, { status: 404 });

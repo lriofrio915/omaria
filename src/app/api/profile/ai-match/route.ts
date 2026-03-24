@@ -13,7 +13,7 @@ export async function POST(request: Request) {
 
     // Get employee with full profile
     const employee = await prisma.employee.findFirst({
-      where: { email: user.email! },
+      where: { OR: [{ userId: user.id }, { email: user.email! }] },
       include: {
         position: { select: { title: true, description: true, purpose: true, responsibilities: true, education: true, experience: true, skills: true } },
         profile: {

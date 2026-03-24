@@ -11,7 +11,7 @@ export default async function EmployeeProfilePage() {
   if (!user) redirect("/login");
 
   const employee = await prisma.employee.findFirst({
-    where: { email: user.email! },
+    where: { OR: [{ userId: user.id }, { email: user.email! }] },
     include: {
       position: { select: { title: true } },
       department: {

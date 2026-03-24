@@ -43,7 +43,8 @@ export async function updateSession(request: NextRequest) {
     path.startsWith("/documents") ||
     path.startsWith("/payroll") ||
     path.startsWith("/organigram") ||
-    path.startsWith("/ai-agent");
+    path.startsWith("/ai-agent") ||
+    path.startsWith("/profile");
 
   // No autenticado → redirigir a login
   if (!user && (isDashboardRoute || isRoot)) {
