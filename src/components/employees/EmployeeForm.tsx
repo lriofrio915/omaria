@@ -273,7 +273,7 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
             <Input placeholder="Pérez López" {...register("lastName")} className="cursor-text" />
           </Field>
 
-          <Field label="Teléfono" hint="Formato: +593 9X XXX XXXX">
+          <Field label="WhatsApp">
             <Input
               placeholder="+593 99 651 7455"
               value={phoneValue}
@@ -317,7 +317,7 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
       <Section icon={ShieldCheck} title="Correos electrónicos">
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
-            label="Email del sistema (acceso)"
+            label="Email corporativo (acceso)"
             required
             error={errors.email?.message}
             hint="Este email es el usuario de login"
@@ -326,15 +326,6 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
               type="email"
               placeholder="jperez@sgconsultinggroup.com"
               {...register("email")}
-              className="cursor-text"
-            />
-          </Field>
-
-          <Field label="Email corporativo adicional" error={errors.corporateEmail?.message}>
-            <Input
-              type="email"
-              placeholder="juan.perez@empresa.com"
-              {...register("corporateEmail")}
               className="cursor-text"
             />
           </Field>
