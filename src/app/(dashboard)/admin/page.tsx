@@ -3,8 +3,6 @@ import {
   GitBranch,
   Briefcase,
   AlertTriangle,
-  FileUp,
-  ReceiptText,
   Sparkles,
   TrendingUp,
   CheckCircle2,
@@ -15,6 +13,7 @@ import { prisma } from "@/lib/prisma/client";
 import { cn } from "@/lib/utils";
 import { CompetencyRing } from "@/components/dashboard/CompetencyRing";
 import { DeptBarChart } from "@/components/dashboard/DeptBarChart";
+import { QuickActions } from "@/components/dashboard/QuickActions";
 import Link from "next/link";
 
 interface PageProps {
@@ -168,25 +167,6 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
         ? `${Math.round((stats.conBrecha / stats.totalColaboradores) * 100)}% del total`
         : null,
       badgeIcon: TrendingUp,
-    },
-  ];
-
-  const quickActions = [
-    {
-      label: "Subir documento",
-      description: "Manuales, políticas, contratos",
-      href: "/documents",
-      icon: FileUp,
-      color: "#1B52B5",
-      bg: "#1B52B5",
-    },
-    {
-      label: "Registrar nómina",
-      description: "Recibos y pagos del período",
-      href: "/payroll",
-      icon: ReceiptText,
-      color: "#7c3aed",
-      bg: "#7c3aed",
     },
   ];
 
@@ -384,35 +364,8 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
             <CardTitle className="text-sm font-semibold text-foreground">Acciones rápidas</CardTitle>
             <p className="text-xs text-muted-foreground">Tareas frecuentes de administración</p>
           </CardHeader>
-          <CardContent className="pb-5 space-y-3">
-            {quickActions.map((action) => {
-              const Icon = action.icon;
-              return (
-                <Link
-                  key={action.href}
-                  href={action.href}
-                  className="group flex items-center gap-3 rounded-xl p-3 transition-all hover:shadow-md"
-                  style={{
-                    background: `${action.bg}08`,
-                    border: `1px solid ${action.bg}20`,
-                  }}
-                >
-                  <div
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-105"
-                    style={{ backgroundColor: `${action.bg}18` }}
-                  >
-                    <Icon className="h-4 w-4" style={{ color: action.color }} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-foreground">{action.label}</p>
-                    <p className="text-xs text-muted-foreground truncate">{action.description}</p>
-                  </div>
-                  <span className="ml-auto text-muted-foreground text-xs group-hover:translate-x-0.5 transition-transform">
-                    →
-                  </span>
-                </Link>
-              );
-            })}
+          <CardContent className="pb-4">
+            <QuickActions />
           </CardContent>
         </Card>
 
