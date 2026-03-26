@@ -128,15 +128,17 @@ function Field({
   error,
   children,
   hint,
+  className,
 }: {
   label: string;
   required?: boolean;
   error?: string;
   children: React.ReactNode;
   hint?: string;
+  className?: string;
 }) {
   return (
-    <div className="space-y-1.5">
+    <div className={`space-y-1.5${className ? ` ${className}` : ""}`}>
       <Label className="text-xs font-medium text-foreground/80">
         {label}
         {required && <span className="text-red-500 ml-0.5">*</span>}
@@ -307,8 +309,8 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
             <Input placeholder="Quito" {...register("city")} className="cursor-text" />
           </Field>
 
-          <Field label="Dirección" >
-            <Input placeholder="Av. República del El Salvador N36-183..." {...register("address")} className="cursor-text sm:col-span-2" />
+          <Field label="Dirección" className="sm:col-span-2">
+            <Input placeholder="Av. República del El Salvador N36-183..." {...register("address")} className="cursor-text" />
           </Field>
         </div>
       </Section>
@@ -478,12 +480,12 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
           </Field>
 
           {/* Notas */}
-          <Field label="Notas / Observaciones">
+          <Field label="Notas / Observaciones" className="sm:col-span-2">
             <Textarea
               rows={3}
               placeholder="Información adicional relevante..."
               {...register("notes")}
-              className="cursor-text resize-none sm:col-span-2"
+              className="cursor-text resize-none"
             />
           </Field>
         </div>

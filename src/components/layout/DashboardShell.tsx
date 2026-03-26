@@ -14,7 +14,7 @@ export function DashboardShell({ email, role, children }: DashboardShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950">
+    <div className="flex h-screen overflow-hidden bg-muted/40 dark:bg-background">
       {/* Overlay backdrop on mobile */}
       {mobileOpen && (
         <div
