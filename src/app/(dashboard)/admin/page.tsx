@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma/client";
-import { CompanyGrid } from "@/components/companies/CompanyGrid";
+import { cn } from "@/lib/utils";
 import { CompetencyRing } from "@/components/dashboard/CompetencyRing";
 import { DeptBarChart } from "@/components/dashboard/DeptBarChart";
 import Link from "next/link";
@@ -207,82 +207,83 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
         )}
       </div>
 
-      {/* ── Empresas ── */}
-      <div className="space-y-3">
-        <div>
-          <h2 className="text-sm font-semibold text-foreground">Empresas del holding</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {companySlug
-              ? `Filtrando por ${selectedCompany?.name ?? companySlug} — haz clic para cambiar`
-              : "Selecciona una empresa para filtrar las métricas"}
-          </p>
-        </div>
-        <CompanyGrid
-          companies={companies}
-          hrefPrefix="/admin?company"
-          selectedSlug={companySlug}
-        />
-      </div>
-
-      {/* ── Stat cards ── */}
-      <div className="space-y-3">
-        {selectedCompany && (
-          <div className="flex items-center gap-2">
-            <span
-              className="inline-block h-2.5 w-2.5 rounded-full"
-              style={{ backgroundColor: primaryColor }}
-            />
-            <h2 className="text-sm font-semibold text-foreground">
-              {selectedCompany.name}
-            </h2>
-          </div>
-        )}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {statCards.map((stat) => {
-            const Icon = stat.icon;
-            const BadgeIcon = stat.badgeIcon;
+      {/* ── Selector de empresa (pills) ── */}
+      {companies.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs text-muted-foreground mr-1">Empresa:</span>
+          <Link
+            href="/admin"
+            className={cn(
+              "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-all border",
+              !companySlug
+                ? "bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white"
+                : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+            )}
+          >
+            Todo el holding
+          </Link>
+          {companies.map((company) => {
+            const isSelected = companySlug === company.slug;
             return (
-              <Card
-                key={stat.label}
-                className="relative overflow-hidden border-0 shadow-sm"
-                style={{ borderLeft: `4px solid ${stat.accentColor}` }}
+              <Link
+                key={company.id}
+                href={`/admin?company=${company.slug}`}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all border",
+                  isSelected
+                    ? "text-white border-transparent"
+                    : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+                )}
+                style={isSelected ? { backgroundColor: company.primaryColor, borderColor: company.primaryColor } : {}}
               >
-                {/* Subtle background glow */}
-                <div
-                  className="absolute inset-0 opacity-[0.04] pointer-events-none"
-                  style={{
-                    background: `radial-gradient(ellipse at top right, ${stat.bgColor}, transparent 70%)`,
-                  }}
+                <span
+                  className="h-1.5 w-1.5 rounded-full shrink-0"
+                  style={{ backgroundColor: isSelected ? "rgba(255,255,255,0.8)" : company.primaryColor }}
                 />
-                <CardHeader className="pb-1 pt-5 px-5">
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      {stat.label}
-                    </CardTitle>
-                    <div
-                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
-                      style={{ backgroundColor: `${stat.bgColor}18` }}
-                    >
-                      <Icon className="h-4 w-4" style={{ color: stat.accentColor }} />
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="px-5 pb-5">
-                  <p className="text-4xl font-bold tracking-tight text-foreground">{stat.value}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{stat.hint}</p>
-                  {stat.badge && BadgeIcon && (
-                    <div className="flex items-center gap-1 mt-3">
-                      <BadgeIcon className="h-3 w-3" style={{ color: stat.accentColor }} />
-                      <span className="text-xs font-medium" style={{ color: stat.accentColor }}>
-                        {stat.badge}
-                      </span>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                {company.name}
+              </Link>
             );
           })}
         </div>
+      )}
+
+      {/* ── Stat cards ── */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {statCards.map((stat) => {
+          const Icon = stat.icon;
+          const BadgeIcon = stat.badgeIcon;
+          return (
+            <div
+              key={stat.label}
+              className="relative overflow-hidden rounded-xl bg-card shadow-sm flex items-center gap-3 px-4 py-3.5"
+              style={{ borderLeft: `3px solid ${stat.accentColor}` }}
+            >
+              <div
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                style={{ backgroundColor: `${stat.bgColor}14` }}
+              >
+                <Icon className="h-4 w-4" style={{ color: stat.accentColor }} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-2xl font-bold tracking-tight text-foreground leading-none">
+                  {stat.value}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5 leading-tight">{stat.label}</p>
+              </div>
+              {stat.badge && BadgeIcon && (
+                <div
+                  className="shrink-0 flex items-center gap-1 rounded-full px-2 py-0.5"
+                  style={{ backgroundColor: `${stat.accentColor}12` }}
+                >
+                  <BadgeIcon className="h-2.5 w-2.5" style={{ color: stat.accentColor }} />
+                  <span className="text-[10px] font-semibold" style={{ color: stat.accentColor }}>
+                    {stat.badge}
+                  </span>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* ── Gráficos ── */}
