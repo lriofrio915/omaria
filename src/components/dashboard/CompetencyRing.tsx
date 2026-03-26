@@ -12,19 +12,19 @@ const LABELS = ["Sin brecha", "Con brecha"];
 
 function CustomTooltip({ active, payload }: {
   active?: boolean;
-  payload?: { name: string; value: number; payload: { name: string } }[];
+  payload?: { name: string; value: number }[];
 }) {
   if (!active || !payload?.length) return null;
   const entry = payload[0];
   const color = COLORS[LABELS.indexOf(entry.name)];
   return (
-    <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-lg">
+    <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 shadow-lg">
       <div className="flex items-center gap-2">
-        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
-        <span className="text-xs font-semibold text-slate-800">{entry.name}</span>
+        <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
+        <span className="text-xs font-semibold text-slate-800 dark:text-slate-100">{entry.name}</span>
       </div>
-      <p className="text-xs text-slate-500 mt-0.5 pl-3.5">
-        <span className="font-bold text-slate-900">{entry.value}</span> personas
+      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 pl-3.5">
+        <span className="font-bold text-slate-900 dark:text-white">{entry.value}</span> personas
       </p>
     </div>
   );
@@ -59,9 +59,9 @@ export function CompetencyRing({ sinBrecha, conBrecha }: CompetencyRingProps) {
               cy="50%"
               innerRadius={58}
               outerRadius={82}
-              strokeWidth={2}
-              stroke="#ffffff"
-              paddingAngle={3}
+              strokeWidth={3}
+              stroke="transparent"
+              paddingAngle={4}
               dataKey="value"
               startAngle={90}
               endAngle={-270}

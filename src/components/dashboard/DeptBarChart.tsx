@@ -10,6 +10,7 @@ import {
   Cell,
   LabelList,
 } from "recharts";
+import { useTheme } from "next-themes";
 
 interface DeptData {
   name: string;
@@ -33,18 +34,21 @@ function CustomTooltip({ active, payload, label }: {
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-lg">
-      <p className="text-xs font-semibold text-slate-800 mb-1">{label}</p>
+    <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 shadow-lg">
+      <p className="text-xs font-semibold text-slate-800 dark:text-slate-100 mb-1">{label}</p>
       <div className="flex items-center gap-2">
         <span className="h-2 w-2 rounded-full" style={{ backgroundColor: BAR_COLOR }} />
-        <span className="text-xs text-slate-500">Colaboradores:</span>
-        <span className="text-xs font-bold text-slate-900">{payload[0].value}</span>
+        <span className="text-xs text-slate-500 dark:text-slate-400">Colaboradores:</span>
+        <span className="text-xs font-bold text-slate-900 dark:text-white">{payload[0].value}</span>
       </div>
     </div>
   );
 }
 
 export function DeptBarChart({ data }: DeptBarChartProps) {
+  const { resolvedTheme } = useTheme();
+  const cursorFill = resolvedTheme === "dark" ? "rgba(255,255,255,0.05)" : "#f1f5f9";
+
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-[220px]">
@@ -76,14 +80,14 @@ export function DeptBarChart({ data }: DeptBarChartProps) {
           type="category"
           dataKey="name"
           width={130}
-          tick={{ fontSize: 11, fill: "#6b7280" }}
+          tick={{ fontSize: 11, fill: resolvedTheme === "dark" ? "#94a3b8" : "#6b7280" }}
           tickLine={false}
           axisLine={false}
           tickFormatter={(v) => truncate(v)}
         />
         <Tooltip
           content={<CustomTooltip />}
-          cursor={{ fill: "#f1f5f9", radius: 4 }}
+          cursor={{ fill: cursorFill, radius: 4 }}
         />
         <Bar dataKey="colaboradores" radius={[0, 5, 5, 0]} maxBarSize={14}>
           {data.map((_, i) => (
@@ -96,7 +100,11 @@ export function DeptBarChart({ data }: DeptBarChartProps) {
           <LabelList
             dataKey="colaboradores"
             position="right"
-            style={{ fontSize: 11, fontWeight: 600, fill: "#374151" }}
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              fill: resolvedTheme === "dark" ? "#cbd5e1" : "#374151",
+            }}
           />
         </Bar>
       </BarChart>

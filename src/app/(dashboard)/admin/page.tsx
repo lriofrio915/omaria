@@ -417,15 +417,19 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
         </Card>
 
         {/* OmarIA */}
-        <div
-          className="relative overflow-hidden rounded-xl p-5 flex flex-col justify-between min-h-[180px]"
-          style={{
-            background: "linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1B52B5 100%)",
-          }}
-        >
-          {/* Grid decorativo */}
+        <div className="relative overflow-hidden rounded-xl p-5 flex flex-col justify-between min-h-[180px] bg-gradient-to-br from-[#EEF4FF] via-[#DDE8FF] to-[#C5D8FF] dark:from-[#0f172a] dark:via-[#1e3a5f] dark:to-[#1B52B5]">
+
+          {/* Decoración: light mode — puntos azules sutiles */}
           <div
-            className="absolute inset-0 opacity-[0.06]"
+            className="absolute inset-0 opacity-[0.18] dark:hidden pointer-events-none"
+            style={{
+              backgroundImage: "radial-gradient(circle, #1B52B5 1px, transparent 1px)",
+              backgroundSize: "22px 22px",
+            }}
+          />
+          {/* Decoración: dark mode — grid blanco */}
+          <div
+            className="absolute inset-0 opacity-[0.06] hidden dark:block pointer-events-none"
             style={{
               backgroundImage:
                 "linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)",
@@ -435,25 +439,25 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
 
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15">
-                <Sparkles className="h-4 w-4 text-white" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1B52B5]/10 dark:bg-white/15">
+                <Sparkles className="h-4 w-4 text-[#1B52B5] dark:text-white" />
               </div>
               <div>
-                <p className="text-sm font-bold text-white">OmarIA</p>
-                <p className="text-xs text-white/60">Agente de RRHH</p>
+                <p className="text-sm font-bold text-[#1e3a5f] dark:text-white">OmarIA</p>
+                <p className="text-xs text-[#1B52B5]/60 dark:text-white/60">Agente de RRHH</p>
               </div>
             </div>
-            <p className="text-xs text-white/70 leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-white/70 leading-relaxed">
               Analiza brechas, consulta empleados, genera planes de desarrollo y responde preguntas de RRHH en segundos.
             </p>
           </div>
 
           <Link
             href="/ai-agent"
-            className="relative z-10 mt-4 inline-flex items-center gap-2 self-start rounded-lg bg-white/15 backdrop-blur-sm px-4 py-2 text-xs font-semibold text-white transition-all hover:bg-white/25 border border-white/20"
+            className="relative z-10 mt-4 inline-flex items-center gap-2 self-start rounded-lg px-4 py-2 text-xs font-semibold transition-all border bg-[#1B52B5]/10 text-[#1B52B5] border-[#1B52B5]/25 hover:bg-[#1B52B5]/18 dark:bg-white/15 dark:text-white dark:border-white/20 dark:hover:bg-white/25"
           >
             Abrir OmarIA
-            <span className="text-white/70">→</span>
+            <span className="opacity-60">→</span>
           </Link>
         </div>
       </div>
