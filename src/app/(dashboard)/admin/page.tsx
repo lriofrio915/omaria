@@ -85,6 +85,9 @@ async function getStats(companySlug?: string) {
       conBrecha,
       sinBrecha: totalColaboradores - conBrecha,
       activos: statusMap["ACTIVE"] ?? 0,
+      enLicencia: statusMap["ON_LEAVE"] ?? 0,
+      inactivos: statusMap["INACTIVE"] ?? 0,
+      terminados: statusMap["TERMINATED"] ?? 0,
       deptData,
     };
   } catch {
@@ -95,6 +98,9 @@ async function getStats(companySlug?: string) {
       conBrecha: 0,
       sinBrecha: 0,
       activos: 0,
+      enLicencia: 0,
+      inactivos: 0,
+      terminados: 0,
       deptData: [],
     };
   }
@@ -332,31 +338,43 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
       {/* ── Actividad + Acciones + OmarIA ── */}
       <div className="grid gap-4 md:grid-cols-3">
 
-        {/* Tasa de actividad */}
+        {/* Estado de colaboradores */}
         <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold text-foreground">Tasa de actividad</CardTitle>
-            <p className="text-xs text-muted-foreground">Colaboradores activos sobre el total</p>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-foreground">Estado de colaboradores</CardTitle>
+            <p className="text-xs text-muted-foreground">Distribución por situación laboral</p>
           </CardHeader>
-          <CardContent className="pb-5">
-            <div className="flex items-end gap-3 mb-4">
-              <span className="text-4xl font-bold tracking-tight text-foreground">{actividadPct}%</span>
-              <span className="text-sm text-muted-foreground mb-1">
-                {stats.activos} / {stats.totalColaboradores}
-              </span>
-            </div>
-            <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-700"
-                style={{
-                  width: `${actividadPct}%`,
-                  background: "linear-gradient(90deg, #1B52B5, #3b82f6)",
-                }}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              {stats.totalColaboradores - stats.activos} inactivos o con licencia
-            </p>
+          <CardContent className="pb-5 space-y-3">
+            {[
+              { label: "Activos", value: stats.activos, color: "#10b981", bg: "#10b98118" },
+              { label: "En licencia", value: stats.enLicencia, color: "#3b82f6", bg: "#3b82f618" },
+              { label: "Inactivos", value: stats.inactivos, color: "#94a3b8", bg: "#94a3b818" },
+              { label: "Terminados", value: stats.terminados, color: "#f43f5e", bg: "#f43f5e18" },
+            ].map((s) => {
+              const pct = stats.totalColaboradores > 0
+                ? Math.round((s.value / stats.totalColaboradores) * 100)
+                : 0;
+              return (
+                <div key={s.label}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: s.color }} />
+                      <span className="text-xs text-muted-foreground">{s.label}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-foreground">{s.value}</span>
+                      <span className="text-[10px] text-muted-foreground w-7 text-right">{pct}%</span>
+                    </div>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full overflow-hidden" style={{ backgroundColor: s.bg }}>
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${pct}%`, backgroundColor: s.color }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </CardContent>
         </Card>
 

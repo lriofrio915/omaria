@@ -8,6 +8,27 @@ interface CompetencyRingProps {
 }
 
 const COLORS = ["#10b981", "#f59e0b"];
+const LABELS = ["Sin brecha", "Con brecha"];
+
+function CustomTooltip({ active, payload }: {
+  active?: boolean;
+  payload?: { name: string; value: number; payload: { name: string } }[];
+}) {
+  if (!active || !payload?.length) return null;
+  const entry = payload[0];
+  const color = COLORS[LABELS.indexOf(entry.name)];
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-lg">
+      <div className="flex items-center gap-2">
+        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
+        <span className="text-xs font-semibold text-slate-800">{entry.name}</span>
+      </div>
+      <p className="text-xs text-slate-500 mt-0.5 pl-3.5">
+        <span className="font-bold text-slate-900">{entry.value}</span> personas
+      </p>
+    </div>
+  );
+}
 
 export function CompetencyRing({ sinBrecha, conBrecha }: CompetencyRingProps) {
   const total = sinBrecha + conBrecha;
@@ -29,16 +50,18 @@ export function CompetencyRing({ sinBrecha, conBrecha }: CompetencyRingProps) {
 
   return (
     <div className="space-y-4">
-      <div className="relative h-[200px]">
+      <div className="relative h-[190px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={data}
               cx="50%"
               cy="50%"
-              innerRadius={62}
-              outerRadius={88}
-              strokeWidth={0}
+              innerRadius={58}
+              outerRadius={82}
+              strokeWidth={2}
+              stroke="#ffffff"
+              paddingAngle={3}
               dataKey="value"
               startAngle={90}
               endAngle={-270}
@@ -47,16 +70,7 @@ export function CompetencyRing({ sinBrecha, conBrecha }: CompetencyRingProps) {
                 <Cell key={i} fill={COLORS[i]} />
               ))}
             </Pie>
-            <Tooltip
-              formatter={(v, n) => [`${v} personas`, n]}
-              contentStyle={{
-                borderRadius: 8,
-                border: "1px solid hsl(var(--border))",
-                fontSize: 12,
-                background: "hsl(var(--card))",
-                color: "hsl(var(--foreground))",
-              }}
-            />
+            <Tooltip content={<CustomTooltip />} />
           </PieChart>
         </ResponsiveContainer>
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
@@ -65,13 +79,17 @@ export function CompetencyRing({ sinBrecha, conBrecha }: CompetencyRingProps) {
         </div>
       </div>
 
-      <div className="flex items-center justify-center gap-5">
+      <div className="flex items-center justify-center gap-6">
         {data.map((entry, i) => (
-          <div key={entry.name} className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: COLORS[i] }} />
-            <span className="text-xs text-muted-foreground">
-              {entry.name} <span className="font-semibold text-foreground">{entry.value}</span>
-            </span>
+          <div key={entry.name} className="flex items-center gap-2">
+            <span
+              className="h-2.5 w-2.5 rounded-full shrink-0"
+              style={{ backgroundColor: COLORS[i] }}
+            />
+            <div className="text-xs leading-tight">
+              <span className="font-semibold text-foreground">{entry.value}</span>
+              <span className="text-muted-foreground ml-1">{entry.name}</span>
+            </div>
           </div>
         ))}
       </div>
