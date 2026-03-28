@@ -273,7 +273,7 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
       </div>
 
       {/* ── Gráficos ── */}
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3">
 
         {/* Colaboradores por departamento */}
         <Card className="lg:col-span-2 border-0 shadow-sm">
@@ -316,7 +316,7 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
       </div>
 
       {/* ── Actividad + Acciones + OmarIA ── */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 
         {/* Estado de colaboradores */}
         <Card className="border-0 shadow-sm">
@@ -369,49 +369,85 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
           </CardContent>
         </Card>
 
-        {/* OmarIA */}
-        <div className="relative overflow-hidden rounded-xl p-5 flex flex-col justify-between min-h-[180px] bg-gradient-to-br from-[#EEF4FF] via-[#DDE8FF] to-[#C5D8FF] dark:from-[#0f172a] dark:via-[#1e3a5f] dark:to-[#1B52B5]">
-
-          {/* Decoración: light mode — puntos azules sutiles */}
+        {/* OmarIA — rediseñado */}
+        <div className="relative overflow-hidden rounded-xl sm:col-span-2 lg:col-span-1 bg-gradient-to-br from-[#EEF4FF] via-[#DDE8FF] to-[#C5D8FF] dark:from-[#0f172a] dark:via-[#1e3a5f] dark:to-[#1B52B5]">
+          {/* Decoración dots */}
           <div
-            className="absolute inset-0 opacity-[0.18] dark:hidden pointer-events-none"
+            className="absolute inset-0 opacity-[0.15] dark:hidden pointer-events-none"
             style={{
               backgroundImage: "radial-gradient(circle, #1B52B5 1px, transparent 1px)",
-              backgroundSize: "22px 22px",
+              backgroundSize: "20px 20px",
             }}
           />
-          {/* Decoración: dark mode — grid blanco */}
           <div
-            className="absolute inset-0 opacity-[0.06] hidden dark:block pointer-events-none"
+            className="absolute inset-0 opacity-[0.05] hidden dark:block pointer-events-none"
             style={{
               backgroundImage:
                 "linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)",
-              backgroundSize: "28px 28px",
+              backgroundSize: "24px 24px",
             }}
           />
 
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1B52B5]/10 dark:bg-white/15">
-                <Sparkles className="h-4 w-4 text-[#1B52B5] dark:text-white" />
+          <div className="relative z-10 flex flex-col h-full p-5 gap-4">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1B52B5]/15 dark:bg-white/15">
+                  <Sparkles className="h-4.5 w-4.5 text-[#1B52B5] dark:text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-[#1e3a5f] dark:text-white leading-none">OmarIA</p>
+                  <p className="text-[11px] text-[#1B52B5]/60 dark:text-white/50 mt-0.5">Agente de RRHH · IA</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-bold text-[#1e3a5f] dark:text-white">OmarIA</p>
-                <p className="text-xs text-[#1B52B5]/60 dark:text-white/60">Agente de RRHH</p>
+              <span className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                En línea
+              </span>
+            </div>
+
+            {/* Mini stats */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="rounded-lg bg-white/50 dark:bg-white/8 px-3 py-2 text-center">
+                <p className="text-lg font-bold text-[#1B52B5] dark:text-white leading-none">{stats.totalColaboradores}</p>
+                <p className="text-[10px] text-[#1B52B5]/60 dark:text-white/50 mt-0.5">colaboradores</p>
+              </div>
+              <div className="rounded-lg bg-white/50 dark:bg-white/8 px-3 py-2 text-center">
+                <p className="text-lg font-bold text-amber-600 dark:text-amber-400 leading-none">{stats.conBrecha}</p>
+                <p className="text-[10px] text-[#1B52B5]/60 dark:text-white/50 mt-0.5">con brechas</p>
               </div>
             </div>
-            <p className="text-xs text-slate-600 dark:text-white/70 leading-relaxed">
-              Analiza brechas, consulta empleados, genera planes de desarrollo y responde preguntas de RRHH en segundos.
-            </p>
-          </div>
 
-          <Link
-            href="/ai-agent"
-            className="relative z-10 mt-4 inline-flex items-center gap-2 self-start rounded-lg px-4 py-2 text-xs font-semibold transition-all border bg-[#1B52B5]/10 text-[#1B52B5] border-[#1B52B5]/25 hover:bg-[#1B52B5]/18 dark:bg-white/15 dark:text-white dark:border-white/20 dark:hover:bg-white/25"
-          >
-            Abrir OmarIA
-            <span className="opacity-60">→</span>
-          </Link>
+            {/* Preguntas sugeridas */}
+            <div className="flex flex-col gap-1.5">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#1B52B5]/50 dark:text-white/40">
+                Preguntas frecuentes
+              </p>
+              {[
+                { label: "Analizar brechas de equipo", q: "¿Cuáles son los empleados con más brechas de competencias?" },
+                { label: "Resumen del holding", q: "Resume el estado actual del talento humano" },
+                { label: "Plan de desarrollo", q: "Sugiere un plan de desarrollo para cubrir brechas críticas" },
+              ].map(({ label, q }) => (
+                <Link
+                  key={label}
+                  href={`/ai-agent?q=${encodeURIComponent(q)}`}
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-[#1e3a5f] dark:text-white/80 bg-white/40 dark:bg-white/8 hover:bg-white/70 dark:hover:bg-white/15 transition-colors"
+                >
+                  <span className="h-1 w-1 rounded-full bg-[#1B52B5]/40 dark:bg-white/40 shrink-0" />
+                  {label}
+                </Link>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <Link
+              href="/ai-agent"
+              className="mt-auto flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all bg-[#1B52B5] text-white hover:bg-[#1B52B5]/90 dark:bg-white/20 dark:text-white dark:hover:bg-white/30 shadow-sm"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              Abrir OmarIA
+            </Link>
+          </div>
         </div>
       </div>
     </div>
