@@ -370,7 +370,7 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
         </Card>
 
         {/* OmarIA — rediseñado */}
-        <div className="relative overflow-hidden rounded-xl sm:col-span-2 lg:col-span-1 bg-gradient-to-br from-[#EEF4FF] via-[#DDE8FF] to-[#C5D8FF] dark:from-[#0f172a] dark:via-[#1e3a5f] dark:to-[#1B52B5]">
+        <div className="relative overflow-hidden rounded-xl sm:col-span-2 lg:col-span-1 bg-gradient-to-br from-[#EEF4FF] via-[#DDE8FF] to-[#C5D8FF] dark:from-[#0f172a] dark:via-[#1e3a5f] dark:to-[#1B52B5] p-5">
           {/* Decoración dots */}
           <div
             className="absolute inset-0 opacity-[0.15] dark:hidden pointer-events-none"
@@ -388,12 +388,12 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
             }}
           />
 
-          <div className="relative z-10 flex flex-col h-full p-5 gap-4">
+          <div className="relative z-10 flex flex-col gap-3">
             {/* Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1B52B5]/15 dark:bg-white/15">
-                  <Sparkles className="h-4.5 w-4.5 text-[#1B52B5] dark:text-white" />
+                  <Sparkles className="h-4 w-4 text-[#1B52B5] dark:text-white" />
                 </div>
                 <div>
                   <p className="text-sm font-bold text-[#1e3a5f] dark:text-white leading-none">OmarIA</p>
@@ -408,11 +408,11 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
 
             {/* Mini stats */}
             <div className="grid grid-cols-2 gap-2">
-              <div className="rounded-lg bg-white/50 dark:bg-white/8 px-3 py-2 text-center">
+              <div className="rounded-lg bg-white/50 dark:bg-white/10 px-3 py-2 text-center">
                 <p className="text-lg font-bold text-[#1B52B5] dark:text-white leading-none">{stats.totalColaboradores}</p>
                 <p className="text-[10px] text-[#1B52B5]/60 dark:text-white/50 mt-0.5">colaboradores</p>
               </div>
-              <div className="rounded-lg bg-white/50 dark:bg-white/8 px-3 py-2 text-center">
+              <div className="rounded-lg bg-white/50 dark:bg-white/10 px-3 py-2 text-center">
                 <p className="text-lg font-bold text-amber-600 dark:text-amber-400 leading-none">{stats.conBrecha}</p>
                 <p className="text-[10px] text-[#1B52B5]/60 dark:text-white/50 mt-0.5">con brechas</p>
               </div>
@@ -426,12 +426,11 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
               {[
                 { label: "Analizar brechas de equipo", q: "¿Cuáles son los empleados con más brechas de competencias?" },
                 { label: "Resumen del holding", q: "Resume el estado actual del talento humano" },
-                { label: "Plan de desarrollo", q: "Sugiere un plan de desarrollo para cubrir brechas críticas" },
               ].map(({ label, q }) => (
                 <Link
                   key={label}
                   href={`/ai-agent?q=${encodeURIComponent(q)}`}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-[#1e3a5f] dark:text-white/80 bg-white/40 dark:bg-white/8 hover:bg-white/70 dark:hover:bg-white/15 transition-colors"
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-[#1e3a5f] dark:text-white/80 bg-white/40 dark:bg-white/10 hover:bg-white/70 dark:hover:bg-white/20 transition-colors"
                 >
                   <span className="h-1 w-1 rounded-full bg-[#1B52B5]/40 dark:bg-white/40 shrink-0" />
                   {label}
@@ -442,7 +441,7 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
             {/* CTA */}
             <Link
               href="/ai-agent"
-              className="mt-auto flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all bg-[#1B52B5] text-white hover:bg-[#1B52B5]/90 dark:bg-white/20 dark:text-white dark:hover:bg-white/30 shadow-sm"
+              className="flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all bg-[#1B52B5] text-white hover:bg-[#1B52B5]/90 dark:bg-white/20 dark:text-white dark:hover:bg-white/30 shadow-sm"
             >
               <Sparkles className="h-3.5 w-3.5" />
               Abrir OmarIA
