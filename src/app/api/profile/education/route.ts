@@ -54,6 +54,38 @@ export async function POST(request: Request) {
   }
 }
 
+export async function PUT(request: Request) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    if (!id) return NextResponse.json({ error: "ID requerido" }, { status: 400 });
+    const profileId = await getProfileId(user.id, user.email!);
+    const existing = await prisma.employeeEducation.findUnique({ where: { id } });
+    if (!existing || existing.profileId !== profileId)
+      return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+    const body = await request.json();
+    const item = await prisma.employeeEducation.update({
+      where: { id },
+      data: {
+        institution: body.institution,
+        degree: body.degree,
+        field: body.field,
+        startYear: Number(body.startYear),
+        endYear: body.current ? null : (body.endYear ? Number(body.endYear) : null),
+        current: body.current ?? false,
+        description: body.description ?? null,
+      },
+    });
+    return NextResponse.json(item);
+  } catch {
+    return NextResponse.json({ error: "Error al actualizar formación" }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

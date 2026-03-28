@@ -169,6 +169,13 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
   const [langDialog, setLangDialog] = useState(false);
   const [certDialog, setCertDialog] = useState(false);
 
+  // Editing items
+  const [editingEdu, setEditingEdu] = useState<Education | null>(null);
+  const [editingExp, setEditingExp] = useState<Experience | null>(null);
+  const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
+  const [editingLang, setEditingLang] = useState<Language | null>(null);
+  const [editingCert, setEditingCert] = useState<Certification | null>(null);
+
   const supabase = createClient();
 
   // ── Load fresh data ──────────────────────────────────────────────────────────
@@ -475,15 +482,17 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
             ) : (
               <div className="divide-y divide-slate-100 dark:divide-slate-800">
                 {currentProfile!.education.map(edu => (
-                  <EduItem key={edu.id} item={edu} onDelete={async () => {
-                    await fetch(`/api/profile/education?id=${edu.id}`, { method: "DELETE" });
-                    toast.success("Eliminado"); await reload();
-                  }} />
+                  <EduItem key={edu.id} item={edu}
+                    onEdit={() => { setEditingEdu(edu); setEduDialog(true); }}
+                    onDelete={async () => {
+                      await fetch(`/api/profile/education?id=${edu.id}`, { method: "DELETE" });
+                      toast.success("Eliminado"); await reload();
+                    }} />
                 ))}
               </div>
             )}
           </SectionCard>
-          <EduDialog open={eduDialog} onClose={() => setEduDialog(false)} onSaved={async () => { setEduDialog(false); await reload(); }} />
+          <EduDialog open={eduDialog} editItem={editingEdu} onClose={() => { setEduDialog(false); setEditingEdu(null); }} onSaved={async () => { setEduDialog(false); setEditingEdu(null); await reload(); }} />
         </TabsContent>
 
         {/* Experience */}
@@ -498,15 +507,17 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
             ) : (
               <div className="divide-y divide-slate-100 dark:divide-slate-800">
                 {currentProfile!.experience.map(exp => (
-                  <ExpItem key={exp.id} item={exp} onDelete={async () => {
-                    await fetch(`/api/profile/experience?id=${exp.id}`, { method: "DELETE" });
-                    toast.success("Eliminado"); await reload();
-                  }} />
+                  <ExpItem key={exp.id} item={exp}
+                    onEdit={() => { setEditingExp(exp); setExpDialog(true); }}
+                    onDelete={async () => {
+                      await fetch(`/api/profile/experience?id=${exp.id}`, { method: "DELETE" });
+                      toast.success("Eliminado"); await reload();
+                    }} />
                 ))}
               </div>
             )}
           </SectionCard>
-          <ExpDialog open={expDialog} onClose={() => setExpDialog(false)} onSaved={async () => { setExpDialog(false); await reload(); }} />
+          <ExpDialog open={expDialog} editItem={editingExp} onClose={() => { setExpDialog(false); setEditingExp(null); }} onSaved={async () => { setExpDialog(false); setEditingExp(null); await reload(); }} />
         </TabsContent>
 
         {/* Skills */}
@@ -521,15 +532,17 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
             ) : (
               <div className="flex flex-wrap gap-2 p-4">
                 {currentProfile!.skills.map(skill => (
-                  <SkillBadge key={skill.id} skill={skill} onDelete={async () => {
-                    await fetch(`/api/profile/skills?id=${skill.id}`, { method: "DELETE" });
-                    toast.success("Eliminado"); await reload();
-                  }} />
+                  <SkillBadge key={skill.id} skill={skill}
+                    onEdit={() => { setEditingSkill(skill); setSkillDialog(true); }}
+                    onDelete={async () => {
+                      await fetch(`/api/profile/skills?id=${skill.id}`, { method: "DELETE" });
+                      toast.success("Eliminado"); await reload();
+                    }} />
                 ))}
               </div>
             )}
           </SectionCard>
-          <SkillDialog open={skillDialog} onClose={() => setSkillDialog(false)} onSaved={async () => { setSkillDialog(false); await reload(); }} />
+          <SkillDialog open={skillDialog} editItem={editingSkill} onClose={() => { setSkillDialog(false); setEditingSkill(null); }} onSaved={async () => { setSkillDialog(false); setEditingSkill(null); await reload(); }} />
         </TabsContent>
 
         {/* Languages */}
@@ -544,15 +557,17 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
             ) : (
               <div className="divide-y divide-slate-100 dark:divide-slate-800">
                 {currentProfile!.languages.map(lang => (
-                  <LangItem key={lang.id} item={lang} onDelete={async () => {
-                    await fetch(`/api/profile/languages?id=${lang.id}`, { method: "DELETE" });
-                    toast.success("Eliminado"); await reload();
-                  }} />
+                  <LangItem key={lang.id} item={lang}
+                    onEdit={() => { setEditingLang(lang); setLangDialog(true); }}
+                    onDelete={async () => {
+                      await fetch(`/api/profile/languages?id=${lang.id}`, { method: "DELETE" });
+                      toast.success("Eliminado"); await reload();
+                    }} />
                 ))}
               </div>
             )}
           </SectionCard>
-          <LangDialog open={langDialog} onClose={() => setLangDialog(false)} onSaved={async () => { setLangDialog(false); await reload(); }} />
+          <LangDialog open={langDialog} editItem={editingLang} onClose={() => { setLangDialog(false); setEditingLang(null); }} onSaved={async () => { setLangDialog(false); setEditingLang(null); await reload(); }} />
         </TabsContent>
 
         {/* Certifications */}
@@ -567,15 +582,17 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
             ) : (
               <div className="divide-y divide-slate-100 dark:divide-slate-800">
                 {currentProfile!.certifications.map(cert => (
-                  <CertItem key={cert.id} item={cert} onDelete={async () => {
-                    await fetch(`/api/profile/certifications?id=${cert.id}`, { method: "DELETE" });
-                    toast.success("Eliminado"); await reload();
-                  }} />
+                  <CertItem key={cert.id} item={cert}
+                    onEdit={() => { setEditingCert(cert); setCertDialog(true); }}
+                    onDelete={async () => {
+                      await fetch(`/api/profile/certifications?id=${cert.id}`, { method: "DELETE" });
+                      toast.success("Eliminado"); await reload();
+                    }} />
                 ))}
               </div>
             )}
           </SectionCard>
-          <CertDialog open={certDialog} onClose={() => setCertDialog(false)} onSaved={async () => { setCertDialog(false); await reload(); }} />
+          <CertDialog open={certDialog} editItem={editingCert} onClose={() => { setCertDialog(false); setEditingCert(null); }} onSaved={async () => { setCertDialog(false); setEditingCert(null); await reload(); }} />
         </TabsContent>
       </Tabs>
 
@@ -671,7 +688,7 @@ function EmptyState({ label }: { label: string }) {
 
 // ─── Education ────────────────────────────────────────────────────────────────
 
-function EduItem({ item, onDelete }: { item: Education; onDelete: () => void }) {
+function EduItem({ item, onDelete, onEdit }: { item: Education; onDelete: () => void; onEdit: () => void }) {
   return (
     <div className="flex items-start justify-between gap-3 px-5 py-4 group hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
       <div className="flex items-start gap-3 min-w-0">
@@ -687,40 +704,60 @@ function EduItem({ item, onDelete }: { item: Education; onDelete: () => void }) 
           {item.description && <p className="text-xs text-slate-500 mt-1">{item.description}</p>}
         </div>
       </div>
-      <button
-        onClick={onDelete}
-        className="opacity-0 group-hover:opacity-100 shrink-0 text-slate-400 hover:text-red-500 cursor-pointer transition-all"
-        title="Eliminar"
-      >
-        <Trash2 className="h-4 w-4" />
-      </button>
+      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 shrink-0 transition-all">
+        <button onClick={onEdit} className="text-slate-400 hover:text-blue-500 cursor-pointer" title="Editar">
+          <Edit2 className="h-4 w-4" />
+        </button>
+        <button onClick={onDelete} className="text-slate-400 hover:text-red-500 cursor-pointer" title="Eliminar">
+          <Trash2 className="h-4 w-4" />
+        </button>
+      </div>
     </div>
   );
 }
 
-function EduDialog({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => void }) {
+function EduDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClose: () => void; onSaved: () => void; editItem?: Education | null }) {
   const [form, setForm] = useState({ institution: "", degree: "", field: "", startYear: "", endYear: "", current: false, description: "" });
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (editItem) {
+      setForm({
+        institution: editItem.institution,
+        degree: editItem.degree,
+        field: editItem.field,
+        startYear: String(editItem.startYear),
+        endYear: editItem.endYear ? String(editItem.endYear) : "",
+        current: editItem.current,
+        description: editItem.description ?? "",
+      });
+    } else {
+      setForm({ institution: "", degree: "", field: "", startYear: "", endYear: "", current: false, description: "" });
+    }
+  }, [editItem, open]);
 
   async function submit() {
     if (!form.institution || !form.degree || !form.field || !form.startYear) {
       toast.error("Completa los campos requeridos"); return;
     }
     setSaving(true);
-    const res = await fetch("/api/profile/education", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    const res = await fetch(
+      editItem ? `/api/profile/education?id=${editItem.id}` : "/api/profile/education",
+      {
+        method: editItem ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      }
+    );
     setSaving(false);
-    if (res.ok) { toast.success("Formación añadida"); onSaved(); }
+    if (res.ok) { toast.success(editItem ? "Formación actualizada" : "Formación añadida"); onSaved(); }
     else toast.error("Error al guardar");
   }
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
       <DialogContent className="sm:max-w-lg">
-        <DialogHeader><DialogTitle>Añadir formación académica</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{editItem ? "Editar formación académica" : "Añadir formación académica"}</DialogTitle></DialogHeader>
         <div className="space-y-3 py-2">
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-2">
@@ -767,7 +804,7 @@ function EduDialog({ open, onClose, onSaved }: { open: boolean; onClose: () => v
 
 // ─── Experience ───────────────────────────────────────────────────────────────
 
-function ExpItem({ item, onDelete }: { item: Experience; onDelete: () => void }) {
+function ExpItem({ item, onDelete, onEdit }: { item: Experience; onDelete: () => void; onEdit: () => void }) {
   return (
     <div className="flex items-start justify-between gap-3 px-5 py-4 group hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
       <div className="flex items-start gap-3 min-w-0">
@@ -783,40 +820,60 @@ function ExpItem({ item, onDelete }: { item: Experience; onDelete: () => void })
           {item.description && <p className="text-xs text-slate-500 mt-1 line-clamp-2">{item.description}</p>}
         </div>
       </div>
-      <button
-        onClick={onDelete}
-        className="opacity-0 group-hover:opacity-100 shrink-0 text-slate-400 hover:text-red-500 cursor-pointer transition-all"
-        title="Eliminar"
-      >
-        <Trash2 className="h-4 w-4" />
-      </button>
+      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 shrink-0 transition-all">
+        <button onClick={onEdit} className="text-slate-400 hover:text-blue-500 cursor-pointer" title="Editar">
+          <Edit2 className="h-4 w-4" />
+        </button>
+        <button onClick={onDelete} className="text-slate-400 hover:text-red-500 cursor-pointer" title="Eliminar">
+          <Trash2 className="h-4 w-4" />
+        </button>
+      </div>
     </div>
   );
 }
 
-function ExpDialog({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => void }) {
+function ExpDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClose: () => void; onSaved: () => void; editItem?: Experience | null }) {
   const [form, setForm] = useState({ company: "", position: "", location: "", startDate: "", endDate: "", current: false, description: "" });
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (editItem) {
+      setForm({
+        company: editItem.company,
+        position: editItem.position,
+        location: editItem.location ?? "",
+        startDate: editItem.startDate.slice(0, 10),
+        endDate: editItem.endDate ? editItem.endDate.slice(0, 10) : "",
+        current: editItem.current,
+        description: editItem.description ?? "",
+      });
+    } else {
+      setForm({ company: "", position: "", location: "", startDate: "", endDate: "", current: false, description: "" });
+    }
+  }, [editItem, open]);
 
   async function submit() {
     if (!form.company || !form.position || !form.startDate) {
       toast.error("Completa los campos requeridos"); return;
     }
     setSaving(true);
-    const res = await fetch("/api/profile/experience", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    const res = await fetch(
+      editItem ? `/api/profile/experience?id=${editItem.id}` : "/api/profile/experience",
+      {
+        method: editItem ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      }
+    );
     setSaving(false);
-    if (res.ok) { toast.success("Experiencia añadida"); onSaved(); }
+    if (res.ok) { toast.success(editItem ? "Experiencia actualizada" : "Experiencia añadida"); onSaved(); }
     else toast.error("Error al guardar");
   }
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
       <DialogContent className="sm:max-w-lg">
-        <DialogHeader><DialogTitle>Añadir experiencia laboral</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{editItem ? "Editar experiencia laboral" : "Añadir experiencia laboral"}</DialogTitle></DialogHeader>
         <div className="space-y-3 py-2">
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -864,40 +921,54 @@ function ExpDialog({ open, onClose, onSaved }: { open: boolean; onClose: () => v
 
 // ─── Skills ───────────────────────────────────────────────────────────────────
 
-function SkillBadge({ skill, onDelete }: { skill: Skill; onDelete: () => void }) {
+function SkillBadge({ skill, onDelete, onEdit }: { skill: Skill; onDelete: () => void; onEdit: () => void }) {
   const levelColor = ["", "bg-slate-100 text-slate-600", "bg-green-50 text-green-700", "bg-blue-50 text-blue-700", "bg-indigo-50 text-indigo-700", "bg-purple-50 text-purple-700"];
   return (
     <div className={`group flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium ${levelColor[skill.level] ?? levelColor[3]} dark:bg-slate-800 dark:text-slate-300`}>
       {skill.name}
       <span className="text-[10px] opacity-60">· {SKILL_LEVELS[skill.level]}</span>
-      <button onClick={onDelete} className="opacity-0 group-hover:opacity-100 ml-0.5 text-current hover:text-red-500 cursor-pointer transition-all">
+      <button onClick={onEdit} className="opacity-0 group-hover:opacity-100 ml-0.5 text-current hover:text-blue-500 cursor-pointer transition-all" title="Editar">
+        <Edit2 className="h-3 w-3" />
+      </button>
+      <button onClick={onDelete} className="opacity-0 group-hover:opacity-100 text-current hover:text-red-500 cursor-pointer transition-all" title="Eliminar">
         <X className="h-3 w-3" />
       </button>
     </div>
   );
 }
 
-function SkillDialog({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => void }) {
+function SkillDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClose: () => void; onSaved: () => void; editItem?: Skill | null }) {
   const [form, setForm] = useState({ name: "", level: "3", category: "Técnica" });
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (editItem) {
+      setForm({ name: editItem.name, level: String(editItem.level), category: editItem.category });
+    } else {
+      setForm({ name: "", level: "3", category: "Técnica" });
+    }
+  }, [editItem, open]);
 
   async function submit() {
     if (!form.name) { toast.error("Ingresa el nombre de la habilidad"); return; }
     setSaving(true);
-    const res = await fetch("/api/profile/skills", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    const res = await fetch(
+      editItem ? `/api/profile/skills?id=${editItem.id}` : "/api/profile/skills",
+      {
+        method: editItem ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      }
+    );
     setSaving(false);
-    if (res.ok) { toast.success("Habilidad añadida"); onSaved(); }
+    if (res.ok) { toast.success(editItem ? "Habilidad actualizada" : "Habilidad añadida"); onSaved(); }
     else toast.error("Error al guardar");
   }
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
       <DialogContent className="sm:max-w-sm">
-        <DialogHeader><DialogTitle>Añadir habilidad</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{editItem ? "Editar habilidad" : "Añadir habilidad"}</DialogTitle></DialogHeader>
         <div className="space-y-3 py-2">
           <div>
             <label className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1 block">Habilidad *</label>
@@ -944,7 +1015,7 @@ const LANG_LEVEL_COLORS: Record<string, string> = {
   Nativo: "bg-amber-100 text-amber-700",
 };
 
-function LangItem({ item, onDelete }: { item: Language; onDelete: () => void }) {
+function LangItem({ item, onDelete, onEdit }: { item: Language; onDelete: () => void; onEdit: () => void }) {
   return (
     <div className="flex items-center justify-between gap-3 px-5 py-3 group hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
       <div className="flex items-center gap-3">
@@ -954,37 +1025,50 @@ function LangItem({ item, onDelete }: { item: Language; onDelete: () => void }) 
           {item.level}
         </Badge>
       </div>
-      <button
-        onClick={onDelete}
-        className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 cursor-pointer transition-all"
-      >
-        <Trash2 className="h-4 w-4" />
-      </button>
+      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+        <button onClick={onEdit} className="text-slate-400 hover:text-blue-500 cursor-pointer" title="Editar">
+          <Edit2 className="h-4 w-4" />
+        </button>
+        <button onClick={onDelete} className="text-slate-400 hover:text-red-500 cursor-pointer" title="Eliminar">
+          <Trash2 className="h-4 w-4" />
+        </button>
+      </div>
     </div>
   );
 }
 
-function LangDialog({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => void }) {
+function LangDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClose: () => void; onSaved: () => void; editItem?: Language | null }) {
   const [form, setForm] = useState({ language: "", level: "B1" });
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (editItem) {
+      setForm({ language: editItem.language, level: editItem.level });
+    } else {
+      setForm({ language: "", level: "B1" });
+    }
+  }, [editItem, open]);
 
   async function submit() {
     if (!form.language) { toast.error("Ingresa el idioma"); return; }
     setSaving(true);
-    const res = await fetch("/api/profile/languages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    const res = await fetch(
+      editItem ? `/api/profile/languages?id=${editItem.id}` : "/api/profile/languages",
+      {
+        method: editItem ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      }
+    );
     setSaving(false);
-    if (res.ok) { toast.success("Idioma añadido"); onSaved(); }
+    if (res.ok) { toast.success(editItem ? "Idioma actualizado" : "Idioma añadido"); onSaved(); }
     else toast.error("Error al guardar");
   }
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
       <DialogContent className="sm:max-w-sm">
-        <DialogHeader><DialogTitle>Añadir idioma</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{editItem ? "Editar idioma" : "Añadir idioma"}</DialogTitle></DialogHeader>
         <div className="space-y-3 py-2">
           <div>
             <label className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1 block">Idioma *</label>
@@ -1014,7 +1098,7 @@ function LangDialog({ open, onClose, onSaved }: { open: boolean; onClose: () => 
 
 // ─── Certifications ───────────────────────────────────────────────────────────
 
-function CertItem({ item, onDelete }: { item: Certification; onDelete: () => void }) {
+function CertItem({ item, onDelete, onEdit }: { item: Certification; onDelete: () => void; onEdit: () => void }) {
   return (
     <div className="flex items-start justify-between gap-3 px-5 py-4 group hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
       <div className="flex items-start gap-3 min-w-0">
@@ -1036,38 +1120,56 @@ function CertItem({ item, onDelete }: { item: Certification; onDelete: () => voi
           )}
         </div>
       </div>
-      <button
-        onClick={onDelete}
-        className="opacity-0 group-hover:opacity-100 shrink-0 text-slate-400 hover:text-red-500 cursor-pointer transition-all"
-        title="Eliminar"
-      >
-        <Trash2 className="h-4 w-4" />
-      </button>
+      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 shrink-0 transition-all">
+        <button onClick={onEdit} className="text-slate-400 hover:text-blue-500 cursor-pointer" title="Editar">
+          <Edit2 className="h-4 w-4" />
+        </button>
+        <button onClick={onDelete} className="text-slate-400 hover:text-red-500 cursor-pointer" title="Eliminar">
+          <Trash2 className="h-4 w-4" />
+        </button>
+      </div>
     </div>
   );
 }
 
-function CertDialog({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => void }) {
+function CertDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClose: () => void; onSaved: () => void; editItem?: Certification | null }) {
   const [form, setForm] = useState({ name: "", issuer: "", issueYear: "", expiryYear: "", credentialUrl: "" });
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (editItem) {
+      setForm({
+        name: editItem.name,
+        issuer: editItem.issuer,
+        issueYear: editItem.issueYear ? String(editItem.issueYear) : "",
+        expiryYear: editItem.expiryYear ? String(editItem.expiryYear) : "",
+        credentialUrl: editItem.credentialUrl ?? "",
+      });
+    } else {
+      setForm({ name: "", issuer: "", issueYear: "", expiryYear: "", credentialUrl: "" });
+    }
+  }, [editItem, open]);
 
   async function submit() {
     if (!form.name || !form.issuer) { toast.error("Completa los campos requeridos"); return; }
     setSaving(true);
-    const res = await fetch("/api/profile/certifications", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    const res = await fetch(
+      editItem ? `/api/profile/certifications?id=${editItem.id}` : "/api/profile/certifications",
+      {
+        method: editItem ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      }
+    );
     setSaving(false);
-    if (res.ok) { toast.success("Certificación añadida"); onSaved(); }
+    if (res.ok) { toast.success(editItem ? "Certificación actualizada" : "Certificación añadida"); onSaved(); }
     else toast.error("Error al guardar");
   }
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
       <DialogContent className="sm:max-w-md">
-        <DialogHeader><DialogTitle>Añadir certificación o curso</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{editItem ? "Editar certificación o curso" : "Añadir certificación o curso"}</DialogTitle></DialogHeader>
         <div className="space-y-3 py-2">
           <div>
             <label className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1 block">Nombre del certificado / curso *</label>
