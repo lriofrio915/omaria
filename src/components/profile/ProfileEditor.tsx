@@ -267,13 +267,13 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
       {/* ── Header Card ── */}
       <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
         {/* Banner */}
-        <div className="h-24 bg-gradient-to-r from-blue-600 to-indigo-600" />
+        <div className="h-24 bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-100 dark:from-blue-600 dark:via-indigo-600 dark:to-blue-700 border-b border-slate-200 dark:border-transparent" />
 
         <div className="px-6 pb-6">
           <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-10">
             {/* Avatar */}
             <div className="relative shrink-0">
-              <Avatar className="h-20 w-20 border-4 border-white dark:border-slate-900 shadow-md">
+              <Avatar className="h-20 w-20 border-4 border-white dark:border-slate-900 shadow-lg ring-1 ring-slate-200 dark:ring-slate-700">
                 <AvatarImage src={data.avatarUrl ?? undefined} />
                 <AvatarFallback
                   className="text-xl font-bold text-white"
