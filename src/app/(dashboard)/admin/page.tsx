@@ -241,7 +241,7 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
           return (
             <div
               key={stat.label}
-              className="relative overflow-hidden rounded-xl bg-card shadow-sm flex items-center gap-3 px-4 py-3.5"
+              className="relative overflow-hidden rounded-xl bg-card shadow-sm flex items-center gap-3 px-4 py-3.5 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 hover:scale-[1.02] cursor-default"
               style={{ borderLeft: `3px solid ${stat.accentColor}` }}
             >
               <div
@@ -335,20 +335,20 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
                 ? Math.round((s.value / stats.totalColaboradores) * 100)
                 : 0;
               return (
-                <div key={s.label}>
-                  <div className="flex items-center justify-between mb-1">
+                <div key={s.label} className="group rounded-lg px-2 -mx-2 py-1.5 transition-colors duration-150 hover:bg-muted/50 cursor-default">
+                  <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-1.5">
-                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: s.color }} />
-                      <span className="text-xs text-muted-foreground">{s.label}</span>
+                      <span className="h-2 w-2 rounded-full transition-transform duration-150 group-hover:scale-125" style={{ backgroundColor: s.color }} />
+                      <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors duration-150">{s.label}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-semibold text-foreground">{s.value}</span>
                       <span className="text-[10px] text-muted-foreground w-7 text-right">{pct}%</span>
                     </div>
                   </div>
-                  <div className="h-1.5 w-full rounded-full overflow-hidden" style={{ backgroundColor: s.bg }}>
+                  <div className="h-1.5 w-full rounded-full overflow-hidden transition-all duration-150 group-hover:h-2" style={{ backgroundColor: s.bg }}>
                     <div
-                      className="h-full rounded-full"
+                      className="h-full rounded-full transition-all duration-300 group-hover:brightness-110"
                       style={{ width: `${pct}%`, backgroundColor: s.color }}
                     />
                   </div>
