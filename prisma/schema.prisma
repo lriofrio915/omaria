@@ -354,6 +354,8 @@ model EmployeeCertification {
   issueYear     Int?
   expiryYear    Int?
   credentialUrl String?
+  fileUrl       String?
+  fileName      String?
   createdAt     DateTime        @default(now())
 
   @@map("employee_certifications")

@@ -42,6 +42,8 @@ export async function POST(request: Request) {
         issueYear: body.issueYear ? Number(body.issueYear) : null,
         expiryYear: body.expiryYear ? Number(body.expiryYear) : null,
         credentialUrl: body.credentialUrl ?? null,
+        fileUrl: body.fileUrl ?? null,
+        fileName: body.fileName ?? null,
       },
     });
     return NextResponse.json(item, { status: 201 });
@@ -72,6 +74,8 @@ export async function PUT(request: Request) {
         issueYear: body.issueYear ? Number(body.issueYear) : null,
         expiryYear: body.expiryYear ? Number(body.expiryYear) : null,
         credentialUrl: body.credentialUrl ?? null,
+        ...("fileUrl" in body ? { fileUrl: body.fileUrl ?? null } : {}),
+        ...("fileName" in body ? { fileName: body.fileName ?? null } : {}),
       },
     });
     return NextResponse.json(item);

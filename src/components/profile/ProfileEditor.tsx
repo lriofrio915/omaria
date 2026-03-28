@@ -75,6 +75,8 @@ interface Certification {
   issueYear: number | null;
   expiryYear: number | null;
   credentialUrl: string | null;
+  fileUrl: string | null;
+  fileName: string | null;
 }
 
 interface Profile {
@@ -1345,6 +1347,11 @@ function CertItem({ item, onDelete, onEdit }: { item: Certification; onDelete: (
               <ExternalLink className="h-3 w-3" /> Ver credencial
             </a>
           )}
+          {item.fileUrl && (
+            <a href={item.fileUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline mt-0.5 flex items-center gap-1 cursor-pointer">
+              <ExternalLink className="h-3 w-3" /> {item.fileName ?? "Ver archivo"}
+            </a>
+          )}
         </div>
       </div>
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 shrink-0 transition-all">
@@ -1362,6 +1369,10 @@ function CertItem({ item, onDelete, onEdit }: { item: Certification; onDelete: (
 function CertDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClose: () => void; onSaved: () => void; editItem?: Certification | null }) {
   const [form, setForm] = useState({ name: "", issuer: "", issueYear: "", expiryYear: "", credentialUrl: "" });
   const [saving, setSaving] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [removeFile, setRemoveFile] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const supabase = createClient();
 
   useEffect(() => {
     if (editItem) {
@@ -1375,11 +1386,14 @@ function CertDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClo
     } else {
       setForm({ name: "", issuer: "", issueYear: "", expiryYear: "", credentialUrl: "" });
     }
+    setSelectedFile(null);
+    setRemoveFile(false);
   }, [editItem, open]);
 
   async function submit() {
     if (!form.name || !form.issuer) { toast.error("Completa los campos requeridos"); return; }
     setSaving(true);
+
     const res = await fetch(
       editItem ? `/api/profile/certifications?id=${editItem.id}` : "/api/profile/certifications",
       {
@@ -1388,10 +1402,35 @@ function CertDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClo
         body: JSON.stringify(form),
       }
     );
+    if (!res.ok) { setSaving(false); toast.error("Error al guardar"); return; }
+    const saved = await res.json();
+
+    if (selectedFile) {
+      const ext = selectedFile.name.split(".").pop() ?? "pdf";
+      const path = `certifications/${saved.id}.${ext}`;
+      const { error } = await supabase.storage.from("documents").upload(path, selectedFile, { upsert: true });
+      if (!error) {
+        const { data: urlData } = supabase.storage.from("documents").getPublicUrl(path);
+        await fetch(`/api/profile/certifications?id=${saved.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fileUrl: urlData.publicUrl, fileName: selectedFile.name }),
+        });
+      }
+    } else if (removeFile) {
+      await fetch(`/api/profile/certifications?id=${saved.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileUrl: null, fileName: null }),
+      });
+    }
+
     setSaving(false);
-    if (res.ok) { toast.success(editItem ? "Certificación actualizada" : "Certificación añadida"); onSaved(); }
-    else toast.error("Error al guardar");
+    toast.success(editItem ? "Certificación actualizada" : "Certificación añadida");
+    onSaved();
   }
+
+  const existingFile = editItem?.fileUrl && !removeFile;
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
@@ -1419,6 +1458,36 @@ function CertDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClo
           <div>
             <label className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1 block">URL de la credencial (opcional)</label>
             <Input value={form.credentialUrl} onChange={e => setForm(f => ({ ...f, credentialUrl: e.target.value }))} placeholder="https://..." className="cursor-text" />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5 block">Archivo adjunto (imagen o PDF, opcional)</label>
+            {existingFile ? (
+              <div className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-2 bg-slate-50 dark:bg-slate-800/50">
+                <ExternalLink className="h-4 w-4 text-blue-500 shrink-0" />
+                <a href={editItem!.fileUrl!} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline truncate flex-1 cursor-pointer">
+                  {editItem!.fileName ?? "Ver archivo"}
+                </a>
+                <button type="button" onClick={() => setRemoveFile(true)} className="text-slate-400 hover:text-red-500 cursor-pointer shrink-0" title="Quitar archivo">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-2 rounded-lg border border-dashed border-slate-300 dark:border-slate-600 px-3 py-2.5 cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors"
+              >
+                <Upload className="h-4 w-4 text-slate-400 shrink-0" />
+                <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                  {selectedFile ? selectedFile.name : "Haz clic para adjuntar (PDF, JPG, PNG)"}
+                </span>
+                {selectedFile && (
+                  <button type="button" onClick={e => { e.stopPropagation(); setSelectedFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }} className="text-slate-400 hover:text-red-500 cursor-pointer shrink-0 ml-auto">
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            )}
+            <input ref={fileInputRef} type="file" accept="application/pdf,image/jpeg,image/png,image/webp" className="hidden" onChange={e => { setSelectedFile(e.target.files?.[0] ?? null); setRemoveFile(false); }} />
           </div>
         </div>
         <DialogFooter>

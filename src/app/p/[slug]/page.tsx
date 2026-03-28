@@ -272,6 +272,11 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                             <ExternalLink className="h-3 w-3" /> Ver credencial
                           </a>
                         )}
+                        {cert.fileUrl && (
+                          <a href={cert.fileUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline flex items-center gap-1 mt-0.5">
+                            <ExternalLink className="h-3 w-3" /> {cert.fileName ?? "Ver archivo"}
+                          </a>
+                        )}
                       </div>
                     </div>
                   ))}
