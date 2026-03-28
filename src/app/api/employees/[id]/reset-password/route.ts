@@ -4,8 +4,9 @@ import { createClient as createAdminClient } from "@supabase/supabase-js";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  await params; // resolve params (unused but required by Next.js 15)
   try {
     // Verify caller is ADMIN
     const supabase = await createClient();
