@@ -239,9 +239,9 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
     if (file.type !== "application/pdf") { toast.error("Solo se permiten archivos PDF"); return; }
     setUploadingCv(true);
     const path = `cv/${data.id}.pdf`;
-    const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
-    if (error) { toast.error("Error subiendo archivo"); setUploadingCv(false); return; }
-    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+    const { error } = await supabase.storage.from("documents").upload(path, file, { upsert: true });
+    if (error) { toast.error(`Error subiendo archivo: ${error.message}`); setUploadingCv(false); return; }
+    const { data: urlData } = supabase.storage.from("documents").getPublicUrl(path);
     const res = await fetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -254,7 +254,7 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
 
   async function handleCvDelete() {
     setUploadingCv(true);
-    await supabase.storage.from("avatars").remove([`cv/${data.id}.pdf`]);
+    await supabase.storage.from("documents").remove([`cv/${data.id}.pdf`]);
     const res = await fetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -272,9 +272,9 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
     if (file.type !== "application/pdf") { toast.error("Solo se permiten archivos PDF"); return; }
     setUploadingSenescyt(true);
     const path = `senescyt/${data.id}.pdf`;
-    const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
-    if (error) { toast.error("Error subiendo certificado"); setUploadingSenescyt(false); return; }
-    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+    const { error } = await supabase.storage.from("documents").upload(path, file, { upsert: true });
+    if (error) { toast.error(`Error subiendo certificado: ${error.message}`); setUploadingSenescyt(false); return; }
+    const { data: urlData } = supabase.storage.from("documents").getPublicUrl(path);
     const res = await fetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -287,7 +287,7 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
 
   async function handleSenescytDelete() {
     setUploadingSenescyt(true);
-    await supabase.storage.from("avatars").remove([`senescyt/${data.id}.pdf`]);
+    await supabase.storage.from("documents").remove([`senescyt/${data.id}.pdf`]);
     const res = await fetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -908,9 +908,9 @@ function EduDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClos
     if (selectedFile) {
       const ext = selectedFile.name.split(".").pop() ?? "pdf";
       const path = `education/${saved.id}.${ext}`;
-      const { error } = await supabase.storage.from("avatars").upload(path, selectedFile, { upsert: true });
+      const { error } = await supabase.storage.from("documents").upload(path, selectedFile, { upsert: true });
       if (!error) {
-        const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+        const { data: urlData } = supabase.storage.from("documents").getPublicUrl(path);
         await fetch(`/api/profile/education?id=${saved.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
