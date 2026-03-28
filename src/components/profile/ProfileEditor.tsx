@@ -233,17 +233,30 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
     if (file.type !== "application/pdf") { toast.error("Solo se permiten archivos PDF"); return; }
     setUploadingCv(true);
     const path = `cv/${data.id}.pdf`;
-    const { error } = await supabase.storage.from("documents").upload(path, file, { upsert: true });
-    if (error) { toast.error("Error subiendo CV"); setUploadingCv(false); return; }
-    const { data: urlData } = supabase.storage.from("documents").getPublicUrl(path);
+    const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+    if (error) { toast.error("Error subiendo archivo"); setUploadingCv(false); return; }
+    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
     const res = await fetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ cvUrl: urlData.publicUrl, cvFileName: file.name }),
     });
     setUploadingCv(false);
-    if (res.ok) { toast.success("CV actualizado"); await reload(); }
-    else toast.error("Error al guardar CV");
+    if (res.ok) { toast.success("Archivo de respaldo subido"); await reload(); }
+    else toast.error("Error al guardar");
+  }
+
+  async function handleCvDelete() {
+    setUploadingCv(true);
+    await supabase.storage.from("avatars").remove([`cv/${data.id}.pdf`]);
+    const res = await fetch("/api/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cvUrl: null, cvFileName: null }),
+    });
+    setUploadingCv(false);
+    if (res.ok) { toast.success("Archivo eliminado"); await reload(); }
+    else toast.error("Error al eliminar");
   }
 
   // ── AI match ─────────────────────────────────────────────────────────────────
@@ -332,16 +345,28 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
                 className="cursor-pointer"
               >
                 {uploadingCv ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : <Upload className="h-3.5 w-3.5 mr-1.5" />}
-                {currentProfile?.cvFileName ? "Actualizar CV" : "Subir CV"}
+                {currentProfile?.cvFileName ? "Actualizar respaldo" : "Subir respaldo"}
               </Button>
               <input ref={cvInputRef} type="file" accept="application/pdf" className="hidden" onChange={handleCvChange} />
               {currentProfile?.cvUrl && (
-                <Button variant="ghost" size="sm" asChild className="cursor-pointer">
-                  <a href={currentProfile.cvUrl} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
-                    {currentProfile.cvFileName ?? "Ver CV"}
-                  </a>
-                </Button>
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="sm" asChild className="cursor-pointer">
+                    <a href={currentProfile.cvUrl} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
+                      {currentProfile.cvFileName ?? "Ver archivo"}
+                    </a>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleCvDelete}
+                    disabled={uploadingCv}
+                    className="cursor-pointer text-slate-400 hover:text-red-500 px-2"
+                    title="Eliminar archivo"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
               )}
             </div>
           </div>

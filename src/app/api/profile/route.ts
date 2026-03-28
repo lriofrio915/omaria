@@ -74,6 +74,17 @@ export async function PUT(request: Request) {
     const baseSlug = generateSlug(employee.firstName, employee.lastName);
     const slug = existing?.publicSlug ?? await uniqueSlug(baseSlug, existing?.id);
 
+    // Build update only from fields explicitly present in the request body
+    const profileUpdate: Record<string, unknown> = {};
+    if ("headline" in body)    profileUpdate.headline    = body.headline    ?? null;
+    if ("summary" in body)     profileUpdate.summary     = body.summary     ?? null;
+    if ("isPublic" in body)    profileUpdate.isPublic    = body.isPublic    ?? true;
+    if ("linkedinUrl" in body) profileUpdate.linkedinUrl = body.linkedinUrl ?? null;
+    if ("websiteUrl" in body)  profileUpdate.websiteUrl  = body.websiteUrl  ?? null;
+    if ("githubUrl" in body)   profileUpdate.githubUrl   = body.githubUrl   ?? null;
+    if ("cvUrl" in body)       profileUpdate.cvUrl       = body.cvUrl       ?? null;
+    if ("cvFileName" in body)  profileUpdate.cvFileName  = body.cvFileName  ?? null;
+
     const profile = await prisma.employeeProfile.upsert({
       where: { employeeId: employee.id },
       create: {
@@ -88,16 +99,7 @@ export async function PUT(request: Request) {
         cvUrl: body.cvUrl ?? null,
         cvFileName: body.cvFileName ?? null,
       },
-      update: {
-        headline: body.headline ?? null,
-        summary: body.summary ?? null,
-        isPublic: body.isPublic ?? true,
-        linkedinUrl: body.linkedinUrl ?? null,
-        websiteUrl: body.websiteUrl ?? null,
-        githubUrl: body.githubUrl ?? null,
-        cvUrl: body.cvUrl ?? null,
-        cvFileName: body.cvFileName ?? null,
-      },
+      update: profileUpdate,
     });
 
     // Also update employee basic fields if provided
