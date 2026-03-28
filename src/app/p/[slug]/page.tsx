@@ -207,7 +207,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             )}
 
             {/* Education */}
-            {profile.education.length > 0 && (
+            {(profile.education.length > 0 || profile.senescytUrl) && (
               <Section title="Formación Académica" icon={<GraduationCap className="h-4 w-4" />} color={company?.primaryColor}>
                 <div className="space-y-4">
                   {profile.education.map(edu => (
@@ -231,6 +231,25 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                       </div>
                     </div>
                   ))}
+                  {profile.senescytUrl && (
+                    <div className="flex items-center gap-3 pt-3 mt-1 border-t border-slate-100">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50">
+                        <GraduationCap className="h-4 w-4" style={{ color: company?.primaryColor ?? "#1B3D5C" }} />
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Certificado Senescyt</p>
+                        <a
+                          href={profile.senescytUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline mt-0.5"
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                          {profile.senescytFileName ?? "Ver certificado"}
+                        </a>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </Section>
             )}

@@ -82,8 +82,10 @@ export async function PUT(request: Request) {
     if ("linkedinUrl" in body) profileUpdate.linkedinUrl = body.linkedinUrl ?? null;
     if ("websiteUrl" in body)  profileUpdate.websiteUrl  = body.websiteUrl  ?? null;
     if ("githubUrl" in body)   profileUpdate.githubUrl   = body.githubUrl   ?? null;
-    if ("cvUrl" in body)       profileUpdate.cvUrl       = body.cvUrl       ?? null;
-    if ("cvFileName" in body)  profileUpdate.cvFileName  = body.cvFileName  ?? null;
+    if ("cvUrl" in body)            profileUpdate.cvUrl            = body.cvUrl            ?? null;
+    if ("cvFileName" in body)       profileUpdate.cvFileName       = body.cvFileName       ?? null;
+    if ("senescytUrl" in body)      profileUpdate.senescytUrl      = body.senescytUrl      ?? null;
+    if ("senescytFileName" in body) profileUpdate.senescytFileName = body.senescytFileName ?? null;
 
     const profile = await prisma.employeeProfile.upsert({
       where: { employeeId: employee.id },
@@ -98,6 +100,8 @@ export async function PUT(request: Request) {
         githubUrl: body.githubUrl ?? null,
         cvUrl: body.cvUrl ?? null,
         cvFileName: body.cvFileName ?? null,
+        senescytUrl: body.senescytUrl ?? null,
+        senescytFileName: body.senescytFileName ?? null,
       },
       update: profileUpdate,
     });

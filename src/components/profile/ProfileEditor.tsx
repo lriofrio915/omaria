@@ -88,6 +88,8 @@ interface Profile {
   githubUrl: string | null;
   cvUrl: string | null;
   cvFileName: string | null;
+  senescytUrl: string | null;
+  senescytFileName: string | null;
   education: Education[];
   experience: Experience[];
   skills: Skill[];
@@ -156,8 +158,10 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
 
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const cvInputRef = useRef<HTMLInputElement>(null);
+  const senescytInputRef = useRef<HTMLInputElement>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [uploadingCv, setUploadingCv] = useState(false);
+  const [uploadingSenescyt, setUploadingSenescyt] = useState(false);
 
   // AI match
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
@@ -258,6 +262,39 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
     });
     setUploadingCv(false);
     if (res.ok) { toast.success("Archivo eliminado"); await reload(); }
+    else toast.error("Error al eliminar");
+  }
+
+  // ── Senescyt upload ──────────────────────────────────────────────────────────
+  async function handleSenescytChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.type !== "application/pdf") { toast.error("Solo se permiten archivos PDF"); return; }
+    setUploadingSenescyt(true);
+    const path = `senescyt/${data.id}.pdf`;
+    const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+    if (error) { toast.error("Error subiendo certificado"); setUploadingSenescyt(false); return; }
+    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+    const res = await fetch("/api/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ senescytUrl: urlData.publicUrl, senescytFileName: file.name }),
+    });
+    setUploadingSenescyt(false);
+    if (res.ok) { toast.success("Certificado Senescyt subido"); await reload(); }
+    else toast.error("Error al guardar");
+  }
+
+  async function handleSenescytDelete() {
+    setUploadingSenescyt(true);
+    await supabase.storage.from("avatars").remove([`senescyt/${data.id}.pdf`]);
+    const res = await fetch("/api/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ senescytUrl: null, senescytFileName: null }),
+    });
+    setUploadingSenescyt(false);
+    if (res.ok) { toast.success("Certificado eliminado"); await reload(); }
     else toast.error("Error al eliminar");
   }
 
@@ -520,6 +557,75 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
             )}
           </SectionCard>
           <EduDialog open={eduDialog} editItem={editingEdu} onClose={() => { setEduDialog(false); setEditingEdu(null); }} onSaved={async () => { setEduDialog(false); setEditingEdu(null); await reload(); }} />
+
+          {/* Senescyt */}
+          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <GraduationCap className="h-4 w-4 text-blue-500" />
+                Certificado Senescyt
+              </h3>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => senescytInputRef.current?.click()}
+                disabled={uploadingSenescyt}
+                className="cursor-pointer"
+              >
+                {uploadingSenescyt
+                  ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                  : <Upload className="h-3.5 w-3.5 mr-1" />}
+                {currentProfile?.senescytUrl ? "Actualizar" : "Subir"}
+              </Button>
+              <input
+                ref={senescytInputRef}
+                type="file"
+                accept="application/pdf"
+                className="hidden"
+                onChange={handleSenescytChange}
+              />
+            </div>
+            <div className="px-5 py-4">
+              {currentProfile?.senescytUrl ? (
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-900/20">
+                    <GraduationCap className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
+                      {currentProfile.senescytFileName ?? "Certificado Senescyt"}
+                    </p>
+                    <a
+                      href={currentProfile.senescytUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <ExternalLink className="h-3 w-3" /> Ver certificado
+                    </a>
+                  </div>
+                  <button
+                    onClick={handleSenescytDelete}
+                    disabled={uploadingSenescyt}
+                    className="text-slate-400 hover:text-red-500 cursor-pointer transition-colors shrink-0"
+                    title="Eliminar certificado"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div
+                  onClick={() => senescytInputRef.current?.click()}
+                  className="flex flex-col items-center gap-2 py-6 rounded-lg border border-dashed border-slate-300 dark:border-slate-600 cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors"
+                >
+                  <Upload className="h-6 w-6 text-slate-300 dark:text-slate-600" />
+                  <p className="text-sm text-slate-400 dark:text-slate-500 text-center">
+                    Sube el certificado emitido por el Senescyt (PDF)
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         </TabsContent>
 
         {/* Experience */}

@@ -277,6 +277,8 @@ model EmployeeProfile {
   githubUrl      String?
   cvUrl          String?
   cvFileName     String?
+  senescytUrl    String?
+  senescytFileName String?
   education      EmployeeEducation[]
   experience     EmployeeWorkExperience[]
   skills         EmployeeSkill[]
