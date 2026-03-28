@@ -32,7 +32,22 @@ export default async function ProfilePage() {
     },
   });
 
-  if (!employee) redirect("/admin");
+  if (!employee) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-12 text-center space-y-4">
+        <div className="text-5xl">🔗</div>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+          Perfil no vinculado
+        </h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+          Tu cuenta de administrador no está vinculada a un registro de empleado. Pide a otro administrador que vincule tu cuenta en la ficha del empleado, o verifica que el correo de tu cuenta coincida con el registrado en el sistema.
+        </p>
+        <p className="text-xs text-slate-400 dark:text-slate-600 font-mono">
+          Cuenta activa: {user.email}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-2">

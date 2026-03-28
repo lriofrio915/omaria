@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Building2, User, Briefcase, ShieldCheck, ChevronRight } from "lucide-react";
+import { Building2, User, Briefcase, ShieldCheck, ChevronRight, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -161,6 +161,7 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
   const [positions, setPositions] = useState<Position[]>([]);
   const [managers, setManagers] = useState<EmployeeOption[]>([]);
   const [createAccount, setCreateAccount] = useState(false);
+  const [resetSending, setResetSending] = useState(false);
 
   const {
     register,
@@ -305,11 +306,11 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
             </Select>
           </Field>
 
-          <Field label="Ciudad">
+          <Field label="Ciudad de Residencia">
             <Input placeholder="Quito" {...register("city")} className="cursor-text" />
           </Field>
 
-          <Field label="Dirección" className="sm:col-span-2">
+          <Field label="Dirección de Residencia" className="sm:col-span-2">
             <Input placeholder="Av. República del El Salvador N36-183..." {...register("address")} className="cursor-text" />
           </Field>
         </div>
@@ -546,6 +547,45 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
                 </Field>
               </div>
             )}
+          </div>
+        </Section>
+      )}
+
+      {/* ── 5. GESTIÓN DE CUENTA (solo edición) ───────────────────────────── */}
+      {mode === "edit" && (
+        <Section icon={KeyRound} title="Gestión de cuenta">
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Envía un correo de restablecimiento de contraseña al colaborador. Recibirá un enlace para crear una nueva contraseña.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-2"
+              disabled={resetSending}
+              onClick={async () => {
+                const email = initialData?.email;
+                if (!email) { toast.error("No hay email registrado para este empleado"); return; }
+                setResetSending(true);
+                try {
+                  const res = await fetch(`/api/employees/${initialData?.id}/reset-password`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email }),
+                  });
+                  const data = await res.json();
+                  if (!res.ok) throw new Error(data.error || "Error al enviar");
+                  toast.success(`Correo de restablecimiento enviado a ${email}`);
+                } catch (err: any) {
+                  toast.error(err.message);
+                } finally {
+                  setResetSending(false);
+                }
+              }}
+            >
+              <KeyRound className="h-4 w-4" />
+              {resetSending ? "Enviando..." : "Enviar correo de restablecimiento"}
+            </Button>
           </div>
         </Section>
       )}
