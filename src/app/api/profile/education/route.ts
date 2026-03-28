@@ -46,6 +46,8 @@ export async function POST(request: Request) {
         endYear: body.current ? null : (body.endYear ? Number(body.endYear) : null),
         current: body.current ?? false,
         description: body.description ?? null,
+        fileUrl: body.fileUrl ?? null,
+        fileName: body.fileName ?? null,
       },
     });
     return NextResponse.json(item, { status: 201 });
@@ -78,6 +80,8 @@ export async function PUT(request: Request) {
         endYear: body.current ? null : (body.endYear ? Number(body.endYear) : null),
         current: body.current ?? false,
         description: body.description ?? null,
+        ...("fileUrl" in body ? { fileUrl: body.fileUrl ?? null } : {}),
+        ...("fileName" in body ? { fileName: body.fileName ?? null } : {}),
       },
     });
     return NextResponse.json(item);

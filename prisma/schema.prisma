@@ -299,6 +299,8 @@ model EmployeeEducation {
   endYear     Int?
   current     Boolean         @default(false)
   description String?
+  fileUrl     String?
+  fileName    String?
   createdAt   DateTime        @default(now())
 
   @@map("employee_education")

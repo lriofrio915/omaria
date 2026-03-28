@@ -222,6 +222,12 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                           {edu.startYear} – {edu.current ? "Actualidad" : (edu.endYear ?? "")}
                         </p>
                         {edu.description && <p className="text-xs text-slate-500 mt-0.5">{edu.description}</p>}
+                        {edu.fileUrl && (
+                          <a href={edu.fileUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-1">
+                            <ExternalLink className="h-3 w-3" />
+                            {edu.fileName ?? "Ver documento"}
+                          </a>
+                        )}
                       </div>
                     </div>
                   ))}

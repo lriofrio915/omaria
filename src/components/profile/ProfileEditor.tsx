@@ -40,6 +40,8 @@ interface Education {
   endYear: number | null;
   current: boolean;
   description: string | null;
+  fileUrl: string | null;
+  fileName: string | null;
 }
 
 interface Experience {
@@ -727,6 +729,17 @@ function EduItem({ item, onDelete, onEdit }: { item: Education; onDelete: () => 
             {item.startYear} – {item.current ? "Actualidad" : (item.endYear ?? "")}
           </p>
           {item.description && <p className="text-xs text-slate-500 mt-1">{item.description}</p>}
+          {item.fileUrl && (
+            <a
+              href={item.fileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-1 cursor-pointer"
+            >
+              <ExternalLink className="h-3 w-3" />
+              {item.fileName ?? "Ver documento"}
+            </a>
+          )}
         </div>
       </div>
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 shrink-0 transition-all">
@@ -744,6 +757,10 @@ function EduItem({ item, onDelete, onEdit }: { item: Education; onDelete: () => 
 function EduDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClose: () => void; onSaved: () => void; editItem?: Education | null }) {
   const [form, setForm] = useState({ institution: "", degree: "", field: "", startYear: "", endYear: "", current: false, description: "" });
   const [saving, setSaving] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [removeFile, setRemoveFile] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const supabase = createClient();
 
   useEffect(() => {
     if (editItem) {
@@ -759,6 +776,8 @@ function EduDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClos
     } else {
       setForm({ institution: "", degree: "", field: "", startYear: "", endYear: "", current: false, description: "" });
     }
+    setSelectedFile(null);
+    setRemoveFile(false);
   }, [editItem, open]);
 
   async function submit() {
@@ -766,6 +785,8 @@ function EduDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClos
       toast.error("Completa los campos requeridos"); return;
     }
     setSaving(true);
+
+    // Step 1: save form data
     const res = await fetch(
       editItem ? `/api/profile/education?id=${editItem.id}` : "/api/profile/education",
       {
@@ -774,10 +795,36 @@ function EduDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClos
         body: JSON.stringify(form),
       }
     );
+    if (!res.ok) { setSaving(false); toast.error("Error al guardar"); return; }
+    const saved = await res.json();
+
+    // Step 2: handle file upload / removal
+    if (selectedFile) {
+      const ext = selectedFile.name.split(".").pop() ?? "pdf";
+      const path = `education/${saved.id}.${ext}`;
+      const { error } = await supabase.storage.from("avatars").upload(path, selectedFile, { upsert: true });
+      if (!error) {
+        const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+        await fetch(`/api/profile/education?id=${saved.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fileUrl: urlData.publicUrl, fileName: selectedFile.name }),
+        });
+      }
+    } else if (removeFile) {
+      await fetch(`/api/profile/education?id=${saved.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileUrl: null, fileName: null }),
+      });
+    }
+
     setSaving(false);
-    if (res.ok) { toast.success(editItem ? "Formación actualizada" : "Formación añadida"); onSaved(); }
-    else toast.error("Error al guardar");
+    toast.success(editItem ? "Formación actualizada" : "Formación añadida");
+    onSaved();
   }
+
+  const existingFile = editItem?.fileUrl && !removeFile;
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
@@ -813,6 +860,55 @@ function EduDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClos
           <div>
             <label className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1 block">Descripción (opcional)</label>
             <Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} className="cursor-text resize-none" />
+          </div>
+
+          {/* File attachment */}
+          <div>
+            <label className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5 block">
+              Archivo de respaldo (diploma, título, certificado...)
+            </label>
+            {existingFile ? (
+              <div className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-2 bg-slate-50 dark:bg-slate-800/50">
+                <ExternalLink className="h-4 w-4 text-blue-500 shrink-0" />
+                <a href={editItem!.fileUrl!} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline truncate flex-1 cursor-pointer">
+                  {editItem!.fileName ?? "Ver archivo"}
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setRemoveFile(true)}
+                  className="text-slate-400 hover:text-red-500 cursor-pointer shrink-0"
+                  title="Quitar archivo"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-2 rounded-lg border border-dashed border-slate-300 dark:border-slate-600 px-3 py-2.5 cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors"
+              >
+                <Upload className="h-4 w-4 text-slate-400 shrink-0" />
+                <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                  {selectedFile ? selectedFile.name : "Haz clic para adjuntar un archivo (PDF, imagen)"}
+                </span>
+                {selectedFile && (
+                  <button
+                    type="button"
+                    onClick={e => { e.stopPropagation(); setSelectedFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
+                    className="text-slate-400 hover:text-red-500 cursor-pointer shrink-0 ml-auto"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="application/pdf,image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={e => { setSelectedFile(e.target.files?.[0] ?? null); setRemoveFile(false); }}
+            />
           </div>
         </div>
         <DialogFooter>
