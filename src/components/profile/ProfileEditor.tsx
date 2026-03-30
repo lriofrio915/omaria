@@ -136,6 +136,55 @@ function fmtDate(iso: string) {
   return d.toLocaleDateString("es-EC", { month: "short", year: "numeric" });
 }
 
+// ─── FileDropZone ─────────────────────────────────────────────────────────────
+
+function FileDropZone({
+  onFile,
+  accept,
+  children,
+  className,
+  onClick,
+}: {
+  onFile: (file: File) => void;
+  accept?: string;
+  children: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+}) {
+  const [dragging, setDragging] = useState(false);
+
+  function isAccepted(file: File): boolean {
+    if (!accept) return true;
+    return accept.split(",").map(t => t.trim()).some(t => {
+      if (t.startsWith(".")) return file.name.toLowerCase().endsWith(t);
+      if (t.endsWith("/*")) return file.type.startsWith(t.slice(0, -2));
+      return file.type === t;
+    });
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    if (!isAccepted(file)) { toast.error("Tipo de archivo no permitido"); return; }
+    onFile(file);
+  }
+
+  return (
+    <div
+      className={`${className ?? ""} transition-all${dragging ? " ring-2 ring-blue-400 ring-offset-2 bg-blue-50/70 dark:bg-blue-900/20" : ""}`}
+      onClick={onClick}
+      onDragOver={e => { e.preventDefault(); setDragging(true); }}
+      onDragEnter={e => { e.preventDefault(); setDragging(true); }}
+      onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragging(false); }}
+      onDrop={handleDrop}
+    >
+      {children}
+    </div>
+  );
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
@@ -268,9 +317,7 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
   }
 
   // ── Senescyt upload ──────────────────────────────────────────────────────────
-  async function handleSenescytChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  async function handleSenescytFile(file: File) {
     if (file.type !== "application/pdf") { toast.error("Solo se permiten archivos PDF"); return; }
     setUploadingSenescyt(true);
     const path = `senescyt/${data.id}.pdf`;
@@ -285,6 +332,12 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
     setUploadingSenescyt(false);
     if (res.ok) { toast.success("Certificado Senescyt subido"); await reload(); }
     else toast.error("Error al guardar");
+  }
+
+  async function handleSenescytChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await handleSenescytFile(file);
   }
 
   async function handleSenescytDelete() {
@@ -616,15 +669,17 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
                   </button>
                 </div>
               ) : (
-                <div
+                <FileDropZone
+                  onFile={handleSenescytFile}
+                  accept="application/pdf"
                   onClick={() => senescytInputRef.current?.click()}
-                  className="flex flex-col items-center gap-2 py-6 rounded-lg border border-dashed border-slate-300 dark:border-slate-600 cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors"
+                  className="flex flex-col items-center gap-2 py-6 rounded-lg border border-dashed border-slate-300 dark:border-slate-600 cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/10"
                 >
                   <Upload className="h-6 w-6 text-slate-300 dark:text-slate-600" />
                   <p className="text-sm text-slate-400 dark:text-slate-500 text-center">
-                    Sube el certificado emitido por el Senescyt (PDF)
+                    Arrastra aquí o haz clic para subir el certificado Senescyt (PDF)
                   </p>
-                </div>
+                </FileDropZone>
               )}
             </div>
           </div>
@@ -991,13 +1046,15 @@ function EduDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClos
                 </button>
               </div>
             ) : (
-              <div
+              <FileDropZone
+                onFile={file => { setSelectedFile(file); setRemoveFile(false); }}
+                accept="application/pdf,image/jpeg,image/png,image/webp"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-2 rounded-lg border border-dashed border-slate-300 dark:border-slate-600 px-3 py-2.5 cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors"
+                className="flex items-center gap-2 rounded-lg border border-dashed border-slate-300 dark:border-slate-600 px-3 py-2.5 cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/10"
               >
                 <Upload className="h-4 w-4 text-slate-400 shrink-0" />
                 <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                  {selectedFile ? selectedFile.name : "Haz clic para adjuntar un archivo (PDF, imagen)"}
+                  {selectedFile ? selectedFile.name : "Arrastra o haz clic para adjuntar (PDF, JPG, PNG)"}
                 </span>
                 {selectedFile && (
                   <button
@@ -1008,7 +1065,7 @@ function EduDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClos
                     <X className="h-4 w-4" />
                   </button>
                 )}
-              </div>
+              </FileDropZone>
             )}
             <input
               ref={fileInputRef}
@@ -1472,20 +1529,22 @@ function CertDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClo
                 </button>
               </div>
             ) : (
-              <div
+              <FileDropZone
+                onFile={file => { setSelectedFile(file); setRemoveFile(false); }}
+                accept="application/pdf,image/jpeg,image/png,image/webp"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-2 rounded-lg border border-dashed border-slate-300 dark:border-slate-600 px-3 py-2.5 cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors"
+                className="flex items-center gap-2 rounded-lg border border-dashed border-slate-300 dark:border-slate-600 px-3 py-2.5 cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/10"
               >
                 <Upload className="h-4 w-4 text-slate-400 shrink-0" />
                 <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                  {selectedFile ? selectedFile.name : "Haz clic para adjuntar (PDF, JPG, PNG)"}
+                  {selectedFile ? selectedFile.name : "Arrastra o haz clic para adjuntar (PDF, JPG, PNG)"}
                 </span>
                 {selectedFile && (
                   <button type="button" onClick={e => { e.stopPropagation(); setSelectedFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }} className="text-slate-400 hover:text-red-500 cursor-pointer shrink-0 ml-auto">
                     <X className="h-4 w-4" />
                   </button>
                 )}
-              </div>
+              </FileDropZone>
             )}
             <input ref={fileInputRef} type="file" accept="application/pdf,image/jpeg,image/png,image/webp" className="hidden" onChange={e => { setSelectedFile(e.target.files?.[0] ?? null); setRemoveFile(false); }} />
           </div>
