@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning className="h-full">
-      <body className={`${geist.variable} font-sans antialiased h-full overflow-hidden`}>
+      <body className={`${geist.variable} font-sans antialiased h-full`}>
         <ThemeProvider>
           {children}
           <Toaster richColors position="top-right" />
