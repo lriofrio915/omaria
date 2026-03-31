@@ -495,7 +495,82 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
       {/* ── 4. CUENTA DE ACCESO (solo creación) ───────────────────────────── */}
       {mode === "create" && (
         <Section icon={ShieldCheck} title="Cuenta de acceso al sistema">
-          <div className="space-y-4">
+          <div className="space-y-5">
+
+            {/* Selector de rol — siempre visible */}
+            <div>
+              <p className="text-sm font-medium text-foreground mb-3">
+                Rol en el sistema <span className="text-red-500">*</span>
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Tarjeta Colaborador */}
+                <label className="cursor-pointer">
+                  <input
+                    type="radio"
+                    value="EMPLOYEE"
+                    className="sr-only"
+                    {...register("role")}
+                    defaultChecked
+                  />
+                  <div className={`relative rounded-xl border-2 p-4 transition-all ${
+                    watch("role") === "EMPLOYEE" || !watch("role")
+                      ? "border-blue-500 bg-blue-50/60 dark:bg-blue-900/20"
+                      : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                  }`}>
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/40">
+                        <User className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Colaborador</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                          Solo puede ver su perfil, documentos y recibos de nómina propios.
+                        </p>
+                      </div>
+                      {(watch("role") === "EMPLOYEE" || !watch("role")) && (
+                        <div className="h-4 w-4 shrink-0 rounded-full bg-blue-500 flex items-center justify-center mt-0.5">
+                          <div className="h-1.5 w-1.5 rounded-full bg-white" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </label>
+
+                {/* Tarjeta Administrador */}
+                <label className="cursor-pointer">
+                  <input
+                    type="radio"
+                    value="ADMIN"
+                    className="sr-only"
+                    {...register("role")}
+                  />
+                  <div className={`relative rounded-xl border-2 p-4 transition-all ${
+                    watch("role") === "ADMIN"
+                      ? "border-purple-500 bg-purple-50/60 dark:bg-purple-900/20"
+                      : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                  }`}>
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/40">
+                        <ShieldCheck className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Administrador</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                          Acceso completo: gestión de empleados, documentos, nóminas y configuración.
+                        </p>
+                      </div>
+                      {watch("role") === "ADMIN" && (
+                        <div className="h-4 w-4 shrink-0 rounded-full bg-purple-500 flex items-center justify-center mt-0.5">
+                          <div className="h-1.5 w-1.5 rounded-full bg-white" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {/* Crear cuenta de acceso */}
             <label className="flex items-start gap-3 cursor-pointer group">
               <input
                 type="checkbox"
@@ -518,8 +593,8 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
             </label>
 
             {createAccount && (
-              <div className="rounded-lg border border-blue-200 bg-blue-50/50 dark:bg-blue-900/10 dark:border-blue-900/40 p-4 grid gap-4 sm:grid-cols-2">
-                <div className="sm:col-span-2 flex items-center gap-2 text-xs text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/20 rounded-md px-3 py-2">
+              <div className="rounded-lg border border-blue-200 bg-blue-50/50 dark:bg-blue-900/10 dark:border-blue-900/40 p-4 space-y-4">
+                <div className="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/20 rounded-md px-3 py-2">
                   <ChevronRight className="h-3.5 w-3.5 shrink-0" />
                   El <strong>usuario</strong> de login será el email del sistema indicado arriba.
                 </div>
@@ -530,20 +605,6 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
                     {...register("password")}
                     className="cursor-text"
                   />
-                </Field>
-                <Field label="Rol en el sistema">
-                  <Select
-                    defaultValue="EMPLOYEE"
-                    onValueChange={(v) => setValue("role", v as "ADMIN" | "EMPLOYEE")}
-                  >
-                    <SelectTrigger className="cursor-pointer">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="EMPLOYEE" className="cursor-pointer">Colaborador</SelectItem>
-                      <SelectItem value="ADMIN" className="cursor-pointer">Administrador</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </Field>
               </div>
             )}
