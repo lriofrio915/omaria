@@ -17,7 +17,7 @@ export default async function EmployeeProfilePage() {
       department: {
         select: {
           name: true,
-          company: { select: { name: true, primaryColor: true } },
+          company: { select: { name: true, primaryColor: true, slug: true } },
         },
       },
       profile: {

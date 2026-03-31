@@ -33,7 +33,7 @@ export async function GET() {
         department: {
           select: {
             name: true,
-            company: { select: { name: true, primaryColor: true, logoUrl: true } },
+            company: { select: { name: true, primaryColor: true, logoUrl: true, slug: true } },
           },
         },
         position: { select: { title: true } },
@@ -84,8 +84,11 @@ export async function PUT(request: Request) {
     if ("githubUrl" in body)   profileUpdate.githubUrl   = body.githubUrl   ?? null;
     if ("cvUrl" in body)            profileUpdate.cvUrl            = body.cvUrl            ?? null;
     if ("cvFileName" in body)       profileUpdate.cvFileName       = body.cvFileName       ?? null;
-    if ("senescytUrl" in body)      profileUpdate.senescytUrl      = body.senescytUrl      ?? null;
-    if ("senescytFileName" in body) profileUpdate.senescytFileName = body.senescytFileName ?? null;
+    if ("senescytUrl" in body)          profileUpdate.senescytUrl          = body.senescytUrl          ?? null;
+    if ("senescytFileName" in body)     profileUpdate.senescytFileName     = body.senescytFileName     ?? null;
+    if ("trackRecordUrl" in body)       profileUpdate.trackRecordUrl       = body.trackRecordUrl       ?? null;
+    if ("trackRecordFileName" in body)  profileUpdate.trackRecordFileName  = body.trackRecordFileName  ?? null;
+    if ("trackRecordLink" in body)      profileUpdate.trackRecordLink      = body.trackRecordLink      ?? null;
 
     const profile = await prisma.employeeProfile.upsert({
       where: { employeeId: employee.id },
@@ -102,6 +105,9 @@ export async function PUT(request: Request) {
         cvFileName: body.cvFileName ?? null,
         senescytUrl: body.senescytUrl ?? null,
         senescytFileName: body.senescytFileName ?? null,
+        trackRecordUrl: body.trackRecordUrl ?? null,
+        trackRecordFileName: body.trackRecordFileName ?? null,
+        trackRecordLink: body.trackRecordLink ?? null,
       },
       update: profileUpdate,
     });
