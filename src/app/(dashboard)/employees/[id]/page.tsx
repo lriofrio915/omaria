@@ -35,10 +35,10 @@ const CONTRACT_LABELS: Record<string, string> = {
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  ACTIVE: "bg-green-100 text-green-700",
-  INACTIVE: "bg-slate-100 text-slate-600",
-  ON_LEAVE: "bg-yellow-100 text-yellow-700",
-  TERMINATED: "bg-red-100 text-red-700",
+  ACTIVE:     "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+  INACTIVE:   "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
+  ON_LEAVE:   "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+  TERMINATED: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -65,18 +65,18 @@ export default async function EmployeeDetailPage({
         <div>
           <Link
             href="/employees"
-            className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 mb-2"
+            className="inline-flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 mb-2"
           >
             <ArrowLeft className="h-4 w-4" />
             Empleados
           </Link>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
             {employee.firstName} {employee.lastName}
           </h1>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-sm text-slate-500">{employee.position.title}</span>
-            <span className="text-slate-300">·</span>
-            <span className="text-sm text-slate-500">{employee.department.name}</span>
+            <span className="text-sm text-slate-500 dark:text-slate-400">{employee.position.title}</span>
+            <span className="text-slate-400 dark:text-slate-600">·</span>
+            <span className="text-sm text-slate-500 dark:text-slate-400">{employee.department.name}</span>
             <span
               className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[employee.status] ?? ""}`}
             >
@@ -94,9 +94,9 @@ export default async function EmployeeDetailPage({
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Datos personales */}
-        <Card className="border-slate-200">
+        <Card className="border-slate-200 dark:border-slate-800">
           <CardHeader>
-            <CardTitle className="text-sm font-semibold text-slate-700">
+            <CardTitle className="text-sm font-semibold text-slate-700 dark:text-slate-300">
               Datos personales
             </CardTitle>
           </CardHeader>
@@ -116,8 +116,8 @@ export default async function EmployeeDetailPage({
                 { label: "Ciudad", value: employee.city ?? "—" },
               ].map((item) => (
                 <div key={item.label} className="flex justify-between">
-                  <dt className="text-xs text-slate-500">{item.label}</dt>
-                  <dd className="text-sm text-slate-900 font-medium">{item.value}</dd>
+                  <dt className="text-xs text-slate-500 dark:text-slate-400">{item.label}</dt>
+                  <dd className="text-sm text-slate-900 dark:text-slate-100 font-medium">{item.value}</dd>
                 </div>
               ))}
             </dl>
@@ -125,9 +125,9 @@ export default async function EmployeeDetailPage({
         </Card>
 
         {/* Datos laborales */}
-        <Card className="border-slate-200">
+        <Card className="border-slate-200 dark:border-slate-800">
           <CardHeader>
-            <CardTitle className="text-sm font-semibold text-slate-700">
+            <CardTitle className="text-sm font-semibold text-slate-700 dark:text-slate-300">
               Datos laborales
             </CardTitle>
           </CardHeader>
@@ -156,8 +156,8 @@ export default async function EmployeeDetailPage({
                 },
               ].map((item) => (
                 <div key={item.label} className="flex justify-between">
-                  <dt className="text-xs text-slate-500">{item.label}</dt>
-                  <dd className="text-sm text-slate-900 font-medium">{item.value}</dd>
+                  <dt className="text-xs text-slate-500 dark:text-slate-400">{item.label}</dt>
+                  <dd className="text-sm text-slate-900 dark:text-slate-100 font-medium">{item.value}</dd>
                 </div>
               ))}
             </dl>
@@ -166,9 +166,9 @@ export default async function EmployeeDetailPage({
 
         {/* Subordinados */}
         {employee.subordinates.length > 0 && (
-          <Card className="border-slate-200">
+          <Card className="border-slate-200 dark:border-slate-800">
             <CardHeader>
-              <CardTitle className="text-sm font-semibold text-slate-700">
+              <CardTitle className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Subordinados ({employee.subordinates.length})
               </CardTitle>
             </CardHeader>
@@ -178,12 +178,12 @@ export default async function EmployeeDetailPage({
                   <li key={sub.id}>
                     <Link
                       href={`/employees/${sub.id}`}
-                      className="flex items-center justify-between hover:text-blue-600"
+                      className="flex items-center justify-between hover:text-blue-600 dark:hover:text-blue-400"
                     >
-                      <span className="text-sm text-slate-900">
+                      <span className="text-sm text-slate-900 dark:text-slate-100">
                         {sub.firstName} {sub.lastName}
                       </span>
-                      <span className="text-xs text-slate-400 font-mono">
+                      <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                         {sub.employeeCode}
                       </span>
                     </Link>
@@ -196,9 +196,9 @@ export default async function EmployeeDetailPage({
 
         {/* Documentos recientes */}
         {employee.documents.length > 0 && (
-          <Card className="border-slate-200">
+          <Card className="border-slate-200 dark:border-slate-800">
             <CardHeader>
-              <CardTitle className="text-sm font-semibold text-slate-700">
+              <CardTitle className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Documentos recientes
               </CardTitle>
             </CardHeader>
@@ -206,8 +206,8 @@ export default async function EmployeeDetailPage({
               <ul className="space-y-2">
                 {employee.documents.map((doc) => (
                   <li key={doc.id} className="flex items-center justify-between">
-                    <span className="text-sm text-slate-900">{doc.title}</span>
-                    <span className="text-xs text-slate-400">{doc.type}</span>
+                    <span className="text-sm text-slate-900 dark:text-slate-100">{doc.title}</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">{doc.type}</span>
                   </li>
                 ))}
               </ul>
@@ -217,12 +217,12 @@ export default async function EmployeeDetailPage({
       </div>
 
       {employee.notes && (
-        <Card className="border-slate-200">
+        <Card className="border-slate-200 dark:border-slate-800">
           <CardHeader>
-            <CardTitle className="text-sm font-semibold text-slate-700">Notas</CardTitle>
+            <CardTitle className="text-sm font-semibold text-slate-700 dark:text-slate-300">Notas</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-slate-600">{employee.notes}</p>
+            <p className="text-sm text-slate-600 dark:text-slate-300">{employee.notes}</p>
           </CardContent>
         </Card>
       )}

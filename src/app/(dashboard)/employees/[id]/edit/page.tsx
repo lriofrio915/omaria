@@ -70,13 +70,13 @@ export default async function EditEmployeePage({
       <div>
         <Link
           href={`/employees/${id}`}
-          className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 mb-2"
+          className="inline-flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 mb-2"
         >
           <ArrowLeft className="h-4 w-4" />
           Ver empleado
         </Link>
-        <h1 className="text-2xl font-bold text-slate-900">Editar empleado</h1>
-        <p className="text-sm text-slate-500 mt-1">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Editar empleado</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
           {employee.firstName} {employee.lastName}
         </p>
       </div>

@@ -453,7 +453,7 @@ export function EmployeeList() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 w-7 p-0 text-muted-foreground hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                            className="h-7 w-7 p-0 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                             onClick={() => router.push(`/employees/${emp.id}`)}
                             title="Ver perfil"
                           >
@@ -462,7 +462,7 @@ export function EmployeeList() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 w-7 p-0 text-muted-foreground hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                            className="h-7 w-7 p-0 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                             onClick={() => router.push(`/employees/${emp.id}/edit`)}
                             title="Editar"
                           >
@@ -471,7 +471,7 @@ export function EmployeeList() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 w-7 p-0 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                            className="h-7 w-7 p-0 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                             onClick={() => {
                               setDeleteId(emp.id);
                               setDeleteName(`${emp.firstName} ${emp.lastName}`);
