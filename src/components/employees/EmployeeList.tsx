@@ -311,10 +311,10 @@ export function EmployeeList() {
                 <TableHead className="w-12 text-center font-semibold text-foreground text-xs uppercase tracking-wide py-3">
                   N°
                 </TableHead>
-                <TableHead className="font-semibold text-foreground text-xs uppercase tracking-wide py-3 min-w-[200px]">
+                <TableHead className="font-semibold text-foreground text-xs uppercase tracking-wide py-3 w-[160px] max-w-[160px]">
                   Colaborador
                 </TableHead>
-                <TableHead className="font-semibold text-foreground text-xs uppercase tracking-wide py-3 min-w-[160px]">
+                <TableHead className="font-semibold text-foreground text-xs uppercase tracking-wide py-3 w-[130px] max-w-[130px]">
                   Cargo
                 </TableHead>
                 <TableHead className="font-semibold text-foreground text-xs uppercase tracking-wide py-3 min-w-[120px]">
@@ -388,19 +388,22 @@ export function EmployeeList() {
                       </TableCell>
 
                       {/* Colaborador */}
-                      <TableCell className="py-3">
-                        <div className="flex items-center gap-3">
+                      <TableCell className="py-3 max-w-[160px]">
+                        <div className="flex items-center gap-2">
                           <div
-                            className="h-8 w-8 rounded-full flex items-center justify-center text-white text-xs font-semibold shrink-0 select-none"
+                            className="h-7 w-7 rounded-full flex items-center justify-center text-white text-xs font-semibold shrink-0 select-none"
                             style={{ backgroundColor: avatarColor }}
                           >
                             {initials}
                           </div>
                           <div className="min-w-0">
-                            <p className="font-medium text-sm text-foreground leading-tight truncate">
+                            <p
+                              className="font-medium text-sm text-foreground leading-tight truncate"
+                              title={`${emp.firstName} ${emp.lastName}`}
+                            >
                               {emp.firstName} {emp.lastName}
                             </p>
-                            <p className="text-xs text-muted-foreground font-mono mt-0.5">
+                            <p className="text-xs text-muted-foreground font-mono mt-0.5 truncate">
                               {emp.employeeCode}
                             </p>
                           </div>
@@ -408,8 +411,11 @@ export function EmployeeList() {
                       </TableCell>
 
                       {/* Cargo */}
-                      <TableCell className="py-3">
-                        <span className="text-sm text-foreground/80 leading-tight line-clamp-2">
+                      <TableCell className="py-3 max-w-[130px]">
+                        <span
+                          className="text-sm text-foreground/80 leading-tight truncate block"
+                          title={emp.position.title}
+                        >
                           {emp.position.title}
                         </span>
                       </TableCell>
