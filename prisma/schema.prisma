@@ -279,6 +279,9 @@ model EmployeeProfile {
   cvFileName     String?
   senescytUrl    String?
   senescytFileName String?
+  trackRecordUrl     String?
+  trackRecordFileName String?
+  trackRecordLink    String?
   education      EmployeeEducation[]
   experience     EmployeeWorkExperience[]
   skills         EmployeeSkill[]

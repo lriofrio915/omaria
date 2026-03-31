@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import {
   User, Briefcase, GraduationCap, Zap, Globe, Award,
   Plus, Trash2, ExternalLink, Upload, Bot, Loader2,
-  Edit2, Check, X, Link2, ChevronDown, ChevronUp,
+  Edit2, Check, X, Link2, ChevronDown, ChevronUp, BarChart2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -92,6 +92,9 @@ interface Profile {
   cvFileName: string | null;
   senescytUrl: string | null;
   senescytFileName: string | null;
+  trackRecordUrl: string | null;
+  trackRecordFileName: string | null;
+  trackRecordLink: string | null;
   education: Education[];
   experience: Experience[];
   skills: Skill[];
@@ -108,7 +111,7 @@ interface EmployeeData {
   city: string | null;
   personalEmail: string | null;
   position: { title: string } | null;
-  department: { name: string; company: { name: string; primaryColor: string } | null } | null;
+  department: { name: string; company: { name: string; primaryColor: string; slug: string } | null } | null;
   profile: Profile | null;
 }
 
@@ -210,9 +213,17 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const cvInputRef = useRef<HTMLInputElement>(null);
   const senescytInputRef = useRef<HTMLInputElement>(null);
+  const trackRecordInputRef = useRef<HTMLInputElement>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [uploadingCv, setUploadingCv] = useState(false);
   const [uploadingSenescyt, setUploadingSenescyt] = useState(false);
+  const [uploadingTrackRecord, setUploadingTrackRecord] = useState(false);
+  const [trackRecordLinkInput, setTrackRecordLinkInput] = useState(
+    data.profile?.trackRecordLink ?? ""
+  );
+  const [editingTrackRecordLink, setEditingTrackRecordLink] = useState(false);
+
+  const isEmporium = data.department?.company?.slug === "emporium";
 
   // AI match
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
@@ -351,6 +362,66 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
     setUploadingSenescyt(false);
     if (res.ok) { toast.success("Certificado eliminado"); await reload(); }
     else toast.error("Error al eliminar");
+  }
+
+  // ── Track Record upload ──────────────────────────────────────────────────────
+  async function handleTrackRecordFile(file: File) {
+    const allowed = [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-excel",
+      "text/csv",
+    ];
+    if (!allowed.includes(file.type) && !file.name.match(/\.(xlsx?|csv)$/i)) {
+      toast.error("Solo se permiten archivos Excel (.xlsx, .xls) o CSV");
+      return;
+    }
+    setUploadingTrackRecord(true);
+    const ext = file.name.split(".").pop();
+    const path = `track-record/${data.id}.${ext}`;
+    const { error } = await supabase.storage.from("documents").upload(path, file, { upsert: true });
+    if (error) { toast.error(`Error subiendo archivo: ${error.message}`); setUploadingTrackRecord(false); return; }
+    const { data: urlData } = supabase.storage.from("documents").getPublicUrl(path);
+    const res = await fetch("/api/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ trackRecordUrl: urlData.publicUrl, trackRecordFileName: file.name }),
+    });
+    setUploadingTrackRecord(false);
+    if (res.ok) { toast.success("Track Record subido"); await reload(); }
+    else toast.error("Error al guardar");
+  }
+
+  async function handleTrackRecordChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await handleTrackRecordFile(file);
+  }
+
+  async function handleTrackRecordDelete() {
+    setUploadingTrackRecord(true);
+    const fileName = currentProfile?.trackRecordFileName ?? "";
+    const ext = fileName.split(".").pop();
+    if (ext) await supabase.storage.from("documents").remove([`track-record/${data.id}.${ext}`]);
+    const res = await fetch("/api/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ trackRecordUrl: null, trackRecordFileName: null }),
+    });
+    setUploadingTrackRecord(false);
+    if (res.ok) { toast.success("Archivo eliminado"); await reload(); }
+    else toast.error("Error al eliminar");
+  }
+
+  async function saveTrackRecordLink() {
+    setUploadingTrackRecord(true);
+    const res = await fetch("/api/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ trackRecordLink: trackRecordLinkInput.trim() || null }),
+    });
+    setUploadingTrackRecord(false);
+    if (res.ok) { toast.success("Enlace guardado"); setEditingTrackRecordLink(false); await reload(); }
+    else toast.error("Error al guardar");
   }
 
   // ── AI match ─────────────────────────────────────────────────────────────────
@@ -785,6 +856,181 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
           <CertDialog open={certDialog} editItem={editingCert} onClose={() => { setCertDialog(false); setEditingCert(null); }} onSaved={async () => { setCertDialog(false); setEditingCert(null); await reload(); }} />
         </TabsContent>
       </Tabs>
+
+      {/* ── Track Record (solo Emporium) ── */}
+      {isEmporium && (
+        <div className="rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-white dark:bg-slate-900 overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center gap-3 px-6 py-5 border-b border-emerald-100 dark:border-emerald-900/40 bg-emerald-50/50 dark:bg-emerald-900/10">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-sm">
+              <BarChart2 className="h-5 w-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-slate-900 dark:text-slate-100">Track Record</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Historial de operaciones del trader — adjunta un archivo o enlaza tu plataforma
+              </p>
+            </div>
+            <input
+              ref={trackRecordInputRef}
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              className="hidden"
+              onChange={handleTrackRecordChange}
+            />
+          </div>
+
+          {/* Body: dos columnas en md+ */}
+          <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100 dark:divide-slate-800">
+
+            {/* ── Columna izquierda: archivo ── */}
+            <div className="p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                  <Upload className="h-4 w-4 text-emerald-500" />
+                  Archivo Excel / CSV
+                </p>
+                {currentProfile?.trackRecordUrl && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => trackRecordInputRef.current?.click()}
+                    disabled={uploadingTrackRecord}
+                    className="cursor-pointer text-xs"
+                  >
+                    {uploadingTrackRecord
+                      ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                      : <Upload className="h-3.5 w-3.5 mr-1" />}
+                    Actualizar
+                  </Button>
+                )}
+              </div>
+
+              {currentProfile?.trackRecordUrl ? (
+                <div className="flex items-center gap-3 rounded-lg border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-900/10 px-4 py-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+                    <BarChart2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
+                      {currentProfile.trackRecordFileName ?? "Track Record"}
+                    </p>
+                    <a
+                      href={currentProfile.trackRecordUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-emerald-600 hover:underline flex items-center gap-1 cursor-pointer mt-0.5"
+                    >
+                      <ExternalLink className="h-3 w-3" /> Descargar archivo
+                    </a>
+                  </div>
+                  <button
+                    onClick={handleTrackRecordDelete}
+                    disabled={uploadingTrackRecord}
+                    className="text-slate-300 hover:text-red-500 cursor-pointer transition-colors shrink-0 p-1"
+                    title="Eliminar archivo"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <FileDropZone
+                  onFile={handleTrackRecordFile}
+                  accept=".xlsx,.xls,.csv"
+                  onClick={() => trackRecordInputRef.current?.click()}
+                  className="flex flex-col items-center gap-3 py-10 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10 transition-colors"
+                >
+                  {uploadingTrackRecord ? (
+                    <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+                  ) : (
+                    <Upload className="h-8 w-8 text-slate-300 dark:text-slate-600" />
+                  )}
+                  <div className="text-center px-4">
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                      Arrastra el archivo aquí
+                    </p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                      o haz clic para seleccionar (.xlsx, .xls, .csv)
+                    </p>
+                  </div>
+                </FileDropZone>
+              )}
+            </div>
+
+            {/* ── Columna derecha: enlace externo ── */}
+            <div className="p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                  <Link2 className="h-4 w-4 text-emerald-500" />
+                  Enlace externo
+                </p>
+                {!editingTrackRecordLink ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => { setTrackRecordLinkInput(currentProfile?.trackRecordLink ?? ""); setEditingTrackRecordLink(true); }}
+                    className="cursor-pointer text-xs"
+                  >
+                    <Edit2 className="h-3.5 w-3.5 mr-1" /> Editar
+                  </Button>
+                ) : (
+                  <div className="flex gap-2">
+                    <Button size="sm" onClick={saveTrackRecordLink} disabled={uploadingTrackRecord} className="cursor-pointer">
+                      {uploadingTrackRecord ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5 mr-1" />}
+                      Guardar
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setEditingTrackRecordLink(false)} className="cursor-pointer">
+                      <X className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              {!editingTrackRecordLink ? (
+                currentProfile?.trackRecordLink ? (
+                  <a
+                    href={currentProfile.trackRecordLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-start gap-2 rounded-lg border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-900/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400 hover:underline cursor-pointer break-all"
+                  >
+                    <ExternalLink className="h-4 w-4 shrink-0 mt-0.5" />
+                    {currentProfile.trackRecordLink}
+                  </a>
+                ) : (
+                  <div
+                    onClick={() => { setTrackRecordLinkInput(""); setEditingTrackRecordLink(true); }}
+                    className="flex flex-col items-center gap-3 py-10 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10 transition-colors"
+                  >
+                    <Link2 className="h-8 w-8 text-slate-300 dark:text-slate-600" />
+                    <div className="text-center px-4">
+                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                        Pega el enlace aquí
+                      </p>
+                      <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                        Myfxbook, MetaTrader, TradingView u otra plataforma
+                      </p>
+                    </div>
+                  </div>
+                )
+              ) : (
+                <div className="space-y-3">
+                  <Input
+                    value={trackRecordLinkInput}
+                    onChange={e => setTrackRecordLinkInput(e.target.value)}
+                    placeholder="https://myfxbook.com/... o enlace a la plataforma"
+                    className="cursor-text"
+                    autoFocus
+                  />
+                  <p className="text-xs text-slate-400">
+                    Ej: Myfxbook, MetaTrader, TradingView, cTrader, etc.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── AI Match ── */}
       <div className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-white dark:bg-slate-900 overflow-hidden">
