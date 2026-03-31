@@ -141,6 +141,7 @@ export async function POST(request: Request) {
         address: data.address,
         city: data.city,
         notes: data.notes,
+        role: data.role,
       },
       include: {
         department: { select: { id: true, name: true } },

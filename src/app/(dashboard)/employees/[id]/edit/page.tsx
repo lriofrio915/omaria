@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma/client";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { EmployeeForm } from "@/components/employees/EmployeeForm";
 
 async function getEmployee(id: string) {
@@ -12,6 +11,7 @@ async function getEmployee(id: string) {
       select: {
         id: true,
         userId: true,
+        role: true,
         firstName: true,
         lastName: true,
         email: true,
@@ -49,16 +49,6 @@ export default async function EditEmployeePage({
 
   if (!employee) notFound();
 
-  // Obtener rol actual desde Supabase Auth
-  let currentRole: "ADMIN" | "EMPLOYEE" = "EMPLOYEE";
-  try {
-    const adminClient = createAdminClient();
-    const { data } = await adminClient.auth.admin.getUserById(employee.userId);
-    currentRole = data?.user?.user_metadata?.role ?? "EMPLOYEE";
-  } catch {
-    // Si el usuario no tiene cuenta Supabase, dejamos EMPLOYEE por defecto
-  }
-
   // Convertir a strings para el formulario
   const initialData = {
     id: employee.id,
@@ -83,7 +73,7 @@ export default async function EditEmployeePage({
     address: employee.address ?? undefined,
     city: employee.city ?? undefined,
     notes: employee.notes ?? undefined,
-    role: currentRole,
+    role: (employee.role === "ADMIN" ? "ADMIN" : "EMPLOYEE") as "ADMIN" | "EMPLOYEE",
   };
 
   return (

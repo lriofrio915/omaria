@@ -86,6 +86,8 @@ export async function PUT(
       where: { id },
       data: {
         ...restData,
+        // Guardar role en la DB para persistencia garantizada
+        ...(role ? { role } : {}),
         birthDate: restData.birthDate ? new Date(restData.birthDate) : restData.birthDate === null ? null : undefined,
         hireDate: restData.hireDate ? new Date(restData.hireDate) : undefined,
         endDate: restData.endDate ? new Date(restData.endDate) : restData.endDate === null ? null : undefined,
@@ -96,7 +98,7 @@ export async function PUT(
       },
     });
 
-    // Actualizar rol en Supabase Auth si fue enviado
+    // También actualizar en Supabase Auth (best-effort, no bloquea si falla)
     if (role) {
       try {
         const adminClient = createAdminClient();
@@ -104,7 +106,7 @@ export async function PUT(
           user_metadata: { role },
         });
       } catch {
-        // No bloqueamos el guardado si falla la actualización del rol
+        // Si el userId es un placeholder, esto falla silenciosamente. El role ya está en DB.
       }
     }
 

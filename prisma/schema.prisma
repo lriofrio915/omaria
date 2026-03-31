@@ -157,6 +157,7 @@ model Employee {
   address        String?
   city           String?
   notes          String?
+  role           String               @default("EMPLOYEE")
   createdAt      DateTime             @default(now())
   updatedAt      DateTime             @updatedAt
 
