@@ -308,22 +308,22 @@ export function EmployeeList() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/40 hover:bg-muted/40 border-b border-border">
-                <TableHead className="w-12 text-center font-semibold text-foreground text-xs uppercase tracking-wide py-3">
+                <TableHead className="w-10 text-center font-semibold text-foreground text-xs uppercase tracking-wide py-3">
                   N°
                 </TableHead>
-                <TableHead className="font-semibold text-foreground text-xs uppercase tracking-wide py-3 w-[160px] max-w-[160px]">
+                <TableHead className="text-center font-semibold text-foreground text-xs uppercase tracking-wide py-3 w-[210px] max-w-[210px]">
                   Colaborador
                 </TableHead>
-                <TableHead className="font-semibold text-foreground text-xs uppercase tracking-wide py-3 w-[130px] max-w-[130px]">
+                <TableHead className="text-center font-semibold text-foreground text-xs uppercase tracking-wide py-3 w-[120px] max-w-[120px]">
                   Cargo
                 </TableHead>
-                <TableHead className="font-semibold text-foreground text-xs uppercase tracking-wide py-3 min-w-[120px]">
+                <TableHead className="text-center font-semibold text-foreground text-xs uppercase tracking-wide py-3 w-[100px] max-w-[100px]">
                   Área
                 </TableHead>
-                <TableHead className="font-semibold text-foreground text-xs uppercase tracking-wide py-3 min-w-[160px]">
+                <TableHead className="text-center font-semibold text-foreground text-xs uppercase tracking-wide py-3 w-[130px] max-w-[130px]">
                   Empresa
                 </TableHead>
-                <TableHead className="font-semibold text-foreground text-xs uppercase tracking-wide py-3 w-20">
+                <TableHead className="text-center font-semibold text-foreground text-xs uppercase tracking-wide py-3 w-20">
                   Estado
                 </TableHead>
                 <TableHead className="text-right font-semibold text-foreground text-xs uppercase tracking-wide py-3 pr-4 w-32">
@@ -388,7 +388,7 @@ export function EmployeeList() {
                       </TableCell>
 
                       {/* Colaborador */}
-                      <TableCell className="py-3 max-w-[160px]">
+                      <TableCell className="py-3 max-w-[210px]">
                         <div className="flex items-center gap-2">
                           <div
                             className="h-7 w-7 rounded-full flex items-center justify-center text-white text-xs font-semibold shrink-0 select-none"
@@ -411,7 +411,7 @@ export function EmployeeList() {
                       </TableCell>
 
                       {/* Cargo */}
-                      <TableCell className="py-3 max-w-[130px]">
+                      <TableCell className="py-3 max-w-[120px]">
                         <span
                           className="text-sm text-foreground/80 leading-tight truncate block"
                           title={emp.position.title}
@@ -421,21 +421,27 @@ export function EmployeeList() {
                       </TableCell>
 
                       {/* Área */}
-                      <TableCell className="py-3">
-                        <span className="text-sm text-muted-foreground">
+                      <TableCell className="py-3 max-w-[100px]">
+                        <span
+                          className="text-sm text-muted-foreground truncate block"
+                          title={emp.department.name}
+                        >
                           {emp.department.name}
                         </span>
                       </TableCell>
 
                       {/* Empresa */}
-                      <TableCell className="py-3">
+                      <TableCell className="py-3 max-w-[130px]">
                         {company ? (
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-1.5 min-w-0">
                             <span
                               className="inline-block h-2 w-2 rounded-full shrink-0"
                               style={{ backgroundColor: company.primaryColor }}
                             />
-                            <span className="text-sm text-foreground/80 truncate max-w-[140px]">
+                            <span
+                              className="text-sm text-foreground/80 truncate"
+                              title={company.name}
+                            >
                               {company.name}
                             </span>
                           </div>
