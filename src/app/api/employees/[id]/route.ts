@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { prisma } from "@/lib/prisma/client";
 
 const updateEmployeeSchema = z.object({
@@ -23,6 +24,7 @@ const updateEmployeeSchema = z.object({
   address: z.string().optional().nullable(),
   city: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
+  role: z.enum(["ADMIN", "EMPLOYEE"]).optional(),
 });
 
 export async function GET(
@@ -79,20 +81,32 @@ export async function PUT(
       return NextResponse.json({ error: "Datos inválidos", details: parsed.error.flatten() }, { status: 400 });
     }
 
-    const data = parsed.data;
+    const { role, ...restData } = parsed.data;
     const employee = await prisma.employee.update({
       where: { id },
       data: {
-        ...data,
-        birthDate: data.birthDate ? new Date(data.birthDate) : data.birthDate === null ? null : undefined,
-        hireDate: data.hireDate ? new Date(data.hireDate) : undefined,
-        endDate: data.endDate ? new Date(data.endDate) : data.endDate === null ? null : undefined,
+        ...restData,
+        birthDate: restData.birthDate ? new Date(restData.birthDate) : restData.birthDate === null ? null : undefined,
+        hireDate: restData.hireDate ? new Date(restData.hireDate) : undefined,
+        endDate: restData.endDate ? new Date(restData.endDate) : restData.endDate === null ? null : undefined,
       },
       include: {
         department: { select: { id: true, name: true } },
         position: { select: { id: true, title: true } },
       },
     });
+
+    // Actualizar rol en Supabase Auth si fue enviado
+    if (role) {
+      try {
+        const adminClient = createAdminClient();
+        await adminClient.auth.admin.updateUserById(employee.userId, {
+          user_metadata: { role },
+        });
+      } catch {
+        // No bloqueamos el guardado si falla la actualización del rol
+      }
+    }
 
     return NextResponse.json(employee);
   } catch {

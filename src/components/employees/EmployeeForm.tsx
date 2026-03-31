@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -163,6 +163,9 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
   const [createAccount, setCreateAccount] = useState(false);
   const [resetSending, setResetSending] = useState(false);
 
+  // Evita que el efecto de companyId limpie departamento/cargo al cargar datos iniciales
+  const isFirstCompanyLoad = useRef(true);
+
   const {
     register,
     handleSubmit,
@@ -209,9 +212,13 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
   useEffect(() => {
     if (selectedCompany) {
       loadDepartments(selectedCompany);
-      setValue("departmentId", "");
-      setValue("positionId", "");
-      setPositions([]);
+      if (isFirstCompanyLoad.current) {
+        isFirstCompanyLoad.current = false;
+      } else {
+        setValue("departmentId", "");
+        setValue("positionId", "");
+        setPositions([]);
+      }
     }
   }, [selectedCompany, loadDepartments, setValue]);
 
@@ -237,6 +244,7 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
       personalEmail: rest.personalEmail || undefined,
       corporateEmail: rest.corporateEmail || undefined,
       bloodType: rest.bloodType || undefined,
+      role: rest.role ?? "EMPLOYEE",
       createAccount,
     };
 
@@ -615,7 +623,69 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
       {/* ── 5. GESTIÓN DE CUENTA (solo edición) ───────────────────────────── */}
       {mode === "edit" && (
         <Section icon={KeyRound} title="Gestión de cuenta">
-          <div className="space-y-3">
+          <div className="space-y-5">
+
+            {/* Selector de rol */}
+            <div>
+              <p className="text-sm font-medium text-foreground mb-3">
+                Rol en el sistema <span className="text-red-500">*</span>
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label className="cursor-pointer">
+                  <input type="radio" value="EMPLOYEE" className="sr-only" {...register("role")} />
+                  <div className={`relative rounded-xl border-2 p-4 transition-all ${
+                    watch("role") === "EMPLOYEE" || !watch("role")
+                      ? "border-blue-500 bg-blue-50/60 dark:bg-blue-900/20"
+                      : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                  }`}>
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/40">
+                        <User className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Colaborador</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                          Solo puede ver su perfil, documentos y recibos de nómina propios.
+                        </p>
+                      </div>
+                      {(watch("role") === "EMPLOYEE" || !watch("role")) && (
+                        <div className="h-4 w-4 shrink-0 rounded-full bg-blue-500 flex items-center justify-center mt-0.5">
+                          <div className="h-1.5 w-1.5 rounded-full bg-white" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </label>
+
+                <label className="cursor-pointer">
+                  <input type="radio" value="ADMIN" className="sr-only" {...register("role")} />
+                  <div className={`relative rounded-xl border-2 p-4 transition-all ${
+                    watch("role") === "ADMIN"
+                      ? "border-purple-500 bg-purple-50/60 dark:bg-purple-900/20"
+                      : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                  }`}>
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/40">
+                        <ShieldCheck className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Administrador</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                          Acceso completo: gestión de empleados, documentos, nóminas y configuración.
+                        </p>
+                      </div>
+                      {watch("role") === "ADMIN" && (
+                        <div className="h-4 w-4 shrink-0 rounded-full bg-purple-500 flex items-center justify-center mt-0.5">
+                          <div className="h-1.5 w-1.5 rounded-full bg-white" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div className="border-t border-border pt-4 space-y-3">
             <p className="text-sm text-muted-foreground">
               Envía un correo de restablecimiento de contraseña al colaborador. Recibirá un enlace para crear una nueva contraseña.
             </p>
@@ -647,6 +717,7 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
               <KeyRound className="h-4 w-4" />
               {resetSending ? "Enviando..." : "Enviar correo de restablecimiento"}
             </Button>
+            </div>
           </div>
         </Section>
       )}
