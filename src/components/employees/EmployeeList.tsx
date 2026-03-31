@@ -326,7 +326,7 @@ export function EmployeeList() {
                 <TableHead className="font-semibold text-foreground text-xs uppercase tracking-wide py-3 w-20">
                   Estado
                 </TableHead>
-                <TableHead className="text-right font-semibold text-foreground text-xs uppercase tracking-wide py-3 pr-4 w-28">
+                <TableHead className="text-right font-semibold text-foreground text-xs uppercase tracking-wide py-3 pr-4 w-32">
                   Acciones
                 </TableHead>
               </TableRow>
@@ -449,7 +449,7 @@ export function EmployeeList() {
 
                       {/* Acciones */}
                       <TableCell className="py-3 pr-4" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-end gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center justify-end gap-0.5">
                           <Button
                             variant="ghost"
                             size="sm"

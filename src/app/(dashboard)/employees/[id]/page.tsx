@@ -115,9 +115,9 @@ export default async function EmployeeDetailPage({
                 { label: "Dirección", value: employee.address ?? "—" },
                 { label: "Ciudad", value: employee.city ?? "—" },
               ].map((item) => (
-                <div key={item.label} className="flex justify-between">
-                  <dt className="text-xs text-slate-500 dark:text-slate-400">{item.label}</dt>
-                  <dd className="text-sm text-slate-900 dark:text-slate-100 font-medium">{item.value}</dd>
+                <div key={item.label} className="flex items-start justify-between gap-4">
+                  <dt className="text-xs text-slate-500 dark:text-slate-400 shrink-0">{item.label}</dt>
+                  <dd className="text-sm text-slate-900 dark:text-slate-100 font-medium text-right">{item.value}</dd>
                 </div>
               ))}
             </dl>
@@ -155,9 +155,9 @@ export default async function EmployeeDetailPage({
                     : "—",
                 },
               ].map((item) => (
-                <div key={item.label} className="flex justify-between">
-                  <dt className="text-xs text-slate-500 dark:text-slate-400">{item.label}</dt>
-                  <dd className="text-sm text-slate-900 dark:text-slate-100 font-medium">{item.value}</dd>
+                <div key={item.label} className="flex items-start justify-between gap-4">
+                  <dt className="text-xs text-slate-500 dark:text-slate-400 shrink-0">{item.label}</dt>
+                  <dd className="text-sm text-slate-900 dark:text-slate-100 font-medium text-right">{item.value}</dd>
                 </div>
               ))}
             </dl>
