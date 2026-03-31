@@ -859,24 +859,18 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
 
       {/* ── Track Record (solo Emporium) ── */}
       {isEmporium && (
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
-            <h3 className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <BarChart2 className="h-4 w-4 text-emerald-500" />
-              Track Record
-            </h3>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => trackRecordInputRef.current?.click()}
-              disabled={uploadingTrackRecord}
-              className="cursor-pointer"
-            >
-              {uploadingTrackRecord
-                ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
-                : <Upload className="h-3.5 w-3.5 mr-1" />}
-              {currentProfile?.trackRecordUrl ? "Actualizar archivo" : "Subir archivo"}
-            </Button>
+        <div className="rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-white dark:bg-slate-900 overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center gap-3 px-6 py-5 border-b border-emerald-100 dark:border-emerald-900/40 bg-emerald-50/50 dark:bg-emerald-900/10">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-sm">
+              <BarChart2 className="h-5 w-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-slate-900 dark:text-slate-100">Track Record</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Historial de operaciones del trader — adjunta un archivo o enlaza tu plataforma
+              </p>
+            </div>
             <input
               ref={trackRecordInputRef}
               type="file"
@@ -885,66 +879,97 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
               onChange={handleTrackRecordChange}
             />
           </div>
-          <div className="px-5 py-4 space-y-4">
-            <p className="text-xs text-slate-400 dark:text-slate-500">
-              Adjunta el historial de operaciones del trader (.xlsx, .xls, .csv) o indica el enlace a la plataforma donde se encuentre disponible.
-            </p>
 
-            {/* File */}
-            {currentProfile?.trackRecordUrl ? (
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-900/20">
-                  <BarChart2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
-                    {currentProfile.trackRecordFileName ?? "Track Record"}
-                  </p>
-                  <a
-                    href={currentProfile.trackRecordUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-emerald-600 hover:underline flex items-center gap-1 cursor-pointer"
-                  >
-                    <ExternalLink className="h-3 w-3" /> Descargar archivo
-                  </a>
-                </div>
-                <button
-                  onClick={handleTrackRecordDelete}
-                  disabled={uploadingTrackRecord}
-                  className="text-slate-400 hover:text-red-500 cursor-pointer transition-colors shrink-0"
-                  title="Eliminar archivo"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            ) : (
-              <FileDropZone
-                onFile={handleTrackRecordFile}
-                accept=".xlsx,.xls,.csv"
-                onClick={() => trackRecordInputRef.current?.click()}
-                className="flex flex-col items-center gap-2 py-6 rounded-lg border border-dashed border-slate-300 dark:border-slate-600 cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10"
-              >
-                <Upload className="h-6 w-6 text-slate-300 dark:text-slate-600" />
-                <p className="text-sm text-slate-400 dark:text-slate-500 text-center">
-                  Arrastra aquí o haz clic para subir el Track Record (Excel / CSV)
+          {/* Body: dos columnas en md+ */}
+          <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100 dark:divide-slate-800">
+
+            {/* ── Columna izquierda: archivo ── */}
+            <div className="p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                  <Upload className="h-4 w-4 text-emerald-500" />
+                  Archivo Excel / CSV
                 </p>
-              </FileDropZone>
-            )}
+                {currentProfile?.trackRecordUrl && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => trackRecordInputRef.current?.click()}
+                    disabled={uploadingTrackRecord}
+                    className="cursor-pointer text-xs"
+                  >
+                    {uploadingTrackRecord
+                      ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                      : <Upload className="h-3.5 w-3.5 mr-1" />}
+                    Actualizar
+                  </Button>
+                )}
+              </div>
 
-            {/* Link */}
-            <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                  <Link2 className="h-3.5 w-3.5" />
-                  Enlace externo al Track Record
+              {currentProfile?.trackRecordUrl ? (
+                <div className="flex items-center gap-3 rounded-lg border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-900/10 px-4 py-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+                    <BarChart2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
+                      {currentProfile.trackRecordFileName ?? "Track Record"}
+                    </p>
+                    <a
+                      href={currentProfile.trackRecordUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-emerald-600 hover:underline flex items-center gap-1 cursor-pointer mt-0.5"
+                    >
+                      <ExternalLink className="h-3 w-3" /> Descargar archivo
+                    </a>
+                  </div>
+                  <button
+                    onClick={handleTrackRecordDelete}
+                    disabled={uploadingTrackRecord}
+                    className="text-slate-300 hover:text-red-500 cursor-pointer transition-colors shrink-0 p-1"
+                    title="Eliminar archivo"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <FileDropZone
+                  onFile={handleTrackRecordFile}
+                  accept=".xlsx,.xls,.csv"
+                  onClick={() => trackRecordInputRef.current?.click()}
+                  className="flex flex-col items-center gap-3 py-10 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10 transition-colors"
+                >
+                  {uploadingTrackRecord ? (
+                    <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+                  ) : (
+                    <Upload className="h-8 w-8 text-slate-300 dark:text-slate-600" />
+                  )}
+                  <div className="text-center px-4">
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                      Arrastra el archivo aquí
+                    </p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                      o haz clic para seleccionar (.xlsx, .xls, .csv)
+                    </p>
+                  </div>
+                </FileDropZone>
+              )}
+            </div>
+
+            {/* ── Columna derecha: enlace externo ── */}
+            <div className="p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                  <Link2 className="h-4 w-4 text-emerald-500" />
+                  Enlace externo
                 </p>
                 {!editingTrackRecordLink ? (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => { setTrackRecordLinkInput(currentProfile?.trackRecordLink ?? ""); setEditingTrackRecordLink(true); }}
-                    className="cursor-pointer"
+                    className="cursor-pointer text-xs"
                   >
                     <Edit2 className="h-3.5 w-3.5 mr-1" /> Editar
                   </Button>
@@ -960,27 +985,47 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
                   </div>
                 )}
               </div>
+
               {!editingTrackRecordLink ? (
                 currentProfile?.trackRecordLink ? (
                   <a
                     href={currentProfile.trackRecordLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-emerald-600 hover:underline flex items-center gap-1 cursor-pointer break-all"
+                    className="flex items-start gap-2 rounded-lg border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-900/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400 hover:underline cursor-pointer break-all"
                   >
-                    <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                    <ExternalLink className="h-4 w-4 shrink-0 mt-0.5" />
                     {currentProfile.trackRecordLink}
                   </a>
                 ) : (
-                  <p className="text-sm text-slate-400 italic">Sin enlace externo. Haz clic en Editar para añadirlo.</p>
+                  <div
+                    onClick={() => { setTrackRecordLinkInput(""); setEditingTrackRecordLink(true); }}
+                    className="flex flex-col items-center gap-3 py-10 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10 transition-colors"
+                  >
+                    <Link2 className="h-8 w-8 text-slate-300 dark:text-slate-600" />
+                    <div className="text-center px-4">
+                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                        Pega el enlace aquí
+                      </p>
+                      <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                        Myfxbook, MetaTrader, TradingView u otra plataforma
+                      </p>
+                    </div>
+                  </div>
                 )
               ) : (
-                <Input
-                  value={trackRecordLinkInput}
-                  onChange={e => setTrackRecordLinkInput(e.target.value)}
-                  placeholder="https://myfxbook.com/... o enlace a la plataforma"
-                  className="cursor-text"
-                />
+                <div className="space-y-3">
+                  <Input
+                    value={trackRecordLinkInput}
+                    onChange={e => setTrackRecordLinkInput(e.target.value)}
+                    placeholder="https://myfxbook.com/... o enlace a la plataforma"
+                    className="cursor-text"
+                    autoFocus
+                  />
+                  <p className="text-xs text-slate-400">
+                    Ej: Myfxbook, MetaTrader, TradingView, cTrader, etc.
+                  </p>
+                </div>
               )}
             </div>
           </div>
