@@ -516,8 +516,7 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
                   <input
                     type="radio"
                     value="EMPLOYEE"
-                    className="sr-only"
-                    tabIndex={-1}
+                    className="hidden"
                     {...register("role")}
                     defaultChecked
                   />
@@ -550,8 +549,7 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
                   <input
                     type="radio"
                     value="ADMIN"
-                    className="sr-only"
-                    tabIndex={-1}
+                    className="hidden"
                     {...register("role")}
                   />
                   <div className={`relative rounded-xl border-2 p-4 transition-all ${
@@ -634,7 +632,7 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label className="cursor-pointer">
-                  <input type="radio" value="EMPLOYEE" className="sr-only" tabIndex={-1} {...register("role")} />
+                  <input type="radio" value="EMPLOYEE" className="hidden" {...register("role")} />
                   <div className={`relative rounded-xl border-2 p-4 transition-all ${
                     watch("role") === "EMPLOYEE" || !watch("role")
                       ? "border-blue-500 bg-blue-50/60 dark:bg-blue-900/20"
@@ -660,7 +658,7 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
                 </label>
 
                 <label className="cursor-pointer">
-                  <input type="radio" value="ADMIN" className="sr-only" tabIndex={-1} {...register("role")} />
+                  <input type="radio" value="ADMIN" className="hidden" {...register("role")} />
                   <div className={`relative rounded-xl border-2 p-4 transition-all ${
                     watch("role") === "ADMIN"
                       ? "border-purple-500 bg-purple-50/60 dark:bg-purple-900/20"
