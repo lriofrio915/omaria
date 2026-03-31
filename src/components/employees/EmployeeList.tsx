@@ -326,7 +326,7 @@ export function EmployeeList() {
                 <TableHead className="text-center font-semibold text-foreground text-xs uppercase tracking-wide py-3 w-20">
                   Estado
                 </TableHead>
-                <TableHead className="text-right font-semibold text-foreground text-xs uppercase tracking-wide py-3 pr-4 w-32">
+                <TableHead className="text-center font-semibold text-foreground text-xs uppercase tracking-wide py-3 w-32">
                   Acciones
                 </TableHead>
               </TableRow>
@@ -401,7 +401,7 @@ export function EmployeeList() {
                               className="font-medium text-sm text-foreground leading-tight truncate"
                               title={`${emp.firstName} ${emp.lastName}`}
                             >
-                              {emp.firstName} {emp.lastName}
+                              {emp.firstName.split(" ")[0]} {emp.lastName}
                             </p>
                             <p className="text-xs text-muted-foreground font-mono mt-0.5 truncate">
                               {emp.employeeCode}
@@ -411,7 +411,7 @@ export function EmployeeList() {
                       </TableCell>
 
                       {/* Cargo */}
-                      <TableCell className="py-3 max-w-[120px]">
+                      <TableCell className="py-3 max-w-[120px] text-center">
                         <span
                           className="text-sm text-foreground/80 leading-tight truncate block"
                           title={emp.position.title}
@@ -421,7 +421,7 @@ export function EmployeeList() {
                       </TableCell>
 
                       {/* Área */}
-                      <TableCell className="py-3 max-w-[100px]">
+                      <TableCell className="py-3 max-w-[100px] text-center">
                         <span
                           className="text-sm text-muted-foreground truncate block"
                           title={emp.department.name}
@@ -433,7 +433,7 @@ export function EmployeeList() {
                       {/* Empresa */}
                       <TableCell className="py-3 max-w-[130px]">
                         {company ? (
-                          <div className="flex items-center gap-1.5 min-w-0">
+                          <div className="flex items-center justify-center gap-1.5 min-w-0">
                             <span
                               className="inline-block h-2 w-2 rounded-full shrink-0"
                               style={{ backgroundColor: company.primaryColor }}
@@ -446,12 +446,12 @@ export function EmployeeList() {
                             </span>
                           </div>
                         ) : (
-                          <span className="text-sm text-muted-foreground">—</span>
+                          <span className="text-sm text-muted-foreground text-center block">—</span>
                         )}
                       </TableCell>
 
                       {/* Estado */}
-                      <TableCell className="py-3">
+                      <TableCell className="py-3 text-center">
                         <span
                           className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${STATUS_STYLES[emp.status] ?? "bg-muted text-muted-foreground"}`}
                         >
@@ -460,8 +460,8 @@ export function EmployeeList() {
                       </TableCell>
 
                       {/* Acciones */}
-                      <TableCell className="py-3 pr-4" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-end gap-0.5">
+                      <TableCell className="py-3" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-center gap-0.5">
                           <Button
                             variant="ghost"
                             size="sm"
