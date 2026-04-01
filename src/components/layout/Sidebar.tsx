@@ -10,6 +10,7 @@ import {
   GitBranch,
   MessageSquare,
   UserCircle,
+  ShieldCheck,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -21,6 +22,7 @@ const adminNav = [
   { label: "Nóminas", href: "/payroll", icon: DollarSign },
   { label: "Organigrama", href: "/organigram", icon: GitBranch },
   { label: "OmarIA", href: "/ai-agent", icon: MessageSquare },
+  { label: "Gestión de Roles", href: "/admin/roles", icon: ShieldCheck },
   { label: "Mi Perfil", href: "/profile", icon: UserCircle },
 ];
 

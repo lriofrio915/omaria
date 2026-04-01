@@ -35,7 +35,7 @@ export async function updateSession(request: NextRequest) {
   const isAuthRoute = path === "/login" || path === "/register";
   const isRoot = path === "/";
   const isAdminOnlyRoute =
-    path.startsWith("/admin") || path.startsWith("/employees");
+    path.startsWith("/admin") || path.startsWith("/employees") || path.startsWith("/api/admin");
   const isDashboardRoute =
     path.startsWith("/admin") ||
     path.startsWith("/employee") ||

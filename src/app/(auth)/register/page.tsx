@@ -18,20 +18,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const registerSchema = z
   .object({
     email: z.string().email("Ingresa un correo válido"),
     password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
     confirmPassword: z.string(),
-    role: z.enum(["ADMIN", "EMPLOYEE"]),
   })
   .refine((d) => d.password === d.confirmPassword, {
     message: "Las contraseñas no coinciden",
@@ -43,16 +35,13 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState<"ADMIN" | "EMPLOYEE">("EMPLOYEE");
 
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { role: "EMPLOYEE" },
   });
 
   async function onSubmit(data: RegisterFormData) {
@@ -63,7 +52,7 @@ export default function RegisterPage() {
       email: data.email,
       password: data.password,
       options: {
-        data: { role: data.role },
+        data: { role: "EMPLOYEE" },
         emailRedirectTo: `${window.location.origin}/api/auth/callback`,
       },
     });
@@ -111,33 +100,13 @@ export default function RegisterPage() {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="role" className="text-slate-200">
-              Rol
-            </Label>
-            <Select
-              value={role}
-              onValueChange={(v: "ADMIN" | "EMPLOYEE") => {
-                setRole(v);
-                setValue("role", v);
-              }}
-            >
-              <SelectTrigger className="border-slate-600 bg-slate-700 text-white focus:border-blue-500">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="border-slate-600 bg-slate-700 text-white">
-                <SelectItem value="EMPLOYEE">Empleado</SelectItem>
-                <SelectItem value="ADMIN">Administrador</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="password" className="text-slate-200">
               Contraseña
             </Label>
             <Input
               id="password"
               type="password"
-              placeholder="••••••••"
+              placeholder="Mínimo 8 caracteres"
               autoComplete="new-password"
               className="border-slate-600 bg-slate-700 text-white placeholder:text-slate-400 focus:border-blue-500"
               {...register("password")}
@@ -159,9 +128,7 @@ export default function RegisterPage() {
               {...register("confirmPassword")}
             />
             {errors.confirmPassword && (
-              <p className="text-sm text-red-400">
-                {errors.confirmPassword.message}
-              </p>
+              <p className="text-sm text-red-400">{errors.confirmPassword.message}</p>
             )}
           </div>
           <Button
