@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,7 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowLeft, MailCheck } from "lucide-react";
+import { ArrowLeft, CheckCircle2, MailCheck } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email("Ingresa un correo válido"),
@@ -36,8 +36,16 @@ type View = "login" | "forgot" | "forgot-sent";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState<View>("login");
+  const [emailConfirmed, setEmailConfirmed] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("confirmed") === "1") {
+      setEmailConfirmed(true);
+    }
+  }, [searchParams]);
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -123,6 +131,16 @@ export default function LoginPage() {
       </CardHeader>
 
       <CardContent>
+        {/* Banner: email confirmado */}
+        {emailConfirmed && (
+          <div className="mb-4 flex items-center gap-3 rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3">
+            <CheckCircle2 className="h-5 w-5 shrink-0 text-green-400" />
+            <p className="text-sm text-green-300">
+              ¡Correo confirmado! Ya puedes iniciar sesión.
+            </p>
+          </div>
+        )}
+
         {/* Vista: Login */}
         {view === "login" && (
           <>
