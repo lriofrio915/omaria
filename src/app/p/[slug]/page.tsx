@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma/client";
 import {
   GraduationCap, Briefcase, Zap, Globe, Award,
   MapPin, ExternalLink, Mail, Phone, Download,
-  Building2, Calendar, Link2, BookOpen,
+  Building2, Calendar, Link2, BookOpen, BarChart2,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Metadata } from "next";
@@ -465,6 +465,46 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                       </div>
                     );
                   })}
+                </div>
+              </Section>
+            )}
+
+            {/* Track Record */}
+            {(profile.trackRecordUrl || profile.trackRecordLink) && (
+              <Section title="Track Record" icon={<BarChart2 className="h-4 w-4" />} color={primary}>
+                <div className="space-y-3">
+                  {profile.trackRecordUrl && (
+                    <a
+                      href={profile.trackRecordUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 rounded-lg border border-emerald-100 bg-emerald-50/60 px-4 py-3 hover:bg-emerald-50 transition-colors"
+                    >
+                      <div className="h-9 w-9 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
+                        <BarChart2 className="h-4 w-4 text-emerald-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {profile.trackRecordFileName ?? "Ver archivo"}
+                        </p>
+                        <p className="text-xs text-emerald-600 flex items-center gap-1 mt-0.5">
+                          <Download className="h-3 w-3" />
+                          Descargar
+                        </p>
+                      </div>
+                    </a>
+                  )}
+                  {profile.trackRecordLink && (
+                    <a
+                      href={profile.trackRecordLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 rounded-lg border border-emerald-100 bg-emerald-50/60 px-4 py-3 text-sm text-emerald-700 hover:bg-emerald-50 transition-colors break-all"
+                    >
+                      <ExternalLink className="h-4 w-4 shrink-0" />
+                      {profile.trackRecordLink}
+                    </a>
+                  )}
                 </div>
               </Section>
             )}
