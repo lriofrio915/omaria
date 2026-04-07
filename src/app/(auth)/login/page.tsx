@@ -18,7 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowLeft, MailCheck } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, MailCheck } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email("Ingresa un correo válido"),
@@ -38,6 +38,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState<View>("login");
+  const [showPassword, setShowPassword] = useState(false);
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -58,6 +59,13 @@ export default function LoginPage() {
 
     if (error) {
       toast.error("Credenciales incorrectas. Verifica tu correo y contraseña.");
+      setLoading(false);
+      return;
+    }
+
+    if (!authData.user?.email_confirmed_at) {
+      await supabase.auth.signOut();
+      toast.error("Debes confirmar tu correo antes de ingresar. Revisa tu bandeja de entrada.");
       setLoading(false);
       return;
     }
@@ -156,14 +164,24 @@ export default function LoginPage() {
                     ¿Olvidaste tu contraseña?
                   </button>
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                  className="border-slate-600 bg-slate-700 text-white placeholder:text-slate-400 focus:border-blue-500"
-                  {...loginForm.register("password")}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    autoComplete="current-password"
+                    className="border-slate-600 bg-slate-700 pr-10 text-white placeholder:text-slate-400 focus:border-blue-500"
+                    {...loginForm.register("password")}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
                 {loginForm.formState.errors.password && (
                   <p className="text-sm text-red-400">{loginForm.formState.errors.password.message}</p>
                 )}
