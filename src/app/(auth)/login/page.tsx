@@ -73,7 +73,7 @@ export default function LoginPage() {
     const supabase = createClient();
 
     const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${window.location.origin}/api/auth/callback`,
     });
 
     setLoading(false);
@@ -232,7 +232,7 @@ export default function LoginPage() {
             </div>
             <p className="text-sm text-slate-400">
               Revisa tu bandeja de entrada y sigue las instrucciones del correo.
-              El enlace expira en 24 horas.
+              El enlace expira en 1 hora.
             </p>
             <button
               type="button"
