@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,8 +32,8 @@ const registerSchema = z
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
   const {
     register,
@@ -63,8 +62,50 @@ export default function RegisterPage() {
       return;
     }
 
-    toast.success("Cuenta creada. Revisa tu correo para confirmar.");
-    router.push("/login");
+    setRegisteredEmail(data.email);
+  }
+
+  // Pantalla de confirmación tras el registro exitoso
+  if (registeredEmail) {
+    return (
+      <Card className="w-full max-w-md border-slate-700 bg-slate-800/50 text-white backdrop-blur-sm">
+        <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/20">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-8 w-8 text-blue-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25H4.5a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5H4.5a2.25 2.25 0 00-2.25 2.25m19.5 0l-9.75 6.75L2.25 6.75"
+              />
+            </svg>
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold text-white">Revisa tu correo</h2>
+            <p className="text-sm text-slate-400">
+              Enviamos un enlace de confirmación a{" "}
+              <span className="font-medium text-blue-400">{registeredEmail}</span>
+            </p>
+            <p className="text-sm text-slate-400">
+              Haz clic en el enlace del correo para activar tu cuenta. Si no lo
+              ves, revisa tu carpeta de spam.
+            </p>
+          </div>
+          <Link
+            href="/login"
+            className="mt-2 text-sm text-blue-400 underline-offset-4 hover:text-blue-300 hover:underline"
+          >
+            Volver al inicio de sesión
+          </Link>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
