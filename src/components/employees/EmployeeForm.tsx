@@ -196,7 +196,7 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
 
     fetch("/api/employees")
       .then((r) => r.json())
-      .then((data: EmployeeOption[]) => setManagers(data))
+      .then((json) => setManagers(Array.isArray(json) ? json : (json.data ?? [])))
       .catch(() => {});
   }, []);
 
