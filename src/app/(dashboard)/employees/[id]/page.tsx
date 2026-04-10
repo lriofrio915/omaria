@@ -22,6 +22,7 @@ interface Employee {
   personalEmail: string | null;
   corporateEmail: string | null;
   phone: string | null;
+  whatsapp: string | null;
   birthDate: string | null;
   hireDate: string;
   endDate: string | null;
@@ -34,7 +35,7 @@ interface Employee {
   notes: string | null;
   avatarUrl: string | null;
   role: string;
-  department: { id: string; name: string };
+  department: { id: string; name: string; company?: { name: string } | null };
   position: { id: string; title: string };
   manager: { id: string; firstName: string; lastName: string } | null;
   subordinates: { id: string; firstName: string; lastName: string; employeeCode: string }[];
@@ -346,8 +347,10 @@ export default function EmployeeDetailPage() {
             <CardContent>
               <dl className="space-y-3">
                 {[
+                  { label: "Empresa", value: employee.department?.company?.name ?? "—" },
                   { label: "Correo corporativo", value: employee.corporateEmail ?? employee.email },
                   { label: "Correo personal", value: employee.personalEmail ?? "—" },
+                  { label: "WhatsApp", value: employee.whatsapp ?? "—" },
                   { label: "Teléfono", value: employee.phone ?? "—" },
                   { label: "Fecha de nacimiento", value: employee.birthDate ? new Date(employee.birthDate).toLocaleDateString("es-EC") : "—" },
                   { label: "Tipo de sangre", value: employee.bloodType ?? "—" },

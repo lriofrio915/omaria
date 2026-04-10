@@ -12,6 +12,7 @@ const updateEmployeeSchema = z.object({
   corporateEmail: z.string().email().optional().nullable().or(z.literal("")),
   bloodType: z.string().optional().nullable(),
   phone: z.string().optional().nullable(),
+  whatsapp: z.string().optional().nullable(),
   birthDate: z.string().optional().nullable(),
   hireDate: z.string().optional(),
   endDate: z.string().optional().nullable(),
@@ -43,7 +44,7 @@ export async function GET(
     const employee = await prisma.employee.findUnique({
       where: { id },
       include: {
-        department: true,
+        department: { include: { company: true } },
         position: true,
         manager: { select: { id: true, firstName: true, lastName: true } },
         subordinates: { select: { id: true, firstName: true, lastName: true, employeeCode: true } },

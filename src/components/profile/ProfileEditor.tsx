@@ -108,6 +108,7 @@ interface EmployeeData {
   lastName: string;
   avatarUrl: string | null;
   phone: string | null;
+  whatsapp: string | null;
   city: string | null;
   personalEmail: string | null;
   birthDate: string | null;
@@ -214,6 +215,7 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
   const [savingPersonal, setSavingPersonal] = useState(false);
   const [personalForm, setPersonalForm] = useState({
     phone: data.phone ?? "",
+    whatsapp: data.whatsapp ?? "",
     personalEmail: data.personalEmail ?? "",
     birthDate: toDateInput(data.birthDate),
     bloodType: data.bloodType ?? "",
@@ -300,6 +302,7 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         phone: personalForm.phone || null,
+        whatsapp: personalForm.whatsapp || null,
         personalEmail: personalForm.personalEmail || null,
         birthDate: personalForm.birthDate || null,
         bloodType: personalForm.bloodType || null,
@@ -695,6 +698,7 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
             <Button variant="ghost" size="sm" onClick={() => {
               setPersonalForm({
                 phone: data.phone ?? "",
+                whatsapp: data.whatsapp ?? "",
                 personalEmail: data.personalEmail ?? "",
                 birthDate: toDateInput(data.birthDate),
                 bloodType: data.bloodType ?? "",
@@ -721,7 +725,8 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
         {!editingPersonal ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
             {[
-              { label: "WhatsApp / Teléfono", value: data.phone },
+              { label: "WhatsApp", value: data.whatsapp },
+              { label: "Teléfono", value: data.phone },
               { label: "Correo personal", value: data.personalEmail },
               { label: "Fecha de nacimiento", value: data.birthDate ? new Date(data.birthDate).toLocaleDateString("es-EC") : null },
               { label: "Tipo de sangre", value: data.bloodType },
@@ -737,8 +742,12 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-600 dark:text-slate-400">WhatsApp / Teléfono</label>
-              <Input value={personalForm.phone} onChange={e => setPersonalForm(f => ({ ...f, phone: e.target.value }))} placeholder="+593 99 000 0000" className="cursor-text" />
+              <label className="text-xs font-medium text-slate-600 dark:text-slate-400">WhatsApp</label>
+              <Input value={personalForm.whatsapp} onChange={e => setPersonalForm(f => ({ ...f, whatsapp: e.target.value }))} placeholder="+593 99 000 0000" className="cursor-text" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-600 dark:text-slate-400">Teléfono</label>
+              <Input value={personalForm.phone} onChange={e => setPersonalForm(f => ({ ...f, phone: e.target.value }))} placeholder="+593 2 000 0000" className="cursor-text" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-medium text-slate-600 dark:text-slate-400">Correo personal</label>
