@@ -97,6 +97,7 @@ export function EmployeeList() {
 
   // Data
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [total, setTotal] = useState(0);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -130,14 +131,21 @@ export function EmployeeList() {
     if (search) params.set("search", search);
     if (filterCompany !== "all") params.set("companyId", filterCompany);
     if (filterStatus !== "all") params.set("status", filterStatus);
+    params.set("page", String(page));
+    params.set("pageSize", String(pageSize));
     const res = await fetch(`/api/employees?${params}`);
     if (res.ok) {
-      const data = await res.json();
-      setEmployees(data);
-      setPage(1); // reset page on new filter
+      const json = await res.json();
+      setEmployees(json.data);
+      setTotal(json.total);
     }
     setLoading(false);
-  }, [search, filterCompany, filterStatus]);
+  }, [search, filterCompany, filterStatus, page, pageSize]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [search, filterCompany, filterStatus, pageSize]);
 
   useEffect(() => {
     const t = setTimeout(fetchEmployees, 300);
@@ -145,9 +153,9 @@ export function EmployeeList() {
   }, [fetchEmployees]);
 
   // ── Pagination ────────────────────────────────────────────────────────────
-  const totalPages = Math.max(1, Math.ceil(employees.length / pageSize));
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const safePage = Math.min(page, totalPages);
-  const paginated = employees.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const paginated = employees;
 
   // ── Filters active count ──────────────────────────────────────────────────
   const activeFilters = [filterCompany !== "all", filterStatus !== "all"].filter(Boolean).length;

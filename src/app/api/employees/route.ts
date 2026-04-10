@@ -41,40 +41,52 @@ export async function GET(request: Request) {
   const status = searchParams.get("status");
   const companyId = searchParams.get("companyId");
   const departmentId = searchParams.get("departmentId");
+  const showTerminated = searchParams.get("showTerminated") === "true";
+  const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
+  const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get("pageSize") ?? "25", 10)));
 
   try {
-    const employees = await prisma.employee.findMany({
-      where: {
-        AND: [
-          search
-            ? {
-                OR: [
-                  { firstName: { contains: search, mode: "insensitive" } },
-                  { lastName: { contains: search, mode: "insensitive" } },
-                  { lastName: { contains: search, mode: "insensitive" } },
-                  { employeeCode: { contains: search, mode: "insensitive" } },
-                  { position: { title: { contains: search, mode: "insensitive" } } },
-                ],
-              }
-            : {},
-          status ? { status: status as never } : {},
-          departmentId ? { departmentId } : {},
-          companyId ? { department: { companyId } } : {},
-        ],
-      },
-      include: {
-        department: {
-          select: {
-            id: true,
-            name: true,
-            company: { select: { id: true, name: true, slug: true, primaryColor: true } },
+    const where = {
+      AND: [
+        // Ocultar TERMINATED por defecto a menos que se pida explícitamente
+        !showTerminated && !status ? { status: { not: "TERMINATED" as const } } : {},
+        search
+          ? {
+              OR: [
+                { firstName: { contains: search, mode: "insensitive" as const } },
+                { lastName: { contains: search, mode: "insensitive" as const } },
+                { employeeCode: { contains: search, mode: "insensitive" as const } },
+                { position: { title: { contains: search, mode: "insensitive" as const } } },
+              ],
+            }
+          : {},
+        status ? { status: status as never } : {},
+        departmentId ? { departmentId } : {},
+        companyId ? { department: { companyId } } : {},
+      ],
+    };
+
+    const [employees, total] = await prisma.$transaction([
+      prisma.employee.findMany({
+        where,
+        include: {
+          department: {
+            select: {
+              id: true,
+              name: true,
+              company: { select: { id: true, name: true, slug: true, primaryColor: true } },
+            },
           },
+          position: { select: { id: true, title: true } },
         },
-        position: { select: { id: true, title: true } },
-      },
-      orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
-    });
-    return NextResponse.json(employees);
+        orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
+        take: pageSize,
+        skip: (page - 1) * pageSize,
+      }),
+      prisma.employee.count({ where }),
+    ]);
+
+    return NextResponse.json({ data: employees, total, page, pageSize });
   } catch {
     return NextResponse.json({ error: "Error al obtener empleados" }, { status: 500 });
   }
@@ -96,9 +108,12 @@ export async function POST(request: Request) {
 
     const data = parsed.data;
 
-    // Generar código de empleado
-    const count = await prisma.employee.count();
-    const employeeCode = `SG${String(count + 1).padStart(4, "0")}`;
+    // Generar código de empleado usando MAX para evitar race conditions
+    const result = await prisma.$queryRaw<[{ max: string | null }]>`
+      SELECT MAX("employeeCode") as max FROM employees WHERE "employeeCode" LIKE 'SG%'
+    `;
+    const lastNum = result[0]?.max ? parseInt(result[0].max.replace("SG", ""), 10) : 0;
+    const employeeCode = `SG${String(lastNum + 1).padStart(4, "0")}`;
 
     // Crear cuenta de Supabase Auth si se solicita
     let userId: string;
