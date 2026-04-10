@@ -19,11 +19,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+const COMPANIES = ["Emporium", "SG Consulting", "Livin", "Eureka", "Spartans"] as const;
+
 const registerSchema = z
   .object({
     firstName: z.string().min(1, "El nombre es requerido"),
     lastName: z.string().min(1, "El apellido es requerido"),
     email: z.string().email("Ingresa un correo válido"),
+    company: z.enum(COMPANIES, { errorMap: () => ({ message: "Selecciona una empresa" }) }),
     password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
     confirmPassword: z.string(),
   })
@@ -56,7 +59,12 @@ export default function RegisterPage() {
       email: data.email,
       password: data.password,
       options: {
-        data: { role: "EMPLOYEE", firstName: data.firstName, lastName: data.lastName },
+        data: {
+          role: "EMPLOYEE",
+          firstName: data.firstName,
+          lastName: data.lastName,
+          company: data.company,
+        },
         emailRedirectTo: `${window.location.origin}/api/auth/callback`,
       },
     });
@@ -165,6 +173,23 @@ export default function RegisterPage() {
             />
             {errors.email && (
               <p className="text-sm text-red-400">{errors.email.message}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="company" className="text-slate-200">Empresa</Label>
+            <select
+              id="company"
+              className="w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-white placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              defaultValue=""
+              {...register("company")}
+            >
+              <option value="" disabled className="text-slate-400">Selecciona tu empresa</option>
+              {COMPANIES.map((c) => (
+                <option key={c} value={c} className="bg-slate-700">{c}</option>
+              ))}
+            </select>
+            {errors.company && (
+              <p className="text-sm text-red-400">{errors.company.message}</p>
             )}
           </div>
           <div className="space-y-2">
