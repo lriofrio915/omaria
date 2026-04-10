@@ -11,6 +11,7 @@ import {
   MessageSquare,
   UserCircle,
   ShieldCheck,
+  BookUser,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -28,6 +29,7 @@ const adminNav = [
 
 const employeeNav = [
   { label: "Mi Portal", href: "/employee", icon: LayoutDashboard },
+  { label: "Directorio", href: "/employee/directory", icon: BookUser },
   { label: "Mis Documentos", href: "/documents", icon: FileText },
   { label: "Mis Nóminas", href: "/payroll", icon: DollarSign },
   { label: "OmarIA", href: "/ai-agent", icon: MessageSquare },
