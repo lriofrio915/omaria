@@ -46,7 +46,11 @@
       "mcp__plugin_supabase_supabase__get_project",
       "Bash(printf \"postgresql://postgres.aypskvmtqxfsmrdpxjcu:Omar_P%%2B2_proyecT@aws-0-us-east-1.pooler.supabase.com:5432/postgres\")",
       "Bash(printf \"postgresql://postgres.aypskvmtqxfsmrdpxjcu:Omar_P%%2B2_proyecT@aws-1-us-east-1.pooler.supabase.com:6543/postgres\")",
-      "mcp__plugin_context-mode_context-mode__ctx_execute_file"
+      "mcp__plugin_context-mode_context-mode__ctx_execute_file",
+      "mcp__plugin_context-mode_context-mode__ctx_fetch_and_index",
+      "mcp__plugin_context-mode_context-mode__ctx_search",
+      "Skill(qa)",
+      "Skill(qa:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
