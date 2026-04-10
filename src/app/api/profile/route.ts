@@ -113,7 +113,8 @@ export async function PUT(request: Request) {
     });
 
     // Also update employee basic fields if provided
-    if (body.avatarUrl !== undefined || body.phone !== undefined || body.city !== undefined) {
+    const employeeFields = ["avatarUrl", "phone", "city", "personalEmail", "birthDate", "bloodType", "address"];
+    if (employeeFields.some(f => f in body)) {
       await prisma.employee.update({
         where: { id: employee.id },
         data: {
@@ -121,6 +122,9 @@ export async function PUT(request: Request) {
           phone: body.phone ?? undefined,
           city: body.city ?? undefined,
           personalEmail: body.personalEmail ?? undefined,
+          birthDate: body.birthDate !== undefined ? (body.birthDate ? new Date(body.birthDate) : null) : undefined,
+          bloodType: body.bloodType ?? undefined,
+          address: body.address ?? undefined,
         },
       });
     }

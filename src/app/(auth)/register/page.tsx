@@ -21,6 +21,8 @@ import {
 
 const registerSchema = z
   .object({
+    firstName: z.string().min(1, "El nombre es requerido"),
+    lastName: z.string().min(1, "El apellido es requerido"),
     email: z.string().email("Ingresa un correo válido"),
     password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
     confirmPassword: z.string(),
@@ -54,7 +56,7 @@ export default function RegisterPage() {
       email: data.email,
       password: data.password,
       options: {
-        data: { role: "EMPLOYEE" },
+        data: { role: "EMPLOYEE", firstName: data.firstName, lastName: data.lastName },
         emailRedirectTo: `${window.location.origin}/api/auth/callback`,
       },
     });
@@ -127,6 +129,28 @@ export default function RegisterPage() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="firstName" className="text-slate-200">Nombre</Label>
+              <Input
+                id="firstName"
+                placeholder="Juan"
+                className="border-slate-600 bg-slate-700 text-white placeholder:text-slate-400 focus:border-blue-500"
+                {...register("firstName")}
+              />
+              {errors.firstName && <p className="text-sm text-red-400">{errors.firstName.message}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastName" className="text-slate-200">Apellido</Label>
+              <Input
+                id="lastName"
+                placeholder="Pérez"
+                className="border-slate-600 bg-slate-700 text-white placeholder:text-slate-400 focus:border-blue-500"
+                {...register("lastName")}
+              />
+              {errors.lastName && <p className="text-sm text-red-400">{errors.lastName.message}</p>}
+            </div>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="email" className="text-slate-200">
               Correo electrónico

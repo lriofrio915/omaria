@@ -1,16 +1,14 @@
-import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 import { PrismaClient } from "@/generated/prisma";
 
 function createPrismaClient() {
-  // Usamos Pool con credenciales separadas para evitar problemas de URL-encoding
   const pool = new Pool({
-    host: process.env.DB_HOST_POOLER!,
-    port: 6543, // Transaction pooler
-    user: process.env.DB_USER!,
-    password: process.env.DB_PASSWORD!, // contraseña en crudo, sin encoding
-    database: "postgres",
+    connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false },
+    max: 5,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000,
   });
 
   const adapter = new PrismaPg(pool);

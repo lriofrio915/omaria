@@ -110,6 +110,9 @@ interface EmployeeData {
   phone: string | null;
   city: string | null;
   personalEmail: string | null;
+  birthDate: string | null;
+  bloodType: string | null;
+  address: string | null;
   position: { title: string } | null;
   department: { name: string; company: { name: string; primaryColor: string; slug: string } | null } | null;
   profile: Profile | null;
@@ -201,6 +204,16 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
 
   const [saving, setSaving] = useState(false);
   const [editingBio, setEditingBio] = useState(false);
+  const [editingPersonal, setEditingPersonal] = useState(false);
+  const [savingPersonal, setSavingPersonal] = useState(false);
+  const [personalForm, setPersonalForm] = useState({
+    phone: data.phone ?? "",
+    personalEmail: data.personalEmail ?? "",
+    birthDate: data.birthDate ? data.birthDate.slice(0, 10) : "",
+    bloodType: data.bloodType ?? "",
+    city: data.city ?? "",
+    address: data.address ?? "",
+  });
   const [bioForm, setBioForm] = useState({
     headline: profile.headline ?? "",
     summary: profile.summary ?? "",
@@ -267,6 +280,31 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
     if (res.ok) {
       toast.success("Perfil actualizado");
       setEditingBio(false);
+      await reload();
+    } else {
+      toast.error("Error al guardar");
+    }
+  }
+
+  // ── Save personal data ───────────────────────────────────────────────────────
+  async function savePersonal() {
+    setSavingPersonal(true);
+    const res = await fetch("/api/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        phone: personalForm.phone || null,
+        personalEmail: personalForm.personalEmail || null,
+        birthDate: personalForm.birthDate || null,
+        bloodType: personalForm.bloodType || null,
+        city: personalForm.city || null,
+        address: personalForm.address || null,
+      }),
+    });
+    setSavingPersonal(false);
+    if (res.ok) {
+      toast.success("Datos personales actualizados");
+      setEditingPersonal(false);
       await reload();
     } else {
       toast.error("Error al guardar");
@@ -635,6 +673,95 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
               <label htmlFor="isPublic" className="text-sm text-slate-600 dark:text-slate-400 cursor-pointer">
                 Perfil público (visible con el enlace)
               </label>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── Datos personales Card ── */}
+      <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <User className="h-4 w-4 text-blue-500" />
+            Datos personales
+          </h2>
+          {!editingPersonal ? (
+            <Button variant="ghost" size="sm" onClick={() => {
+              setPersonalForm({
+                phone: data.phone ?? "",
+                personalEmail: data.personalEmail ?? "",
+                birthDate: data.birthDate ? data.birthDate.slice(0, 10) : "",
+                bloodType: data.bloodType ?? "",
+                city: data.city ?? "",
+                address: data.address ?? "",
+              });
+              setEditingPersonal(true);
+            }} className="cursor-pointer">
+              <Edit2 className="h-3.5 w-3.5 mr-1.5" /> Editar
+            </Button>
+          ) : (
+            <div className="flex gap-2">
+              <Button size="sm" onClick={savePersonal} disabled={savingPersonal} className="cursor-pointer">
+                {savingPersonal ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5 mr-1" />}
+                Guardar
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setEditingPersonal(false)} className="cursor-pointer">
+                <X className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {!editingPersonal ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            {[
+              { label: "WhatsApp / Teléfono", value: data.phone },
+              { label: "Correo personal", value: data.personalEmail },
+              { label: "Fecha de nacimiento", value: data.birthDate ? new Date(data.birthDate).toLocaleDateString("es-EC") : null },
+              { label: "Tipo de sangre", value: data.bloodType },
+              { label: "Ciudad de residencia", value: data.city },
+              { label: "Dirección", value: data.address },
+            ].map(({ label, value }) => (
+              <div key={label}>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
+                <p className="text-slate-800 dark:text-slate-200">{value ?? <span className="text-slate-400 italic">Sin completar</span>}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-600 dark:text-slate-400">WhatsApp / Teléfono</label>
+              <Input value={personalForm.phone} onChange={e => setPersonalForm(f => ({ ...f, phone: e.target.value }))} placeholder="+593 99 000 0000" className="cursor-text" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-600 dark:text-slate-400">Correo personal</label>
+              <Input type="email" value={personalForm.personalEmail} onChange={e => setPersonalForm(f => ({ ...f, personalEmail: e.target.value }))} placeholder="tu@gmail.com" className="cursor-text" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-600 dark:text-slate-400">Fecha de nacimiento</label>
+              <Input type="date" value={personalForm.birthDate} onChange={e => setPersonalForm(f => ({ ...f, birthDate: e.target.value }))} className="cursor-text" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-600 dark:text-slate-400">Tipo de sangre</label>
+              <select
+                value={personalForm.bloodType}
+                onChange={e => setPersonalForm(f => ({ ...f, bloodType: e.target.value }))}
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm cursor-pointer"
+              >
+                <option value="">Seleccionar...</option>
+                {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(t => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-600 dark:text-slate-400">Ciudad de residencia</label>
+              <Input value={personalForm.city} onChange={e => setPersonalForm(f => ({ ...f, city: e.target.value }))} placeholder="Ej: Quito" className="cursor-text" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-600 dark:text-slate-400">Dirección de residencia</label>
+              <Input value={personalForm.address} onChange={e => setPersonalForm(f => ({ ...f, address: e.target.value }))} placeholder="Calle, número, sector..." className="cursor-text" />
             </div>
           </div>
         )}

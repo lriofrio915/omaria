@@ -1,0 +1,286 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e6]:
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - link "Supabase" [ref=e9] [cursor=pointer]:
+            - /url: /dashboard/organizations
+            - img "Supabase" [ref=e10]
+          - img [ref=e14]
+          - button "Connect" [disabled] [ref=e18]:
+            - img [ref=e20]
+            - generic [ref=e22]: Connect
+        - generic [ref=e23]:
+          - generic [ref=e25] [cursor=pointer]: Feedback
+          - generic [ref=e26]:
+            - button "Search..." [ref=e27] [cursor=pointer]:
+              - generic [ref=e28]:
+                - img [ref=e29]
+                - paragraph [ref=e32]: Search...
+              - generic [ref=e34]: Ctrl K
+            - button [ref=e35] [cursor=pointer]:
+              - img [ref=e37]
+            - button [ref=e41] [cursor=pointer]:
+              - img [ref=e43]
+            - button [ref=e45] [cursor=pointer]:
+              - img [ref=e47]
+            - button [ref=e49] [cursor=pointer]:
+              - img [ref=e53]
+          - button [ref=e56] [cursor=pointer]:
+            - img [ref=e59]
+    - generic [ref=e61]:
+      - generic [ref=e65]:
+        - list [ref=e68]:
+          - generic [ref=e69]:
+            - listitem [ref=e70]:
+              - link "Project Overview" [ref=e71] [cursor=pointer]:
+                - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu
+                - img [ref=e72]
+                - generic: Project Overview
+            - listitem [ref=e74]:
+              - button "Table Editor" [disabled]:
+                - img
+                - generic: Table Editor
+            - listitem [ref=e75]:
+              - button "SQL Editor" [disabled]:
+                - img
+                - generic: SQL Editor
+          - generic [ref=e76]:
+            - listitem [ref=e77]:
+              - button "Database" [disabled]:
+                - img
+                - generic: Database
+            - listitem [ref=e78]:
+              - button "Authentication" [disabled]:
+                - img
+                - generic: Authentication
+            - listitem [ref=e79]:
+              - button "Storage" [disabled]:
+                - img
+                - generic: Storage
+            - listitem [ref=e80]:
+              - link "Edge Functions" [ref=e81] [cursor=pointer]:
+                - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/functions
+                - img [ref=e82]
+                - generic: Edge Functions
+            - listitem [ref=e87]:
+              - button "Realtime" [disabled]:
+                - img
+                - generic: Realtime
+          - generic [ref=e88]:
+            - listitem [ref=e90]:
+              - button "Advisors" [disabled]:
+                - img
+                - generic: Advisors
+            - listitem [ref=e91]:
+              - button "Observability" [disabled]:
+                - img
+                - generic: Observability
+            - listitem [ref=e92]:
+              - link "Logs" [ref=e93] [cursor=pointer]:
+                - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/logs/explorer
+                - img [ref=e94]
+                - generic: Logs
+            - listitem [ref=e95]:
+              - button "Integrations" [disabled]:
+                - img
+                - generic: Integrations
+          - listitem [ref=e97]:
+            - link "Project Settings" [ref=e98] [cursor=pointer]:
+              - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/settings/general
+              - img [ref=e99]
+              - generic: Project Settings
+        - button [ref=e104] [cursor=pointer]:
+          - img [ref=e106]
+      - generic [ref=e113]:
+        - generic [ref=e117]:
+          - heading "Database" [level=4] [ref=e119]
+          - menu "Sidebar" [disabled] [ref=e122]:
+            - list [ref=e123]:
+              - generic [ref=e126]:
+                - generic [ref=e130]: Database Management
+                - generic [ref=e131]:
+                  - link "Schema Visualizer" [disabled] [ref=e132] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/database/schemas
+                    - menuitem "Schema Visualizer" [disabled] [ref=e133]:
+                      - generic "Schema Visualizer" [ref=e136]:
+                        - generic [ref=e137]: Schema Visualizer
+                  - link "Tables" [disabled] [ref=e138] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/database/tables
+                    - menuitem "Tables" [disabled] [ref=e139]:
+                      - generic "Tables" [ref=e142]:
+                        - generic [ref=e143]: Tables
+                  - link "Functions" [disabled] [ref=e144] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/database/functions
+                    - menuitem "Functions" [disabled] [ref=e145]:
+                      - generic "Functions" [ref=e148]:
+                        - generic [ref=e149]: Functions
+                  - link "Triggers" [disabled] [ref=e150] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/database/triggers/data
+                    - menuitem "Triggers" [disabled] [ref=e151]:
+                      - generic "Triggers" [ref=e154]:
+                        - generic [ref=e155]: Triggers
+                  - link "Enumerated Types" [disabled] [ref=e156] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/database/types
+                    - menuitem "Enumerated Types" [disabled] [ref=e157]:
+                      - generic "Enumerated Types" [ref=e160]:
+                        - generic [ref=e161]: Enumerated Types
+                  - link "Extensions" [disabled] [ref=e162] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/database/extensions
+                    - menuitem "Extensions" [disabled] [ref=e163]:
+                      - generic "Extensions" [ref=e166]:
+                        - generic [ref=e167]: Extensions
+                  - link "Indexes" [disabled] [ref=e168] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/database/indexes
+                    - menuitem "Indexes" [disabled] [ref=e169]:
+                      - generic "Indexes" [ref=e172]:
+                        - generic [ref=e173]: Indexes
+                  - link "Publications" [disabled] [ref=e174] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/database/publications
+                    - menuitem "Publications" [disabled] [ref=e175]:
+                      - generic "Publications" [ref=e178]:
+                        - generic [ref=e179]: Publications
+              - generic [ref=e183]:
+                - generic [ref=e187]: Configuration
+                - generic [ref=e188]:
+                  - link "Roles" [disabled] [ref=e189] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/database/roles
+                    - menuitem "Roles" [disabled] [ref=e190]:
+                      - generic "Roles" [ref=e193]:
+                        - generic [ref=e194]: Roles
+                  - link "Policies" [disabled] [ref=e195] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/auth/policies
+                    - menuitem "Policies" [disabled] [ref=e196]:
+                      - generic [ref=e198]:
+                        - generic "Policies" [ref=e199]:
+                          - generic [ref=e200]: Policies
+                        - img [ref=e202]
+                  - link "Settings" [disabled] [ref=e205] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/database/settings
+                    - menuitem "Settings" [disabled] [ref=e206]:
+                      - generic "Settings" [ref=e209]:
+                        - generic [ref=e210]: Settings
+              - generic [ref=e214]:
+                - generic [ref=e218]: Platform
+                - generic [ref=e219]:
+                  - link "Replication" [disabled] [ref=e220] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/database/replication
+                    - menuitem "Replication" [disabled] [ref=e221]:
+                      - generic "Replication" [ref=e224]:
+                        - generic [ref=e225]: Replication
+                  - link "Backups" [disabled] [ref=e226] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/database/backups/scheduled
+                    - menuitem "Backups" [disabled] [ref=e227]:
+                      - generic "Backups" [ref=e230]:
+                        - generic [ref=e231]: Backups
+                  - link "Migrations" [disabled] [ref=e232] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/database/migrations
+                    - menuitem "Migrations" [disabled] [ref=e233]:
+                      - generic "Migrations" [ref=e236]:
+                        - generic [ref=e237]: Migrations
+                  - link "Wrappers" [disabled] [ref=e238] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/integrations?category=wrapper
+                    - menuitem "Wrappers" [disabled] [ref=e239]:
+                      - generic [ref=e241]:
+                        - generic "Wrappers" [ref=e242]:
+                          - generic [ref=e243]: Wrappers
+                        - img [ref=e245]
+              - generic [ref=e251]:
+                - generic [ref=e255]: Tools
+                - generic [ref=e256]:
+                  - link "Security Advisor" [disabled] [ref=e257] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/advisors/security
+                    - menuitem "Security Advisor" [disabled] [ref=e258]:
+                      - generic [ref=e260]:
+                        - generic "Security Advisor" [ref=e261]:
+                          - generic [ref=e262]: Security Advisor
+                        - img [ref=e264]
+                  - link "Performance Advisor" [disabled] [ref=e267] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/advisors/performance
+                    - menuitem "Performance Advisor" [disabled] [ref=e268]:
+                      - generic [ref=e270]:
+                        - generic "Performance Advisor" [ref=e271]:
+                          - generic [ref=e272]: Performance Advisor
+                        - img [ref=e274]
+                  - link "Query Performance" [disabled] [ref=e277] [cursor=pointer]:
+                    - /url: /dashboard/project/aypskvmtqxfsmrdpxjcu/observability/query-performance
+                    - menuitem "Query Performance" [disabled] [ref=e278]:
+                      - generic [ref=e280]:
+                        - generic "Query Performance" [ref=e281]:
+                          - generic [ref=e282]: Query Performance
+                        - img [ref=e284]
+        - separator [disabled] [ref=e287]:
+          - img [ref=e289]
+        - main [ref=e298]:
+          - generic [ref=e302]:
+            - heading "Database Settings" [level=1] [ref=e303]
+            - generic [ref=e304]: Connections, security, and network configuration
+          - generic [ref=e305]:
+            - generic [ref=e306]:
+              - generic [ref=e309]:
+                - heading "Database password" [level=2] [ref=e310]
+                - generic [ref=e311]: Used for direct Postgres connections
+              - generic [ref=e314]:
+                - generic [ref=e315]:
+                  - heading "Reset database password" [level=3] [ref=e316]
+                  - paragraph [ref=e317]: The database password isn’t viewable after creation. Resetting it will break any existing connections.
+                - button "Reset password" [disabled] [ref=e318]:
+                  - generic [ref=e319]: Reset password
+            - generic [ref=e320]:
+              - generic [ref=e322]:
+                - heading "Connection pooling" [level=2] [ref=e324]
+                - link "Docs" [ref=e326] [cursor=pointer]:
+                  - /url: https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler
+                  - img [ref=e328]
+                  - generic [ref=e331]: Docs
+              - generic [ref=e353]:
+                - generic [ref=e354]: You need additional permissions to update connection pooling settings
+                - generic [ref=e355]:
+                  - button "Cancel" [disabled]:
+                    - generic: Cancel
+                  - button "Save" [disabled]:
+                    - generic: Save
+            - generic [ref=e356]:
+              - generic [ref=e358]:
+                - heading "SSL configuration" [level=2] [ref=e360]
+                - link "Docs" [ref=e361] [cursor=pointer]:
+                  - /url: https://supabase.com/docs/guides/platform/ssl-enforcement
+                  - img [ref=e363]
+                  - generic [ref=e366]: Docs
+              - generic [ref=e368]:
+                - generic [ref=e370]:
+                  - img [ref=e373]
+                  - generic [ref=e375]:
+                    - generic [ref=e377]: Enforce SSL on incoming connections
+                    - paragraph [ref=e378]: Reject non-SSL connections to your database
+                - generic [ref=e380]:
+                  - button "Download certificate" [disabled] [ref=e383]:
+                    - img [ref=e385]
+                    - generic [ref=e388]: Download certificate
+                  - generic [ref=e389]:
+                    - generic [ref=e391]: SSL Certificate
+                    - paragraph [ref=e392]: Use this certificate when connecting to your database to prevent snooping and man-in-the-middle attacks.
+            - generic [ref=e393]:
+              - generic [ref=e395]:
+                - heading "Disk Management" [level=2] [ref=e397]
+                - link "Docs" [ref=e398] [cursor=pointer]:
+                  - /url: https://supabase.com/docs/guides/platform/database-size#disk-management
+                  - img [ref=e400]
+                  - generic [ref=e403]: Docs
+              - alert [ref=e405]:
+                - img [ref=e406]
+                - heading "Disk size configuration is not available for projects on the Free Plan" [level=5] [ref=e408]
+                - generic [ref=e409]:
+                  - paragraph [ref=e410]: If you are intending to use more than 500MB of disk space, then you will need to upgrade to at least the Pro Plan.
+                  - link "Upgrade subscription" [ref=e411] [cursor=pointer]:
+                    - /url: /dashboard/org/undefined/billing?panel=subscriptionPlan
+                    - generic [ref=e412]: Upgrade subscription
+            - generic [ref=e415]:
+              - generic [ref=e416]:
+                - heading "Network bans" [level=2] [ref=e417]
+                - generic [ref=e418]: IP addresses temporarily blocked due to suspicious traffic
+              - link "Docs" [ref=e419] [cursor=pointer]:
+                - /url: https://supabase.com/docs/reference/cli/supabase-network-bans
+                - img [ref=e421]
+                - generic [ref=e424]: Docs
+  - alert [ref=e430]: Settings | Database | Supabase
