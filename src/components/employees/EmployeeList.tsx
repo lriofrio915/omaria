@@ -592,11 +592,11 @@ export function EmployeeList() {
       <Dialog open={!!deleteId} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Eliminar colaborador</DialogTitle>
+            <DialogTitle>Desactivar colaborador</DialogTitle>
             <DialogDescription>
-              ¿Estás seguro de que deseas eliminar a{" "}
+              ¿Estás seguro de que deseas desactivar a{" "}
               <span className="font-semibold text-foreground">{deleteName}</span>?
-              Esta acción no se puede deshacer y eliminará todos sus datos asociados.
+              El colaborador pasará a estado <span className="font-medium">Terminado</span> y dejará de aparecer en los listados activos. Sus datos se conservan.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
