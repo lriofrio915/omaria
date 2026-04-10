@@ -142,6 +142,12 @@ function fmtDate(iso: string) {
   return d.toLocaleDateString("es-EC", { month: "short", year: "numeric" });
 }
 
+function toDateInput(d: Date | string | null | undefined): string {
+  if (!d) return "";
+  if (d instanceof Date) return d.toISOString().slice(0, 10);
+  return String(d).slice(0, 10);
+}
+
 // ─── FileDropZone ─────────────────────────────────────────────────────────────
 
 function FileDropZone({
@@ -209,7 +215,7 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
   const [personalForm, setPersonalForm] = useState({
     phone: data.phone ?? "",
     personalEmail: data.personalEmail ?? "",
-    birthDate: data.birthDate ? data.birthDate.slice(0, 10) : "",
+    birthDate: toDateInput(data.birthDate),
     bloodType: data.bloodType ?? "",
     city: data.city ?? "",
     address: data.address ?? "",
@@ -690,7 +696,7 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
               setPersonalForm({
                 phone: data.phone ?? "",
                 personalEmail: data.personalEmail ?? "",
-                birthDate: data.birthDate ? data.birthDate.slice(0, 10) : "",
+                birthDate: toDateInput(data.birthDate),
                 bloodType: data.bloodType ?? "",
                 city: data.city ?? "",
                 address: data.address ?? "",
@@ -1501,8 +1507,8 @@ function ExpDialog({ open, onClose, onSaved, editItem }: { open: boolean; onClos
         company: editItem.company,
         position: editItem.position,
         location: editItem.location ?? "",
-        startDate: editItem.startDate.slice(0, 10),
-        endDate: editItem.endDate ? editItem.endDate.slice(0, 10) : "",
+        startDate: toDateInput(editItem.startDate),
+        endDate: toDateInput(editItem.endDate),
         current: editItem.current,
         description: editItem.description ?? "",
       });
