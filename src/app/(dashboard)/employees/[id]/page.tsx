@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { useParams, useRouter, notFound } from "next/navigation";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Edit, ArrowLeft, Camera, FileText, DollarSign, Users, Info,
+  Edit, ArrowLeft, Camera, FileText, DollarSign, Users, Info, Star, Save,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,56 @@ interface Employee {
   documents: { id: string; title: string; type: string; createdAt: string }[];
   payrollRecords: { id: string; period: string; netSalary: number; status: string }[];
 }
+
+// ── Competency Types ──────────────────────────────────────────────────────────
+
+type CompetencyLevel = "NONE" | "BASIC" | "INTERMEDIATE" | "ADVANCED" | "EXPERT";
+
+interface Competency {
+  id: string;
+  name: string;
+  description: string | null;
+  category: string;
+}
+
+interface EmployeeCompetency {
+  id: string;
+  competencyId: string;
+  currentLevel: CompetencyLevel;
+  notes: string | null;
+  competency: Competency;
+}
+
+interface PositionRequirement {
+  competencyId: string;
+  requiredLevel: CompetencyLevel;
+  isCritical: boolean;
+  competency: Competency;
+}
+
+interface CompetencyData {
+  employeeCompetencies: EmployeeCompetency[];
+  positionRequirements: PositionRequirement[];
+  allCompetencies: Competency[];
+}
+
+const LEVEL_ORDER: CompetencyLevel[] = ["NONE", "BASIC", "INTERMEDIATE", "ADVANCED", "EXPERT"];
+
+const LEVEL_LABELS: Record<CompetencyLevel, string> = {
+  NONE: "Sin nivel",
+  BASIC: "Básico",
+  INTERMEDIATE: "Intermedio",
+  ADVANCED: "Avanzado",
+  EXPERT: "Experto",
+};
+
+const LEVEL_COLORS: Record<CompetencyLevel, string> = {
+  NONE: "text-slate-400",
+  BASIC: "text-amber-500",
+  INTERMEDIATE: "text-blue-500",
+  ADVANCED: "text-green-500",
+  EXPERT: "text-purple-600",
+};
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -88,6 +138,11 @@ export default function EmployeeDetailPage() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
 
+  // Competency state
+  const [competencyData, setCompetencyData] = useState<CompetencyData | null>(null);
+  const [editedLevels, setEditedLevels] = useState<Record<string, CompetencyLevel>>({});
+  const [savingCompetencies, setSavingCompetencies] = useState(false);
+
   useEffect(() => {
     fetch(`/api/employees/${id}`)
       .then((r) => {
@@ -98,6 +153,39 @@ export default function EmployeeDetailPage() {
       .catch(() => toast.error("Error al cargar el empleado"))
       .finally(() => setLoading(false));
   }, [id, router]);
+
+  const loadCompetencies = useCallback(async () => {
+    const res = await fetch(`/api/employees/${id}/competencies`);
+    if (!res.ok) return;
+    const data: CompetencyData = await res.json();
+    setCompetencyData(data);
+    // Initialize edited levels from current employee competencies
+    const initial: Record<string, CompetencyLevel> = {};
+    data.employeeCompetencies.forEach((ec) => {
+      initial[ec.competencyId] = ec.currentLevel;
+    });
+    setEditedLevels(initial);
+  }, [id]);
+
+  async function saveCompetencies() {
+    setSavingCompetencies(true);
+    const competencies = Object.entries(editedLevels).map(([competencyId, currentLevel]) => ({
+      competencyId,
+      currentLevel,
+    }));
+    const res = await fetch(`/api/employees/${id}/competencies`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ competencies }),
+    });
+    if (res.ok) {
+      toast.success("Competencias guardadas");
+      await loadCompetencies();
+    } else {
+      toast.error("Error al guardar competencias");
+    }
+    setSavingCompetencies(false);
+  }
 
   async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -221,7 +309,7 @@ export default function EmployeeDetailPage() {
 
       {/* Tabs */}
       <Tabs defaultValue="info">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="info" className="gap-1.5">
             <Info className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Info general</span>
@@ -231,6 +319,11 @@ export default function EmployeeDetailPage() {
             <Users className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Equipo</span>
             <span className="sm:hidden">Equipo</span>
+          </TabsTrigger>
+          <TabsTrigger value="competencies" className="gap-1.5" onClick={() => { if (!competencyData) loadCompetencies(); }}>
+            <Star className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Competencias</span>
+            <span className="sm:hidden">Comp.</span>
           </TabsTrigger>
           <TabsTrigger value="documents" className="gap-1.5">
             <FileText className="h-3.5 w-3.5" />
@@ -329,6 +422,77 @@ export default function EmployeeDetailPage() {
                     </li>
                   ))}
                 </ul>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Tab: Competencias */}
+        <TabsContent value="competencies" className="mt-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">Competencias</CardTitle>
+              {competencyData && Object.keys(editedLevels).length > 0 && (
+                <Button size="sm" onClick={saveCompetencies} disabled={savingCompetencies} className="gap-1.5 bg-blue-600 hover:bg-blue-700 h-7 text-xs">
+                  <Save className="h-3 w-3" />
+                  {savingCompetencies ? "Guardando..." : "Guardar"}
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent>
+              {!competencyData ? (
+                <p className="text-sm text-muted-foreground">Cargando competencias...</p>
+              ) : competencyData.allCompetencies.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No hay competencias registradas en el sistema.</p>
+              ) : (
+                <div className="space-y-4">
+                  {(["Directiva", "Tecnica", "Blanda"] as const).map((cat) => {
+                    const comps = competencyData.allCompetencies.filter((c) => c.category === cat);
+                    if (comps.length === 0) return null;
+                    return (
+                      <div key={cat}>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{cat === "Tecnica" ? "Técnica" : cat}</p>
+                        <div className="space-y-2">
+                          {comps.map((comp) => {
+                            const req = competencyData.positionRequirements.find((r) => r.competencyId === comp.id);
+                            const currentLevel = editedLevels[comp.id] ?? "NONE";
+                            const reqIdx = req ? LEVEL_ORDER.indexOf(req.requiredLevel) : -1;
+                            const curIdx = LEVEL_ORDER.indexOf(currentLevel);
+                            const hasGap = req && curIdx < reqIdx;
+
+                            return (
+                              <div key={comp.id} className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 hover:bg-muted/50">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-sm font-medium text-foreground">{comp.name}</span>
+                                    {req?.isCritical && (
+                                      <span className="text-xs text-red-500 font-medium">·crítica</span>
+                                    )}
+                                    {hasGap && (
+                                      <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-1.5 py-0.5 rounded-full">brecha</span>
+                                    )}
+                                  </div>
+                                  {req && (
+                                    <p className="text-xs text-muted-foreground">Requerido: {LEVEL_LABELS[req.requiredLevel]}</p>
+                                  )}
+                                </div>
+                                <select
+                                  value={currentLevel}
+                                  onChange={(e) => setEditedLevels((prev) => ({ ...prev, [comp.id]: e.target.value as CompetencyLevel }))}
+                                  className={`text-xs font-medium rounded-md border border-border bg-background px-2 py-1 cursor-pointer ${LEVEL_COLORS[currentLevel]}`}
+                                >
+                                  {LEVEL_ORDER.map((lvl) => (
+                                    <option key={lvl} value={lvl}>{LEVEL_LABELS[lvl]}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </CardContent>
           </Card>

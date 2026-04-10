@@ -1,6 +1,67 @@
 import { NextRequest } from "next/server";
 import { chatCompletionStream, OMARIA_SYSTEM_PROMPT, ChatMessage } from "@/lib/anthropic/client";
 import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma/client";
+
+async function buildCompetencyContext(): Promise<string> {
+  try {
+    const [employees, competencies] = await Promise.all([
+      prisma.employee.findMany({
+        where: { status: { not: "TERMINATED" } },
+        select: {
+          firstName: true,
+          lastName: true,
+          position: { select: { title: true } },
+          department: { select: { name: true } },
+          competencies: {
+            include: { competency: { select: { name: true, category: true } } },
+          },
+        },
+      }),
+      prisma.competency.findMany({ orderBy: { category: "asc" } }),
+    ]);
+
+    if (employees.length === 0) return "";
+
+    const lines: string[] = [
+      "",
+      "## Datos del equipo (contexto actualizado)",
+      `Total colaboradores activos: ${employees.length}`,
+      "",
+      "### Competencias disponibles en el sistema:",
+    ];
+
+    const byCategory = competencies.reduce<Record<string, string[]>>((acc, c) => {
+      acc[c.category] = acc[c.category] ?? [];
+      acc[c.category].push(c.name);
+      return acc;
+    }, {});
+
+    for (const [cat, names] of Object.entries(byCategory)) {
+      lines.push(`- ${cat}: ${names.join(", ")}`);
+    }
+
+    lines.push("", "### Resumen de competencias por colaborador:");
+
+    for (const emp of employees) {
+      const name = `${emp.firstName} ${emp.lastName}`;
+      const cargo = emp.position.title;
+      const dept = emp.department.name;
+      if (emp.competencies.length === 0) {
+        lines.push(`- ${name} (${cargo}, ${dept}): sin evaluación de competencias`);
+      } else {
+        const compStr = emp.competencies
+          .map((ec: { competency: { name: string }; currentLevel: string }) => `${ec.competency.name}: ${ec.currentLevel}`)
+          .join(", ");
+        lines.push(`- ${name} (${cargo}, ${dept}): ${compStr}`);
+      }
+    }
+
+    return lines.join("\n");
+  } catch {
+    return ""; // No interrumpir el chat si falla la carga de contexto
+  }
+}
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -14,8 +75,11 @@ export async function POST(req: NextRequest) {
     return new Response("Bad Request", { status: 400 });
   }
 
+  const competencyContext = await buildCompetencyContext();
+  const systemContent = OMARIA_SYSTEM_PROMPT + competencyContext;
+
   const fullMessages: ChatMessage[] = [
-    { role: "system", content: OMARIA_SYSTEM_PROMPT },
+    { role: "system", content: systemContent },
     ...messages,
   ];
 
