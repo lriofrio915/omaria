@@ -164,11 +164,11 @@ export function EmployeeList() {
     setDeleting(true);
     const res = await fetch(`/api/employees/${deleteId}`, { method: "DELETE" });
     if (res.ok) {
-      toast.success("Colaborador eliminado correctamente");
+      toast.success("Colaborador desactivado correctamente");
       setDeleteId(null);
       fetchEmployees();
     } else {
-      toast.error("No se pudo eliminar el colaborador");
+      toast.error("No se pudo desactivar el colaborador");
     }
     setDeleting(false);
   }

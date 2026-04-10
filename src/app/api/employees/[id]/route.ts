@@ -129,9 +129,16 @@ export async function DELETE(
   const { id } = await params;
 
   try {
-    await prisma.employee.delete({ where: { id } });
-    return NextResponse.json({ message: "Empleado eliminado" });
+    const employee = await prisma.employee.findUnique({ where: { id } });
+    if (!employee) {
+      return NextResponse.json({ error: "Empleado no encontrado" }, { status: 404 });
+    }
+    await prisma.employee.update({
+      where: { id },
+      data: { status: "TERMINATED", endDate: new Date() },
+    });
+    return NextResponse.json({ message: "Empleado desactivado correctamente" });
   } catch {
-    return NextResponse.json({ error: "Error al eliminar empleado" }, { status: 500 });
+    return NextResponse.json({ error: "Error al desactivar empleado" }, { status: 500 });
   }
 }
