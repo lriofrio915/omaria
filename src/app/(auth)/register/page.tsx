@@ -26,7 +26,7 @@ const registerSchema = z
     firstName: z.string().min(1, "El nombre es requerido"),
     lastName: z.string().min(1, "El apellido es requerido"),
     email: z.string().email("Ingresa un correo válido"),
-    company: z.enum(COMPANIES, { errorMap: () => ({ message: "Selecciona una empresa" }) }),
+    company: z.enum(COMPANIES, { error: "Selecciona una empresa" }),
     password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
     confirmPassword: z.string(),
   })
