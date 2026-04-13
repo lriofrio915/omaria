@@ -56,8 +56,14 @@ export function ProfileSetup({ user }: { user: User }) {
     });
 
     if (!res.ok) {
-      const err = await res.json();
-      toast.error(err.error ?? "Error al configurar el perfil");
+      let errMsg = "Error al configurar el perfil";
+      try {
+        const err = await res.json();
+        errMsg = err.error ?? errMsg;
+      } catch {
+        // respuesta no-JSON (ej. 500 HTML de Next.js)
+      }
+      toast.error(errMsg);
       setLoading(false);
       return;
     }
