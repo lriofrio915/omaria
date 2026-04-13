@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Edit, ArrowLeft, Camera, FileText, DollarSign, Users, Info, Star, Save,
+  Edit, ArrowLeft, Camera, FileText, DollarSign, Users, Info, Star, Save, KeyRound,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -138,6 +138,7 @@ export default function EmployeeDetailPage() {
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [resettingPassword, setResettingPassword] = useState(false);
 
   // Competency state
   const [competencyData, setCompetencyData] = useState<CompetencyData | null>(null);
@@ -154,6 +155,20 @@ export default function EmployeeDetailPage() {
       .catch(() => toast.error("Error al cargar el empleado"))
       .finally(() => setLoading(false));
   }, [id, router]);
+
+  async function resetPassword() {
+    if (!employee) return;
+    if (!confirm(`¿Enviar email de restablecimiento de contraseña a ${employee.email}?`)) return;
+    setResettingPassword(true);
+    const res = await fetch(`/api/employees/${id}/reset-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: employee.email }),
+    });
+    setResettingPassword(false);
+    if (res.ok) toast.success("Email de restablecimiento enviado");
+    else toast.error("Error al enviar el email");
+  }
 
   const loadCompetencies = useCallback(async () => {
     const res = await fetch(`/api/employees/${id}/competencies`);
@@ -296,12 +311,25 @@ export default function EmployeeDetailPage() {
                     </span>
                   </div>
                 </div>
-                <Link href={`/employees/${employee.id}/edit`}>
-                  <Button size="sm" className="gap-2 bg-blue-600 hover:bg-blue-700">
-                    <Edit className="h-4 w-4" />
-                    Editar
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={resetPassword}
+                    disabled={resettingPassword}
+                    className="gap-2"
+                    title="Enviar email de restablecimiento de contraseña"
+                  >
+                    <KeyRound className="h-4 w-4" />
+                    {resettingPassword ? "Enviando..." : "Reset contraseña"}
                   </Button>
-                </Link>
+                  <Link href={`/employees/${employee.id}/edit`}>
+                    <Button size="sm" className="gap-2 bg-blue-600 hover:bg-blue-700">
+                      <Edit className="h-4 w-4" />
+                      Editar
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
