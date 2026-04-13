@@ -63,7 +63,7 @@ async function getStats(companySlug?: string) {
     const LEVELS: Record<string, number> = { NONE: 0, BASIC: 1, INTERMEDIATE: 2, ADVANCED: 3, EXPERT: 4 };
     let conBrecha = 0;
     for (const emp of employees) {
-      const hasGap = emp.position.competencies.some((req) => {
+      const hasGap = (emp.position?.competencies ?? []).some((req) => {
         const empComp = emp.competencies.find((ec) => ec.competencyId === req.competencyId);
         return (LEVELS[empComp?.currentLevel ?? "NONE"] ?? 0) < LEVELS[req.requiredLevel];
       });

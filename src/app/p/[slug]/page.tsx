@@ -37,6 +37,8 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           city: true,
           personalEmail: true,
           phone: true,
+          positionTitle: true,
+          companyName: true,
           position: { select: { title: true } },
           department: {
             select: {
@@ -139,10 +141,10 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                       </p>
                     )}
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-3 text-sm text-gray-500">
-                      {emp.position?.title && (
+                      {(emp.positionTitle ?? emp.position?.title) && (
                         <span className="flex items-center gap-1.5">
                           <Briefcase className="h-3.5 w-3.5 shrink-0" />
-                          {emp.position.title}
+                          {emp.positionTitle ?? emp.position?.title}
                         </span>
                       )}
                       {company?.name && (

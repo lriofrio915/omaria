@@ -11,6 +11,8 @@ async function buildCompetencyContext(): Promise<string> {
         select: {
           firstName: true,
           lastName: true,
+          positionTitle: true,
+          departmentName: true,
           position: { select: { title: true } },
           department: { select: { name: true } },
           competencies: {
@@ -45,8 +47,8 @@ async function buildCompetencyContext(): Promise<string> {
 
     for (const emp of employees) {
       const name = `${emp.firstName} ${emp.lastName}`;
-      const cargo = emp.position.title;
-      const dept = emp.department.name;
+      const cargo = emp.positionTitle ?? emp.position?.title ?? "Sin cargo";
+      const dept = emp.departmentName ?? emp.department?.name ?? "Sin área";
       if (emp.competencies.length === 0) {
         lines.push(`- ${name} (${cargo}, ${dept}): sin evaluación de competencias`);
       } else {

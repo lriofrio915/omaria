@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,9 +35,9 @@ const employeeSchema = z.object({
   contractType: z.enum(["INDEFINITE", "FIXED_TERM", "PART_TIME", "FREELANCE"]),
   status: z.enum(["ACTIVE", "INACTIVE", "ON_LEAVE", "TERMINATED"]),
   salary: z.string().optional(),
-  companyId: z.string().min(1, "Requerido"),
-  departmentId: z.string().min(1, "Requerido"),
-  positionId: z.string().min(1, "Requerido"),
+  companyName: z.string().min(1, "Requerido"),
+  positionTitle: z.string().min(1, "Requerido"),
+  departmentName: z.string().min(1, "Requerido"),
   managerId: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),
@@ -51,9 +51,6 @@ type FormData = z.infer<typeof employeeSchema>;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-interface Company { id: string; name: string; primaryColor: string }
-interface Department { id: string; name: string; companyId: string | null }
-interface Position { id: string; title: string; departmentId: string }
 interface EmployeeOption { id: string; firstName: string; lastName: string }
 
 interface EmployeeFormProps {
@@ -79,6 +76,472 @@ const STATUS_LABELS: Record<string, string> = {
 
 const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
+// ── EMPRESA_DATA ──────────────────────────────────────────────────────────────
+
+const EMPRESA_DATA: Record<string, { cargos: string[]; areas: string[] }> = {
+  "SG - FINTECH": {
+    cargos: [
+      "Gerente General",
+      "Gerente Comercial",
+      "Gerente de Operaciones",
+      "Gerente de Tecnología",
+      "Gerente de Riesgos",
+      "Gerente de Cumplimiento",
+      "Gerente de Producto",
+      "Gerente de Marketing",
+      "Gerente de Recursos Humanos",
+      "Gerente de Finanzas",
+      "Director de Ventas",
+      "Director de Tecnología",
+      "Director de Operaciones",
+      "Director de Marketing",
+      "Director de Riesgos",
+      "Jefe de Desarrollo de Software",
+      "Jefe de Infraestructura",
+      "Jefe de Seguridad Informática",
+      "Jefe de Soporte Técnico",
+      "Jefe de Operaciones",
+      "Jefe de Cumplimiento",
+      "Jefe de Ventas",
+      "Jefe de Atención al Cliente",
+      "Jefe de Producto",
+      "Jefe de Análisis de Datos",
+      "Analista de Sistemas",
+      "Analista de Datos",
+      "Analista de Riesgos",
+      "Analista de Cumplimiento",
+      "Analista Financiero",
+      "Analista de Marketing",
+      "Analista de Operaciones",
+      "Analista de Seguridad",
+      "Desarrollador Backend",
+      "Desarrollador Frontend",
+      "Desarrollador Full Stack",
+      "Desarrollador Mobile",
+      "Desarrollador de Software",
+      "Ingeniero de Datos",
+      "Ingeniero DevOps",
+      "Ingeniero de Seguridad",
+      "Científico de Datos",
+      "Arquitecto de Software",
+      "Arquitecto de Soluciones",
+      "Diseñador UX/UI",
+      "Diseñador Gráfico",
+      "Especialista en Marketing Digital",
+      "Especialista en SEO",
+      "Especialista en Redes Sociales",
+      "Especialista en Cumplimiento",
+      "Especialista en Seguridad",
+      "Especialista en Soporte",
+      "Coordinador de Proyectos",
+      "Coordinador de Operaciones",
+      "Coordinador de Ventas",
+      "Coordinador de Atención al Cliente",
+      "Ejecutivo de Ventas",
+      "Ejecutivo de Cuenta",
+      "Asesor Comercial",
+      "Asesor de Riesgos",
+      "Oficial de Cumplimiento",
+      "Oficial de Seguridad",
+      "Auditor Interno",
+      "Contador",
+      "Tesorero",
+      "Asistente Administrativo",
+      "Asistente de Gerencia",
+      "Recepcionista",
+      "Agente de Soporte",
+      "Agente de Ventas",
+      "Pasante / Practicante",
+    ],
+    areas: [
+      "Gerencia General",
+      "Tecnología e Innovación",
+      "Operaciones",
+      "Comercial y Ventas",
+      "Marketing y Comunicación",
+      "Riesgos",
+      "Cumplimiento",
+      "Producto",
+      "Análisis de Datos",
+      "Seguridad Informática",
+      "Infraestructura",
+      "Soporte Técnico",
+      "Finanzas y Contabilidad",
+      "Recursos Humanos",
+      "Atención al Cliente",
+      "Auditoría Interna",
+      "Legal",
+      "Administración",
+    ],
+  },
+  "SG - CONSULTING GROUP": {
+    cargos: [
+      "Gerente General",
+      "Gerente de Consultoría",
+      "Gerente de Proyectos",
+      "Gerente Comercial",
+      "Gerente de Recursos Humanos",
+      "Gerente de Finanzas",
+      "Director de Consultoría",
+      "Director de Proyectos",
+      "Director Comercial",
+      "Jefe de Proyectos",
+      "Jefe de Consultoría",
+      "Jefe de Operaciones",
+      "Jefe de Ventas",
+      "Consultor Senior",
+      "Consultor Junior",
+      "Consultor de Negocios",
+      "Consultor de Procesos",
+      "Consultor de Estrategia",
+      "Consultor de Tecnología",
+      "Consultor de Recursos Humanos",
+      "Analista de Proyectos",
+      "Analista de Negocios",
+      "Analista de Procesos",
+      "Analista Financiero",
+      "Analista de Datos",
+      "Coordinador de Proyectos",
+      "Coordinador Administrativo",
+      "Ejecutivo de Cuentas",
+      "Ejecutivo de Ventas",
+      "Asesor Comercial",
+      "Especialista en Gestión del Cambio",
+      "Especialista en Procesos",
+      "Especialista en Calidad",
+      "Diseñador de Procesos",
+      "Auditor",
+      "Contador",
+      "Asistente Administrativo",
+      "Asistente de Gerencia",
+      "Recepcionista",
+      "Pasante / Practicante",
+    ],
+    areas: [
+      "Gerencia General",
+      "Consultoría",
+      "Gestión de Proyectos",
+      "Comercial y Ventas",
+      "Recursos Humanos",
+      "Finanzas y Contabilidad",
+      "Operaciones",
+      "Calidad y Mejora Continua",
+      "Legal",
+      "Administración",
+      "Marketing",
+    ],
+  },
+  "SG - TECH": {
+    cargos: [
+      "Gerente General",
+      "Gerente de Tecnología",
+      "Gerente de Proyectos",
+      "Gerente Comercial",
+      "Gerente de Operaciones",
+      "Director de Tecnología",
+      "Director de Proyectos",
+      "Jefe de Desarrollo",
+      "Jefe de Infraestructura",
+      "Jefe de Soporte",
+      "Jefe de Proyectos",
+      "Arquitecto de Software",
+      "Arquitecto de Soluciones",
+      "Arquitecto de Nube",
+      "Desarrollador Backend",
+      "Desarrollador Frontend",
+      "Desarrollador Full Stack",
+      "Desarrollador Mobile",
+      "Ingeniero DevOps",
+      "Ingeniero de Datos",
+      "Ingeniero de Seguridad",
+      "Científico de Datos",
+      "Analista de Sistemas",
+      "Analista de Datos",
+      "Analista de Seguridad",
+      "Analista de QA",
+      "Tester QA",
+      "Diseñador UX/UI",
+      "Diseñador Gráfico",
+      "Especialista en Cloud",
+      "Especialista en Ciberseguridad",
+      "Especialista en Big Data",
+      "Especialista en Inteligencia Artificial",
+      "Coordinador de Proyectos",
+      "Scrum Master",
+      "Product Owner",
+      "Ejecutivo de Ventas Tech",
+      "Consultor Técnico",
+      "Soporte de TI",
+      "Administrador de Sistemas",
+      "Administrador de Bases de Datos",
+      "Asistente Administrativo",
+      "Pasante / Practicante",
+    ],
+    areas: [
+      "Gerencia General",
+      "Desarrollo de Software",
+      "Infraestructura y Cloud",
+      "Ciberseguridad",
+      "Datos e Inteligencia Artificial",
+      "QA y Testing",
+      "Diseño y Experiencia de Usuario",
+      "Gestión de Proyectos",
+      "Soporte Técnico",
+      "Comercial",
+      "Administración",
+    ],
+  },
+  "SG - ACADEMY": {
+    cargos: [
+      "Gerente General",
+      "Gerente Académico",
+      "Gerente Comercial",
+      "Gerente de Operaciones",
+      "Director Académico",
+      "Director de Programas",
+      "Coordinador Académico",
+      "Coordinador de Programas",
+      "Coordinador Comercial",
+      "Docente / Instructor Senior",
+      "Docente / Instructor Junior",
+      "Facilitador",
+      "Tutor",
+      "Diseñador Instruccional",
+      "Desarrollador de Contenido",
+      "Especialista en E-Learning",
+      "Analista Académico",
+      "Analista de Datos Educativos",
+      "Ejecutivo de Ventas",
+      "Asesor Académico",
+      "Asesor Comercial",
+      "Soporte Técnico Educativo",
+      "Administrador de Plataformas",
+      "Asistente Administrativo",
+      "Recepcionista",
+      "Pasante / Practicante",
+    ],
+    areas: [
+      "Gerencia General",
+      "Dirección Académica",
+      "Diseño Curricular",
+      "Docencia",
+      "Operaciones Académicas",
+      "Comercial y Ventas",
+      "Tecnología Educativa",
+      "Atención al Estudiante",
+      "Administración",
+    ],
+  },
+  "SG - LEGAL": {
+    cargos: [
+      "Gerente General",
+      "Socio Director",
+      "Socio",
+      "Director Legal",
+      "Gerente Legal",
+      "Abogado Senior",
+      "Abogado Junior",
+      "Abogado Corporativo",
+      "Abogado Tributario",
+      "Abogado Laboral",
+      "Abogado Civil",
+      "Abogado Mercantil",
+      "Abogado de Cumplimiento",
+      "Especialista en Regulación",
+      "Especialista en Cumplimiento",
+      "Notario",
+      "Paralegal Senior",
+      "Paralegal Junior",
+      "Investigador Legal",
+      "Analista Legal",
+      "Coordinador Legal",
+      "Asistente Legal",
+      "Asistente Administrativo",
+      "Recepcionista",
+      "Pasante / Practicante",
+    ],
+    areas: [
+      "Gerencia General",
+      "Derecho Corporativo",
+      "Derecho Tributario",
+      "Derecho Laboral",
+      "Derecho Civil y Mercantil",
+      "Cumplimiento y Regulación",
+      "Notaría",
+      "Investigación Legal",
+      "Administración",
+    ],
+  },
+  "SG - REAL ESTATE": {
+    cargos: [
+      "Gerente General",
+      "Gerente Comercial",
+      "Gerente de Proyectos",
+      "Gerente de Operaciones",
+      "Director Comercial",
+      "Director de Proyectos",
+      "Jefe de Ventas",
+      "Jefe de Proyectos",
+      "Jefe de Operaciones",
+      "Coordinador de Proyectos",
+      "Coordinador Comercial",
+      "Coordinador de Obras",
+      "Agente Inmobiliario Senior",
+      "Agente Inmobiliario Junior",
+      "Asesor Comercial",
+      "Analista de Mercado",
+      "Analista de Proyectos",
+      "Analista Financiero",
+      "Arquitecto",
+      "Ingeniero Civil",
+      "Ingeniero de Proyectos",
+      "Residente de Obra",
+      "Supervisor de Obra",
+      "Valuador",
+      "Especialista en Marketing Inmobiliario",
+      "Community Manager",
+      "Diseñador Gráfico",
+      "Asistente Administrativo",
+      "Recepcionista",
+      "Pasante / Practicante",
+    ],
+    areas: [
+      "Gerencia General",
+      "Comercial y Ventas",
+      "Gestión de Proyectos",
+      "Obras y Construcción",
+      "Marketing Inmobiliario",
+      "Análisis de Mercado",
+      "Finanzas",
+      "Legal",
+      "Administración",
+    ],
+  },
+  "SG - INVESTMENTS": {
+    cargos: [
+      "Gerente General",
+      "Director de Inversiones",
+      "Director de Portafolio",
+      "Gerente de Inversiones",
+      "Gerente de Riesgos",
+      "Gerente Comercial",
+      "Analista de Inversiones Senior",
+      "Analista de Inversiones Junior",
+      "Analista de Riesgos",
+      "Analista Financiero",
+      "Analista de Mercados",
+      "Gestor de Portafolio",
+      "Especialista en Estructuración",
+      "Especialista en Cumplimiento",
+      "Asesor de Inversiones",
+      "Trader",
+      "Economista",
+      "Contador",
+      "Auditor",
+      "Oficial de Cumplimiento",
+      "Coordinador de Operaciones",
+      "Asistente Administrativo",
+      "Pasante / Practicante",
+    ],
+    areas: [
+      "Gerencia General",
+      "Inversiones",
+      "Gestión de Portafolio",
+      "Riesgos",
+      "Cumplimiento",
+      "Comercial",
+      "Finanzas y Contabilidad",
+      "Análisis de Mercados",
+      "Operaciones",
+      "Administración",
+    ],
+  },
+  "SG - HEALTH": {
+    cargos: [
+      "Gerente General",
+      "Director Médico",
+      "Gerente de Operaciones",
+      "Gerente Comercial",
+      "Coordinador Médico",
+      "Coordinador de Enfermería",
+      "Médico General",
+      "Médico Especialista",
+      "Médico Ocupacional",
+      "Enfermero/a",
+      "Auxiliar de Enfermería",
+      "Nutricionista",
+      "Psicólogo/a",
+      "Fisioterapeuta",
+      "Odontólogo/a",
+      "Tecnólogo Médico",
+      "Farmacéutico",
+      "Paramédico",
+      "Coordinador de Salud Ocupacional",
+      "Especialista en Salud Ocupacional",
+      "Analista de Salud",
+      "Asistente Médico",
+      "Recepcionista Médica",
+      "Asistente Administrativo",
+      "Pasante / Practicante",
+    ],
+    areas: [
+      "Gerencia General",
+      "Dirección Médica",
+      "Enfermería",
+      "Especialidades Médicas",
+      "Salud Ocupacional",
+      "Nutrición",
+      "Psicología",
+      "Fisioterapia",
+      "Odontología",
+      "Farmacia",
+      "Operaciones",
+      "Comercial",
+      "Administración",
+    ],
+  },
+  "SG - AGRO": {
+    cargos: [
+      "Gerente General",
+      "Gerente de Operaciones",
+      "Gerente Comercial",
+      "Director Agrícola",
+      "Director de Producción",
+      "Ingeniero Agrónomo",
+      "Ingeniero Agroindustrial",
+      "Ingeniero de Producción",
+      "Jefe de Campo",
+      "Jefe de Producción",
+      "Jefe de Calidad",
+      "Supervisor de Campo",
+      "Supervisor de Producción",
+      "Técnico Agrícola",
+      "Técnico de Campo",
+      "Analista de Calidad",
+      "Analista de Producción",
+      "Especialista en Sostenibilidad",
+      "Especialista en Riego",
+      "Especialista en Plagas",
+      "Coordinador Logístico",
+      "Operador de Maquinaria",
+      "Trabajador Agrícola",
+      "Asistente Administrativo",
+      "Pasante / Practicante",
+    ],
+    areas: [
+      "Gerencia General",
+      "Producción Agrícola",
+      "Agroindustria",
+      "Control de Calidad",
+      "Campo y Operaciones",
+      "Logística",
+      "Comercial",
+      "Sostenibilidad",
+      "Administración",
+    ],
+  },
+};
+
 // ── Phone formatter ───────────────────────────────────────────────────────────
 
 function formatEcuadorPhone(input: string): string {
@@ -92,6 +555,12 @@ function formatEcuadorPhone(input: string): string {
   if (local.length > 2) result += " " + local.slice(2, 5);
   if (local.length > 5) result += " " + local.slice(5);
   return result;
+}
+
+// ── Normalize string (removes \xa0 and extra spaces for pre-selection) ────────
+
+function normalizeStr(s: string): string {
+  return s.replace(/\xa0/g, " ").trim();
 }
 
 // ── Section wrapper ───────────────────────────────────────────────────────────
@@ -155,16 +624,17 @@ function Field({
 export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-
-  const [companies, setCompanies] = useState<Company[]>([]);
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [positions, setPositions] = useState<Position[]>([]);
   const [managers, setManagers] = useState<EmployeeOption[]>([]);
   const [createAccount, setCreateAccount] = useState(false);
   const [resetSending, setResetSending] = useState(false);
 
-  // Evita que el efecto de companyId limpie departamento/cargo al cargar datos iniciales
-  const isFirstCompanyLoad = useRef(true);
+  // Normalize initialData company name for matching against EMPRESA_DATA keys
+  const normalizedInitialCompany = initialData?.companyName
+    ? normalizeStr(initialData.companyName)
+    : undefined;
+  const matchedInitialCompany = normalizedInitialCompany
+    ? Object.keys(EMPRESA_DATA).find((k) => normalizeStr(k) === normalizedInitialCompany)
+    : undefined;
 
   const {
     register,
@@ -180,71 +650,36 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
       role: "EMPLOYEE",
       createAccount: false,
       ...initialData,
+      companyName: matchedInitialCompany ?? initialData?.companyName ?? "",
     },
   });
 
-  const selectedCompany = watch("companyId");
-  const selectedDepartment = watch("departmentId");
+  const selectedCompany = watch("companyName") ?? "";
   const phoneValue = watch("phone") ?? "";
 
-  // Load companies + managers once
-  useEffect(() => {
-    fetch("/api/companies")
-      .then((r) => r.json())
-      .then((data: Company[]) => setCompanies(data))
-      .catch(() => {});
+  const cargos = selectedCompany ? (EMPRESA_DATA[selectedCompany]?.cargos ?? []) : [];
+  const areas = selectedCompany ? (EMPRESA_DATA[selectedCompany]?.areas ?? []) : [];
 
+  // Load managers once
+  useEffect(() => {
     fetch("/api/employees")
       .then((r) => r.json())
       .then((json) => setManagers(Array.isArray(json) ? json : (json.data ?? [])))
       .catch(() => {});
   }, []);
 
-  // Load departments when company changes
-  const loadDepartments = useCallback(async (companyId: string) => {
-    const res = await fetch(`/api/departments?companyId=${companyId}`);
-    if (res.ok) {
-      const data: Department[] = await res.json();
-      setDepartments(data);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (selectedCompany) {
-      loadDepartments(selectedCompany);
-      if (isFirstCompanyLoad.current) {
-        isFirstCompanyLoad.current = false;
-      } else {
-        setValue("departmentId", "");
-        setValue("positionId", "");
-        setPositions([]);
-      }
-    }
-  }, [selectedCompany, loadDepartments, setValue]);
-
-  // Load positions when department changes
-  useEffect(() => {
-    if (selectedDepartment) {
-      fetch(`/api/positions?departmentId=${selectedDepartment}`)
-        .then((r) => r.json())
-        .then((data: Position[]) => setPositions(data))
-        .catch(() => setPositions([]));
-    }
-  }, [selectedDepartment]);
-
   // Submit
   async function onSubmit(data: FormData) {
     setLoading(true);
-    const { companyId: _companyId, ...rest } = data;
 
     const payload = {
-      ...rest,
-      salary: rest.salary ? parseFloat(rest.salary) : undefined,
-      managerId: rest.managerId || undefined,
-      personalEmail: rest.personalEmail || undefined,
-      corporateEmail: rest.corporateEmail || undefined,
-      bloodType: rest.bloodType || undefined,
-      role: rest.role ?? "EMPLOYEE",
+      ...data,
+      salary: data.salary ? parseFloat(data.salary) : undefined,
+      managerId: data.managerId || undefined,
+      personalEmail: data.personalEmail || undefined,
+      corporateEmail: data.corporateEmail || undefined,
+      bloodType: data.bloodType || undefined,
+      role: data.role ?? "EMPLOYEE",
       createAccount,
     };
 
@@ -356,62 +791,58 @@ export function EmployeeForm({ initialData, mode }: EmployeeFormProps) {
       <Section icon={Briefcase} title="Datos laborales">
         <div className="grid gap-4 sm:grid-cols-2">
 
-          {/* Empresa — selector que controla los departamentos */}
-          <Field label="Empresa" required error={errors.companyId?.message}>
+          {/* Empresa */}
+          <Field label="Empresa" required error={errors.companyName?.message}>
             <Select
-              defaultValue={initialData?.companyId ?? ""}
-              onValueChange={(v) => setValue("companyId", v)}
+              value={selectedCompany}
+              onValueChange={(v) => {
+                setValue("companyName", v);
+                setValue("positionTitle", "");
+                setValue("departmentName", "");
+              }}
             >
               <SelectTrigger className="cursor-pointer">
                 <SelectValue placeholder="Seleccionar empresa..." />
               </SelectTrigger>
               <SelectContent>
-                {companies.map((c) => (
-                  <SelectItem key={c.id} value={c.id} className="cursor-pointer">
-                    <span className="flex items-center gap-2">
-                      <span
-                        className="inline-block h-2 w-2 rounded-full shrink-0"
-                        style={{ backgroundColor: c.primaryColor }}
-                      />
-                      {c.name}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-
-          {/* Departamento */}
-          <Field label="Área / Departamento" required error={errors.departmentId?.message}>
-            <Select
-              value={watch("departmentId") ?? ""}
-              onValueChange={(v) => { setValue("departmentId", v); setValue("positionId", ""); }}
-              disabled={!selectedCompany}
-            >
-              <SelectTrigger className={selectedCompany ? "cursor-pointer" : "cursor-not-allowed opacity-60"}>
-                <SelectValue placeholder={selectedCompany ? "Seleccionar área..." : "Selecciona empresa primero"} />
-              </SelectTrigger>
-              <SelectContent>
-                {departments.map((d) => (
-                  <SelectItem key={d.id} value={d.id} className="cursor-pointer">{d.name}</SelectItem>
+                {Object.keys(EMPRESA_DATA).map((k) => (
+                  <SelectItem key={k} value={k} className="cursor-pointer">{k}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </Field>
 
           {/* Cargo */}
-          <Field label="Cargo" required error={errors.positionId?.message}>
+          <Field label="Cargo" required error={errors.positionTitle?.message}>
             <Select
-              value={watch("positionId") ?? ""}
-              onValueChange={(v) => setValue("positionId", v)}
-              disabled={!selectedDepartment}
+              value={watch("positionTitle") ?? ""}
+              onValueChange={(v) => setValue("positionTitle", v)}
+              disabled={!selectedCompany}
             >
-              <SelectTrigger className={selectedDepartment ? "cursor-pointer" : "cursor-not-allowed opacity-60"}>
-                <SelectValue placeholder={selectedDepartment ? "Seleccionar cargo..." : "Selecciona área primero"} />
+              <SelectTrigger className={selectedCompany ? "cursor-pointer" : "cursor-not-allowed opacity-60"}>
+                <SelectValue placeholder={selectedCompany ? "Seleccionar cargo..." : "Selecciona empresa primero"} />
               </SelectTrigger>
               <SelectContent>
-                {positions.map((p) => (
-                  <SelectItem key={p.id} value={p.id} className="cursor-pointer">{p.title}</SelectItem>
+                {cargos.map((c) => (
+                  <SelectItem key={c} value={c} className="cursor-pointer">{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+
+          {/* Área / Departamento */}
+          <Field label="Área / Departamento" required error={errors.departmentName?.message}>
+            <Select
+              value={watch("departmentName") ?? ""}
+              onValueChange={(v) => setValue("departmentName", v)}
+              disabled={!selectedCompany}
+            >
+              <SelectTrigger className={selectedCompany ? "cursor-pointer" : "cursor-not-allowed opacity-60"}>
+                <SelectValue placeholder={selectedCompany ? "Seleccionar área..." : "Selecciona empresa primero"} />
+              </SelectTrigger>
+              <SelectContent>
+                {areas.map((a) => (
+                  <SelectItem key={a} value={a} className="cursor-pointer">{a}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

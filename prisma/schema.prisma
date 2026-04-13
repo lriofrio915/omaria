@@ -140,10 +140,13 @@ model Employee {
   contractType   ContractType         @default(INDEFINITE)
   status         EmployeeStatus       @default(ACTIVE)
   salary         Decimal?             @db.Decimal(10, 2)
-  departmentId   String
-  department     Department           @relation(fields: [departmentId], references: [id])
-  positionId     String
-  position       Position             @relation(fields: [positionId], references: [id])
+  companyName    String?
+  positionTitle  String?
+  departmentName String?
+  departmentId   String?
+  department     Department?          @relation(fields: [departmentId], references: [id])
+  positionId     String?
+  position       Position?            @relation(fields: [positionId], references: [id])
   managerId      String?
   manager        Employee?            @relation("EmployeeHierarchy", fields: [managerId], references: [id])
   subordinates   Employee[]           @relation("EmployeeHierarchy")

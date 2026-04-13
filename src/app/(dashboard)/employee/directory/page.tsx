@@ -10,8 +10,11 @@ interface DirectoryEmployee {
   lastName: string;
   avatarUrl: string | null;
   city: string | null;
-  department: { name: string };
-  position: { title: string };
+  companyName: string | null;
+  positionTitle: string | null;
+  departmentName: string | null;
+  department: { name: string } | null;
+  position: { title: string } | null;
 }
 
 function colorFromString(str: string) {
@@ -139,8 +142,8 @@ export default function EmployeeDirectoryPage() {
                 <p className="text-sm font-semibold text-foreground leading-tight">
                   {emp.firstName} {emp.lastName}
                 </p>
-                <p className="text-xs text-muted-foreground mt-0.5">{emp.position.title}</p>
-                <p className="text-xs text-muted-foreground">{emp.department.name}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{emp.positionTitle ?? emp.position?.title ?? "—"}</p>
+                <p className="text-xs text-muted-foreground">{emp.departmentName ?? emp.department?.name ?? "—"}</p>
                 {emp.city && (
                   <p className="text-xs text-muted-foreground/60 mt-1">{emp.city}</p>
                 )}

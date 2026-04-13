@@ -8,7 +8,18 @@ async function getEmployeeData(userId: string) {
   try {
     const employee = await prisma.employee.findUnique({
       where: { userId },
-      include: {
+      select: {
+        id: true,
+        userId: true,
+        employeeCode: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        hireDate: true,
+        status: true,
+        companyName: true,
+        positionTitle: true,
+        departmentName: true,
         department: { select: { name: true } },
         position: { select: { title: true } },
       },
@@ -39,7 +50,7 @@ export default async function EmployeeDashboard() {
         </h1>
         <p className="text-sm text-slate-500 mt-1">
           {employee
-            ? `${employee.position.title} · ${employee.department.name}`
+            ? `${employee.positionTitle ?? employee.position?.title ?? "—"} · ${employee.departmentName ?? employee.department?.name ?? "—"}`
             : "Bienvenido a OmarIA — SG Consulting Group"}
         </p>
       </div>
@@ -55,8 +66,8 @@ export default async function EmployeeDashboard() {
             <dl className="grid gap-3 sm:grid-cols-2">
               {[
                 { label: "Código", value: employee.employeeCode },
-                { label: "Cargo", value: employee.position.title },
-                { label: "Departamento", value: employee.department.name },
+                { label: "Cargo", value: employee.positionTitle ?? employee.position?.title ?? "—" },
+                { label: "Departamento", value: employee.departmentName ?? employee.department?.name ?? "—" },
                 { label: "Correo", value: employee.email },
                 {
                   label: "Fecha de ingreso",

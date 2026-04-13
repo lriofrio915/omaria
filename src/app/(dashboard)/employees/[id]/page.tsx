@@ -44,8 +44,11 @@ interface Employee {
   notes: string | null;
   avatarUrl: string | null;
   role: string;
-  department: { id: string; name: string; company?: { name: string } | null };
-  position: { id: string; title: string };
+  companyName: string | null;
+  positionTitle: string | null;
+  departmentName: string | null;
+  department: { id: string; name: string; company?: { name: string } | null } | null;
+  position: { id: string; title: string } | null;
   manager: { id: string; firstName: string; lastName: string } | null;
   subordinates: { id: string; firstName: string; lastName: string; employeeCode: string }[];
   documents: { id: string; title: string; type: string; createdAt: string }[];
@@ -309,7 +312,7 @@ export default function EmployeeDetailPage() {
                     {employee.firstName} {employee.lastName}
                   </h1>
                   <p className="text-sm text-muted-foreground mt-0.5">
-                    {employee.position.title} · {employee.department.name}
+                    {employee.positionTitle ?? employee.position?.title ?? "—"} · {employee.departmentName ?? employee.department?.name ?? "—"}
                   </p>
                   <div className="flex items-center gap-2 mt-2">
                     <span className="font-mono text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
