@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,7 +18,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowLeft, Eye, EyeOff, MailCheck } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, MailCheck, AlertCircle } from "lucide-react";
+
+const AUTH_ERROR_MESSAGES: Record<string, string> = {
+  link_expired:
+    "El enlace de confirmación ha expirado. Regístrate de nuevo para recibir un enlace actualizado.",
+  link_used:
+    "Este enlace ya fue utilizado. Inicia sesión directamente o solicita uno nuevo.",
+  auth_callback_error:
+    "El enlace de acceso no es válido. Intenta registrarte o iniciar sesión de nuevo.",
+};
+
+function AuthErrorBanner() {
+  const params = useSearchParams();
+  const error = params.get("error");
+  if (!error) return null;
+  const msg = AUTH_ERROR_MESSAGES[error] ?? "Ocurrió un error al verificar tu cuenta. Intenta de nuevo.";
+  return (
+    <div className="mb-4 flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-sm text-red-400">
+      <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+      <span>{msg}</span>
+    </div>
+  );
+}
 
 const loginSchema = z.object({
   email: z.string().email("Ingresa un correo válido"),
@@ -131,6 +153,10 @@ export default function LoginPage() {
       </CardHeader>
 
       <CardContent>
+        <Suspense>
+          <AuthErrorBanner />
+        </Suspense>
+
         {/* Vista: Login */}
         {view === "login" && (
           <>

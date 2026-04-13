@@ -4,6 +4,19 @@ import type { SupabaseClient, EmailOtpType } from "@supabase/supabase-js";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
+
+  // Supabase envía ?error cuando el OTP ya expiró, fue usado, o la URL es inválida
+  const errorCode = searchParams.get("error_code");
+  if (errorCode) {
+    const msg =
+      errorCode === "otp_expired"
+        ? "link_expired"
+        : errorCode === "otp_disabled"
+        ? "link_used"
+        : "auth_callback_error";
+    return NextResponse.redirect(`${origin}/login?error=${msg}`);
+  }
+
   const code = searchParams.get("code");
   const token_hash = searchParams.get("token_hash");
   const type = searchParams.get("type");
