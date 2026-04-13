@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DocumentList } from "@/components/documents/DocumentList";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -531,25 +532,7 @@ export default function EmployeeDetailPage() {
 
         {/* Tab: Documentos */}
         <TabsContent value="documents" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-semibold text-muted-foreground">Documentos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {employee.documents.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Sin documentos asociados.</p>
-              ) : (
-                <ul className="space-y-2">
-                  {employee.documents.map((doc) => (
-                    <li key={doc.id} className="flex items-center justify-between rounded-lg px-3 py-2 hover:bg-muted">
-                      <span className="text-sm font-medium">{doc.title}</span>
-                      <span className="text-xs text-muted-foreground">{doc.type}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
+          <DocumentList isAdmin={true} employeeId={employee.id} />
         </TabsContent>
 
         {/* Tab: Nóminas */}
