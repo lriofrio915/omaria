@@ -149,6 +149,11 @@ function toDateInput(d: Date | string | null | undefined): string {
   return String(d).slice(0, 10);
 }
 
+function parseLocalDate(iso: string): Date {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
 // ─── FileDropZone ─────────────────────────────────────────────────────────────
 
 function FileDropZone({
@@ -728,7 +733,7 @@ export function ProfileEditor({ initialData }: { initialData: EmployeeData }) {
               { label: "WhatsApp", value: data.whatsapp },
               { label: "Teléfono", value: data.phone },
               { label: "Correo personal", value: data.personalEmail },
-              { label: "Fecha de nacimiento", value: data.birthDate ? new Date(data.birthDate).toLocaleDateString("es-EC") : null },
+              { label: "Fecha de nacimiento", value: data.birthDate ? parseLocalDate(data.birthDate).toLocaleDateString("es-EC") : null },
               { label: "Tipo de sangre", value: data.bloodType },
               { label: "Ciudad de residencia", value: data.city },
               { label: "Dirección", value: data.address },

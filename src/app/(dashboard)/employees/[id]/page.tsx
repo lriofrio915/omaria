@@ -12,6 +12,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DocumentList } from "@/components/documents/DocumentList";
 
+function parseLocalDate(iso: string): Date {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface Employee {
@@ -381,7 +386,7 @@ export default function EmployeeDetailPage() {
                   { label: "Correo personal", value: employee.personalEmail ?? "—" },
                   { label: "WhatsApp", value: employee.whatsapp ?? "—" },
                   { label: "Teléfono", value: employee.phone ?? "—" },
-                  { label: "Fecha de nacimiento", value: employee.birthDate ? new Date(employee.birthDate).toLocaleDateString("es-EC") : "—" },
+                  { label: "Fecha de nacimiento", value: employee.birthDate ? parseLocalDate(employee.birthDate).toLocaleDateString("es-EC") : "—" },
                   { label: "Tipo de sangre", value: employee.bloodType ?? "—" },
                   { label: "Dirección", value: employee.address ?? "—" },
                   { label: "Ciudad", value: employee.city ?? "—" },
