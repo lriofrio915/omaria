@@ -1,0 +1,209 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e6]: O
+        - generic [ref=e7]:
+          - paragraph [ref=e8]: OmarIA
+          - paragraph [ref=e9]: SG Consulting Group
+      - navigation [ref=e10]:
+        - list [ref=e11]:
+          - listitem [ref=e12]:
+            - link "Dashboard" [ref=e13] [cursor=pointer]:
+              - /url: /admin
+              - img [ref=e14]
+              - text: Dashboard
+          - listitem [ref=e19]:
+            - link "Empleados" [ref=e20] [cursor=pointer]:
+              - /url: /employees
+              - img [ref=e21]
+              - text: Empleados
+          - listitem [ref=e26]:
+            - link "Documentos" [ref=e27] [cursor=pointer]:
+              - /url: /documents
+              - img [ref=e28]
+              - text: Documentos
+          - listitem [ref=e31]:
+            - link "Nóminas" [ref=e32] [cursor=pointer]:
+              - /url: /payroll
+              - img [ref=e33]
+              - text: Nóminas
+          - listitem [ref=e35]:
+            - link "Organigrama" [ref=e36] [cursor=pointer]:
+              - /url: /organigram
+              - img [ref=e37]
+              - text: Organigrama
+          - listitem [ref=e41]:
+            - link "OmarIA" [ref=e42] [cursor=pointer]:
+              - /url: /ai-agent
+              - img [ref=e43]
+              - text: OmarIA
+          - listitem [ref=e45]:
+            - link "Gestión de Roles" [ref=e46] [cursor=pointer]:
+              - /url: /admin/roles
+              - img [ref=e47]
+              - text: Gestión de Roles
+          - listitem [ref=e50]:
+            - link "Mi Perfil" [ref=e51] [cursor=pointer]:
+              - /url: /profile
+              - img [ref=e52]
+              - text: Mi Perfil
+      - generic [ref=e57]: Administrador
+    - generic [ref=e58]:
+      - banner [ref=e59]:
+        - generic [ref=e60]:
+          - button "Activar modo oscuro" [ref=e275] [cursor=pointer]:
+            - img
+          - button "LR lriofrio915@gmail.com Administrador" [ref=e62] [cursor=pointer]:
+            - generic [ref=e64]: LR
+            - generic [ref=e65]:
+              - paragraph [ref=e66]: lriofrio915@gmail.com
+              - paragraph [ref=e67]: Administrador
+      - main [ref=e68]:
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - generic [ref=e71]:
+              - generic [ref=e72]:
+                - img [ref=e74]
+                - heading "Colaboradores" [level=1] [ref=e79]
+              - paragraph [ref=e80]: Directorio del personal — SG Consulting Group
+            - generic [ref=e81]:
+              - generic [ref=e82]:
+                - paragraph [ref=e83]: "4"
+                - paragraph [ref=e84]: total
+              - generic [ref=e86]:
+                - paragraph [ref=e87]: "4"
+                - paragraph [ref=e88]: activos
+          - generic [ref=e89]:
+            - generic [ref=e90]:
+              - generic [ref=e91]:
+                - img
+                - textbox "Buscar por nombre, cargo o cédula..." [ref=e92]
+              - generic [ref=e93]:
+                - button "Filtros" [ref=e94] [cursor=pointer]:
+                  - img
+                  - text: Filtros
+                - link "Nuevo colaborador" [ref=e95] [cursor=pointer]:
+                  - /url: /employees/new
+                  - button "Nuevo colaborador" [ref=e96]:
+                    - img
+                    - generic [ref=e97]: Nuevo colaborador
+            - generic [ref=e98]:
+              - generic [ref=e99]: 4 colaboradores en total
+              - generic [ref=e402]:
+                - generic [ref=e403]: Mostrar
+                - combobox [ref=e404]:
+                  - generic: "25"
+                  - img
+                - generic [ref=e405]: por página
+            - table [ref=e103]:
+              - rowgroup [ref=e104]:
+                - row "N° Colaborador Cargo Área Empresa Estado Acciones" [ref=e105]:
+                  - columnheader "N°" [ref=e106]
+                  - columnheader "Colaborador" [ref=e107]
+                  - columnheader "Cargo" [ref=e108]
+                  - columnheader "Área" [ref=e109]
+                  - columnheader "Empresa" [ref=e110]
+                  - columnheader "Estado" [ref=e111]
+                  - columnheader "Acciones" [ref=e112]
+              - rowgroup [ref=e113]:
+                - row "1 WH WASHINGTON HERRERA DIAZ SG0003 Administrador de RRHH Talento Humano SG Consulting Group Activo" [ref=e406] [cursor=pointer]:
+                  - cell "1" [ref=e407]
+                  - cell "WH WASHINGTON HERRERA DIAZ SG0003" [ref=e408]:
+                    - generic [ref=e409]:
+                      - generic [ref=e410]: WH
+                      - generic [ref=e411]:
+                        - paragraph [ref=e412]: WASHINGTON HERRERA DIAZ
+                        - paragraph [ref=e413]: SG0003
+                  - cell "Administrador de RRHH" [ref=e414]:
+                    - generic "Administrador de RRHH" [ref=e415]
+                  - cell "Talento Humano" [ref=e416]:
+                    - generic "Talento Humano" [ref=e417]
+                  - cell "SG Consulting Group" [ref=e418]:
+                    - generic "SG Consulting Group" [ref=e421]
+                  - cell "Activo" [ref=e422]:
+                    - generic [ref=e423]: Activo
+                  - cell [ref=e424]:
+                    - generic [ref=e425]:
+                      - button "Ver perfil" [ref=e426]:
+                        - img
+                      - button "Editar" [ref=e427]:
+                        - img
+                      - button "Eliminar" [ref=e428]:
+                        - img
+                - row "2 DM Daniel Montero SG0002 Administrador de RRHH Talento Humano SG Consulting Group Activo" [ref=e429] [cursor=pointer]:
+                  - cell "2" [ref=e430]
+                  - cell "DM Daniel Montero SG0002" [ref=e431]:
+                    - generic [ref=e432]:
+                      - generic [ref=e433]: DM
+                      - generic [ref=e434]:
+                        - paragraph [ref=e435]: Daniel Montero
+                        - paragraph [ref=e436]: SG0002
+                  - cell "Administrador de RRHH" [ref=e437]:
+                    - generic "Administrador de RRHH" [ref=e438]
+                  - cell "Talento Humano" [ref=e439]:
+                    - generic "Talento Humano" [ref=e440]
+                  - cell "SG Consulting Group" [ref=e441]:
+                    - generic "SG Consulting Group" [ref=e444]
+                  - cell "Activo" [ref=e445]:
+                    - generic [ref=e446]: Activo
+                  - cell [ref=e447]:
+                    - generic [ref=e448]:
+                      - button "Ver perfil" [ref=e449]:
+                        - img
+                      - button "Editar" [ref=e450]:
+                        - img
+                      - button "Eliminar" [ref=e451]:
+                        - img
+                - row "3 LR Luis Riofrio EMP001 Administrador de RRHH Talento Humano SG Consulting Group Activo" [ref=e452] [cursor=pointer]:
+                  - cell "3" [ref=e453]
+                  - cell "LR Luis Riofrio EMP001" [ref=e454]:
+                    - generic [ref=e455]:
+                      - generic [ref=e456]: LR
+                      - generic [ref=e457]:
+                        - paragraph [ref=e458]: Luis Riofrio
+                        - paragraph [ref=e459]: EMP001
+                  - cell "Administrador de RRHH" [ref=e460]:
+                    - generic "Administrador de RRHH" [ref=e461]
+                  - cell "Talento Humano" [ref=e462]:
+                    - generic "Talento Humano" [ref=e463]
+                  - cell "SG Consulting Group" [ref=e464]:
+                    - generic "SG Consulting Group" [ref=e467]
+                  - cell "Activo" [ref=e468]:
+                    - generic [ref=e469]: Activo
+                  - cell [ref=e470]:
+                    - generic [ref=e471]:
+                      - button "Ver perfil" [ref=e472]:
+                        - img
+                      - button "Editar" [ref=e473]:
+                        - img
+                      - button "Eliminar" [ref=e474]:
+                        - img
+                - row "4 CR Cristian Rosero SG0004 Pendiente Pendiente — Activo" [ref=e475] [cursor=pointer]:
+                  - cell "4" [ref=e476]
+                  - cell "CR Cristian Rosero SG0004" [ref=e477]:
+                    - generic [ref=e478]:
+                      - generic [ref=e479]: CR
+                      - generic [ref=e480]:
+                        - paragraph [ref=e481]: Cristian Rosero
+                        - paragraph [ref=e482]: SG0004
+                  - cell "Pendiente" [ref=e483]:
+                    - generic "Pendiente" [ref=e484]
+                  - cell "Pendiente" [ref=e485]:
+                    - generic "Pendiente" [ref=e486]
+                  - cell "—" [ref=e487]:
+                    - generic [ref=e488]: —
+                  - cell "Activo" [ref=e489]:
+                    - generic [ref=e490]: Activo
+                  - cell [ref=e491]:
+                    - generic [ref=e492]:
+                      - button "Ver perfil" [ref=e493]:
+                        - img
+                      - button "Editar" [ref=e494]:
+                        - img
+                      - button "Eliminar" [ref=e495]:
+                        - img
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e271] [cursor=pointer]:
+    - img [ref=e272]
+  - alert [ref=e370]

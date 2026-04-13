@@ -1,0 +1,230 @@
+- generic:
+  - generic:
+    - complementary:
+      - generic:
+        - generic:
+          - generic: O
+        - generic:
+          - paragraph: OmarIA
+          - paragraph: SG Consulting Group
+      - navigation:
+        - list:
+          - listitem:
+            - link:
+              - /url: /admin
+              - img
+              - text: Dashboard
+          - listitem:
+            - link:
+              - /url: /employees
+              - img
+              - text: Empleados
+          - listitem:
+            - link:
+              - /url: /documents
+              - img
+              - text: Documentos
+          - listitem:
+            - link:
+              - /url: /payroll
+              - img
+              - text: Nóminas
+          - listitem:
+            - link:
+              - /url: /organigram
+              - img
+              - text: Organigrama
+          - listitem:
+            - link:
+              - /url: /ai-agent
+              - img
+              - text: OmarIA
+          - listitem:
+            - link:
+              - /url: /admin/roles
+              - img
+              - text: Gestión de Roles
+          - listitem:
+            - link:
+              - /url: /profile
+              - img
+              - text: Mi Perfil
+      - generic:
+        - generic: Administrador
+    - generic:
+      - banner:
+        - generic:
+          - button:
+            - img
+          - button:
+            - generic:
+              - generic: LR
+            - generic:
+              - paragraph: lriofrio915@gmail.com
+              - paragraph: Administrador
+      - main:
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - img
+                - heading [level=1]: Colaboradores
+              - paragraph: Directorio del personal — SG Consulting Group
+            - generic:
+              - generic:
+                - paragraph: "4"
+                - paragraph: total
+              - generic:
+                - paragraph: "4"
+                - paragraph: activos
+          - generic:
+            - generic:
+              - generic:
+                - img
+                - textbox:
+                  - /placeholder: Buscar por nombre, cargo o cédula...
+              - generic:
+                - button:
+                  - img
+                  - text: Filtros
+                - link:
+                  - /url: /employees/new
+                  - button:
+                    - img
+                    - generic: Nuevo colaborador
+            - generic:
+              - generic: 4 colaboradores en total
+              - generic:
+                - generic: Mostrar
+                - combobox:
+                  - generic: "25"
+                  - img
+                - generic: por página
+            - generic:
+              - generic:
+                - generic:
+                  - table:
+                    - rowgroup:
+                      - row:
+                        - columnheader: N°
+                        - columnheader: Colaborador
+                        - columnheader: Cargo
+                        - columnheader: Área
+                        - columnheader: Empresa
+                        - columnheader: Estado
+                        - columnheader: Acciones
+                    - rowgroup:
+                      - row:
+                        - cell: "1"
+                        - cell:
+                          - generic:
+                            - generic: WH
+                            - generic:
+                              - paragraph: WASHINGTON HERRERA DIAZ
+                              - paragraph: SG0003
+                        - cell:
+                          - generic: Administrador de RRHH
+                        - cell:
+                          - generic: Talento Humano
+                        - cell:
+                          - generic:
+                            - generic: SG Consulting Group
+                        - cell:
+                          - generic: Activo
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                            - button:
+                              - img
+                            - button:
+                              - img
+                      - row:
+                        - cell: "2"
+                        - cell:
+                          - generic:
+                            - generic: DM
+                            - generic:
+                              - paragraph: Daniel Montero
+                              - paragraph: SG0002
+                        - cell:
+                          - generic: Administrador de RRHH
+                        - cell:
+                          - generic: Talento Humano
+                        - cell:
+                          - generic:
+                            - generic: SG Consulting Group
+                        - cell:
+                          - generic: Activo
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                            - button:
+                              - img
+                            - button:
+                              - img
+                      - row:
+                        - cell: "3"
+                        - cell:
+                          - generic:
+                            - generic: LR
+                            - generic:
+                              - paragraph: Luis Riofrio
+                              - paragraph: EMP001
+                        - cell:
+                          - generic: Administrador de RRHH
+                        - cell:
+                          - generic: Talento Humano
+                        - cell:
+                          - generic:
+                            - generic: SG Consulting Group
+                        - cell:
+                          - generic: Activo
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                            - button:
+                              - img
+                            - button:
+                              - img
+                      - row:
+                        - cell: "4"
+                        - cell:
+                          - generic:
+                            - generic: CR
+                            - generic:
+                              - paragraph: Cristian Rosero
+                              - paragraph: SG0004
+                        - cell:
+                          - generic: Pendiente
+                        - cell:
+                          - generic: Pendiente
+                        - cell:
+                          - generic: —
+                        - cell:
+                          - generic: Activo
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                            - button:
+                              - img
+                            - button:
+                              - img
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e271] [cursor=pointer]:
+    - img [ref=e272]
+  - alert
+  - dialog "Eliminar colaborador" [ref=e372]:
+    - generic [ref=e373]:
+      - heading "Eliminar colaborador" [level=2] [ref=e374]
+      - paragraph [ref=e375]: ¿Estás seguro de que deseas eliminar a Cristian Rosero? Esta acción no se puede deshacer y eliminará todos sus datos asociados.
+    - generic [ref=e376]:
+      - button "Cancelar" [active] [ref=e377] [cursor=pointer]
+      - button "Sí, eliminar" [ref=e378] [cursor=pointer]
+    - button "Close" [ref=e379]:
+      - img
+      - generic [ref=e380]: Close

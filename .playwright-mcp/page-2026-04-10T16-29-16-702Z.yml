@@ -1,0 +1,202 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e6]: O
+        - generic [ref=e7]:
+          - paragraph [ref=e8]: OmarIA
+          - paragraph [ref=e9]: SG Consulting Group
+      - navigation [ref=e10]:
+        - list [ref=e11]:
+          - listitem [ref=e12]:
+            - link "Dashboard" [ref=e13] [cursor=pointer]:
+              - /url: /admin
+              - img [ref=e14]
+              - text: Dashboard
+          - listitem [ref=e19]:
+            - link "Empleados" [ref=e20] [cursor=pointer]:
+              - /url: /employees
+              - img [ref=e21]
+              - text: Empleados
+          - listitem [ref=e26]:
+            - link "Documentos" [ref=e27] [cursor=pointer]:
+              - /url: /documents
+              - img [ref=e28]
+              - text: Documentos
+          - listitem [ref=e31]:
+            - link "Nóminas" [ref=e32] [cursor=pointer]:
+              - /url: /payroll
+              - img [ref=e33]
+              - text: Nóminas
+          - listitem [ref=e35]:
+            - link "Organigrama" [ref=e36] [cursor=pointer]:
+              - /url: /organigram
+              - img [ref=e37]
+              - text: Organigrama
+          - listitem [ref=e41]:
+            - link "OmarIA" [ref=e42] [cursor=pointer]:
+              - /url: /ai-agent
+              - img [ref=e43]
+              - text: OmarIA
+          - listitem [ref=e45]:
+            - link "Gestión de Roles" [ref=e46] [cursor=pointer]:
+              - /url: /admin/roles
+              - img [ref=e47]
+              - text: Gestión de Roles
+          - listitem [ref=e50]:
+            - link "Mi Perfil" [ref=e51] [cursor=pointer]:
+              - /url: /profile
+              - img [ref=e52]
+              - text: Mi Perfil
+      - generic [ref=e57]: Administrador
+    - generic [ref=e58]:
+      - banner [ref=e59]:
+        - generic [ref=e60]:
+          - button "Activar modo oscuro" [ref=e82] [cursor=pointer]:
+            - img
+          - button "LR lriofrio915@gmail.com Administrador" [ref=e62] [cursor=pointer]:
+            - generic [ref=e64]: LR
+            - generic [ref=e65]:
+              - paragraph [ref=e66]: lriofrio915@gmail.com
+              - paragraph [ref=e67]: Administrador
+      - main [ref=e68]:
+        - generic [ref=e69]:
+          - link "Colaboradores" [ref=e83] [cursor=pointer]:
+            - /url: /employees
+            - img [ref=e84]
+            - text: Colaboradores
+          - generic [ref=e88]:
+            - generic [ref=e89]:
+              - generic [ref=e90]: WH
+              - button "Cambiar foto" [ref=e91]:
+                - img [ref=e92]
+            - generic [ref=e96]:
+              - generic [ref=e97]:
+                - heading "WASHINGTON OMAR HERRERA DIAZ" [level=1] [ref=e98]
+                - paragraph [ref=e99]: Administrador de RRHH · Talento Humano
+                - generic [ref=e100]:
+                  - generic [ref=e101]: SG0003
+                  - generic [ref=e102]: Activo
+              - link "Editar" [ref=e103] [cursor=pointer]:
+                - /url: /employees/cmnros1ta000204l1jdfeeoin/edit
+                - button "Editar" [ref=e104]:
+                  - img
+                  - text: Editar
+          - generic [ref=e105]:
+            - tablist [ref=e106]:
+              - tab "Info general" [ref=e107]:
+                - img
+                - generic [ref=e108]: Info general
+              - tab "Equipo" [ref=e109]:
+                - img
+                - generic [ref=e110]: Equipo
+              - tab "Competencias" [active] [selected] [ref=e111]:
+                - img
+                - generic [ref=e112]: Competencias
+              - tab "Documentos" [ref=e113]:
+                - img
+                - generic [ref=e114]: Documentos
+              - tab "Nóminas" [ref=e115]:
+                - img
+                - generic [ref=e116]: Nóminas
+            - tabpanel "Competencias" [ref=e165]:
+              - generic [ref=e166]:
+                - generic [ref=e167]:
+                  - generic [ref=e168]: Competencias
+                  - button "Guardar" [ref=e230] [cursor=pointer]:
+                    - img
+                    - text: Guardar
+                - generic [ref=e170]:
+                  - generic [ref=e171]:
+                    - paragraph [ref=e172]: Directiva
+                    - generic [ref=e173]:
+                      - generic [ref=e174]:
+                        - generic [ref=e177]: Gestión del cambio
+                        - combobox [ref=e178] [cursor=pointer]:
+                          - option "Sin nivel" [selected]
+                          - option "Básico"
+                          - option "Intermedio"
+                          - option "Avanzado"
+                          - option "Experto"
+                      - generic [ref=e179]:
+                        - generic [ref=e182]: Liderazgo
+                        - combobox [ref=e183] [cursor=pointer]:
+                          - option "Sin nivel"
+                          - option "Básico"
+                          - option "Intermedio"
+                          - option "Avanzado" [selected]
+                          - option "Experto"
+                      - generic [ref=e184]:
+                        - generic [ref=e187]: Toma de decisiones
+                        - combobox [ref=e188] [cursor=pointer]:
+                          - option "Sin nivel" [selected]
+                          - option "Básico"
+                          - option "Intermedio"
+                          - option "Avanzado"
+                          - option "Experto"
+                  - generic [ref=e189]:
+                    - paragraph [ref=e190]: Técnica
+                    - generic [ref=e191]:
+                      - generic [ref=e192]:
+                        - generic [ref=e195]: Análisis de datos
+                        - combobox [ref=e196] [cursor=pointer]:
+                          - option "Sin nivel" [selected]
+                          - option "Básico"
+                          - option "Intermedio"
+                          - option "Avanzado"
+                          - option "Experto"
+                      - generic [ref=e197]:
+                        - generic [ref=e200]: Gestión de RRHH
+                        - combobox [ref=e201] [cursor=pointer]:
+                          - option "Sin nivel" [selected]
+                          - option "Básico"
+                          - option "Intermedio"
+                          - option "Avanzado"
+                          - option "Experto"
+                      - generic [ref=e202]:
+                        - generic [ref=e205]: Legislación laboral
+                        - combobox [ref=e206] [cursor=pointer]:
+                          - option "Sin nivel" [selected]
+                          - option "Básico"
+                          - option "Intermedio"
+                          - option "Avanzado"
+                          - option "Experto"
+                  - generic [ref=e207]:
+                    - paragraph [ref=e208]: Blanda
+                    - generic [ref=e209]:
+                      - generic [ref=e210]:
+                        - generic [ref=e213]: Comunicación efectiva
+                        - combobox [ref=e214] [cursor=pointer]:
+                          - option "Sin nivel" [selected]
+                          - option "Básico"
+                          - option "Intermedio"
+                          - option "Avanzado"
+                          - option "Experto"
+                      - generic [ref=e215]:
+                        - generic [ref=e218]: Orientación al cliente
+                        - combobox [ref=e219] [cursor=pointer]:
+                          - option "Sin nivel" [selected]
+                          - option "Básico"
+                          - option "Intermedio"
+                          - option "Avanzado"
+                          - option "Experto"
+                      - generic [ref=e220]:
+                        - generic [ref=e223]: Resolución de problemas
+                        - combobox [ref=e224] [cursor=pointer]:
+                          - option "Sin nivel" [selected]
+                          - option "Básico"
+                          - option "Intermedio"
+                          - option "Avanzado"
+                          - option "Experto"
+                      - generic [ref=e225]:
+                        - generic [ref=e228]: Trabajo en equipo
+                        - combobox [ref=e229] [cursor=pointer]:
+                          - option "Sin nivel" [selected]
+                          - option "Básico"
+                          - option "Intermedio"
+                          - option "Avanzado"
+                          - option "Experto"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e78] [cursor=pointer]:
+    - img [ref=e79]
+  - alert [ref=e164]

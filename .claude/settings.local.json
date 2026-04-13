@@ -50,11 +50,51 @@
       "mcp__plugin_context-mode_context-mode__ctx_fetch_and_index",
       "mcp__plugin_context-mode_context-mode__ctx_search",
       "Skill(qa)",
-      "Skill(qa:*)"
+      "Skill(qa:*)",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_fill_form",
+      "mcp__playwright__browser_console_messages",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(taskkill /F /IM node.exe /FI \"WINDOWTITLE eq next*\")",
+      "Bash(echo \"PID: $!\")",
+      "Bash(taskkill /F /IM node.exe)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(cmd /c \"taskkill /F /IM node.exe\")",
+      "Bash(powershell -Command \"Stop-Process -Name node -Force -ErrorAction SilentlyContinue; Write-Host 'done'\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_select_option",
+      "Bash(git commit -m 'feat: Fase 4 — competencias de empleados + contexto OmarIA:*)",
+      "Bash(git commit -m 'fix: corregir TypeError al editar experiencia o datos personales en ProfileEditor:*)",
+      "Bash(git commit -m 'fix: corregir fetch de managers en EmployeeForm para respuesta paginada:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npx dotenv:*)",
+      "Bash(git commit -m 'fix: usar error en lugar de errorMap en z.enum \\(Zod v4\\):*)",
+      "Bash(git commit -m 'fix: agregar whatsapp y empresa al perfil del empleado:*)",
+      "Bash(git commit -m 'feat: botón reset contraseña en detalle de empleado:*)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Skill(investigate)",
+      "mcp__supabase__get_logs",
+      "Skill(gstack-upgrade)",
+      "Skill(gstack-upgrade:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "supabase"
-  ]
+  ],
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\": \"Pixel Agent listo. Soy tu asistente de IA para OmarIA — Talento Humano de SG Consulting Group.\", \"hookSpecificOutput\": {\"hookEventName\": \"SessionStart\", \"additionalContext\": \"Tu nombre en esta sesión es Pixel Agent. Siempre preséntate como Pixel Agent cuando el usuario te pregunte quién eres o cómo te llamas.\"}}'",
+            "shell": "bash"
+          }
+        ]
+      }
+    ]
+  }
 }

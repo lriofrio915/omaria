@@ -1,0 +1,166 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e6]: O
+        - generic [ref=e7]:
+          - paragraph [ref=e8]: OmarIA
+          - paragraph [ref=e9]: SG Consulting Group
+      - navigation [ref=e10]:
+        - list [ref=e11]:
+          - listitem [ref=e12]:
+            - link "Dashboard" [ref=e13] [cursor=pointer]:
+              - /url: /admin
+              - img [ref=e14]
+              - text: Dashboard
+          - listitem [ref=e19]:
+            - link "Empleados" [ref=e20] [cursor=pointer]:
+              - /url: /employees
+              - img [ref=e21]
+              - text: Empleados
+          - listitem [ref=e26]:
+            - link "Documentos" [ref=e27] [cursor=pointer]:
+              - /url: /documents
+              - img [ref=e28]
+              - text: Documentos
+          - listitem [ref=e31]:
+            - link "Nóminas" [ref=e32] [cursor=pointer]:
+              - /url: /payroll
+              - img [ref=e33]
+              - text: Nóminas
+          - listitem [ref=e35]:
+            - link "Organigrama" [ref=e36] [cursor=pointer]:
+              - /url: /organigram
+              - img [ref=e37]
+              - text: Organigrama
+          - listitem [ref=e41]:
+            - link "OmarIA" [ref=e42] [cursor=pointer]:
+              - /url: /ai-agent
+              - img [ref=e43]
+              - text: OmarIA
+          - listitem [ref=e45]:
+            - link "Gestión de Roles" [ref=e46] [cursor=pointer]:
+              - /url: /admin/roles
+              - img [ref=e47]
+              - text: Gestión de Roles
+          - listitem [ref=e50]:
+            - link "Mi Perfil" [ref=e51] [cursor=pointer]:
+              - /url: /profile
+              - img [ref=e52]
+              - text: Mi Perfil
+      - generic [ref=e57]: Administrador
+    - generic [ref=e58]:
+      - banner [ref=e59]:
+        - button "LR lriofrio915@gmail.com Administrador" [ref=e62] [cursor=pointer]:
+          - generic [ref=e64]: LR
+          - generic [ref=e65]:
+            - paragraph [ref=e66]: lriofrio915@gmail.com
+            - paragraph [ref=e67]: Administrador
+      - main [ref=e68]:
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - generic [ref=e71]:
+              - generic [ref=e72]:
+                - img [ref=e74]
+                - heading "Colaboradores" [level=1] [ref=e79]
+              - paragraph [ref=e80]: Directorio del personal — SG Consulting Group
+            - generic [ref=e81]:
+              - generic [ref=e82]:
+                - paragraph [ref=e83]: "4"
+                - paragraph [ref=e84]: total
+              - generic [ref=e86]:
+                - paragraph [ref=e87]: "3"
+                - paragraph [ref=e88]: activos
+          - generic [ref=e89]:
+            - generic [ref=e90]:
+              - generic [ref=e91]:
+                - img
+                - textbox "Buscar por nombre, cargo o cédula..." [ref=e92]
+              - generic [ref=e93]:
+                - button "Filtros" [ref=e94] [cursor=pointer]:
+                  - img
+                  - text: Filtros
+                - link "Nuevo colaborador" [ref=e95] [cursor=pointer]:
+                  - /url: /employees/new
+                  - button "Nuevo colaborador" [ref=e96]:
+                    - img
+                    - generic [ref=e97]: Nuevo colaborador
+            - generic [ref=e99]: Cargando...
+            - table [ref=e103]:
+              - rowgroup [ref=e104]:
+                - row "N° Colaborador Cargo Área Empresa Estado Acciones" [ref=e105]:
+                  - columnheader "N°" [ref=e106]
+                  - columnheader "Colaborador" [ref=e107]
+                  - columnheader "Cargo" [ref=e108]
+                  - columnheader "Área" [ref=e109]
+                  - columnheader "Empresa" [ref=e110]
+                  - columnheader "Estado" [ref=e111]
+                  - columnheader "Acciones" [ref=e112]
+              - rowgroup [ref=e113]:
+                - row [ref=e114]:
+                  - cell [ref=e115]
+                  - cell [ref=e117]
+                  - cell [ref=e123]
+                  - cell [ref=e125]
+                  - cell [ref=e127]
+                  - cell [ref=e129]
+                  - cell [ref=e131]
+                - row [ref=e133]:
+                  - cell [ref=e134]
+                  - cell [ref=e136]
+                  - cell [ref=e142]
+                  - cell [ref=e144]
+                  - cell [ref=e146]
+                  - cell [ref=e148]
+                  - cell [ref=e150]
+                - row [ref=e152]:
+                  - cell [ref=e153]
+                  - cell [ref=e155]
+                  - cell [ref=e161]
+                  - cell [ref=e163]
+                  - cell [ref=e165]
+                  - cell [ref=e167]
+                  - cell [ref=e169]
+                - row [ref=e171]:
+                  - cell [ref=e172]
+                  - cell [ref=e174]
+                  - cell [ref=e180]
+                  - cell [ref=e182]
+                  - cell [ref=e184]
+                  - cell [ref=e186]
+                  - cell [ref=e188]
+                - row [ref=e190]:
+                  - cell [ref=e191]
+                  - cell [ref=e193]
+                  - cell [ref=e199]
+                  - cell [ref=e201]
+                  - cell [ref=e203]
+                  - cell [ref=e205]
+                  - cell [ref=e207]
+                - row [ref=e209]:
+                  - cell [ref=e210]
+                  - cell [ref=e212]
+                  - cell [ref=e218]
+                  - cell [ref=e220]
+                  - cell [ref=e222]
+                  - cell [ref=e224]
+                  - cell [ref=e226]
+                - row [ref=e228]:
+                  - cell [ref=e229]
+                  - cell [ref=e231]
+                  - cell [ref=e237]
+                  - cell [ref=e239]
+                  - cell [ref=e241]
+                  - cell [ref=e243]
+                  - cell [ref=e245]
+                - row [ref=e247]:
+                  - cell [ref=e248]
+                  - cell [ref=e250]
+                  - cell [ref=e256]
+                  - cell [ref=e258]
+                  - cell [ref=e260]
+                  - cell [ref=e262]
+                  - cell [ref=e264]
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e271] [cursor=pointer]:
+    - img [ref=e272]
