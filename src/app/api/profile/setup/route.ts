@@ -81,9 +81,15 @@ export async function POST(request: Request) {
       });
     }
 
-    // Generar código de empleado único
-    const count = await prisma.employee.count();
-    const employeeCode = `SG${String(count + 1).padStart(4, "0")}`;
+    // Generar código de empleado único basado en el máximo actual
+    const lastEmployee = await prisma.employee.findFirst({
+      orderBy: { employeeCode: "desc" },
+      select: { employeeCode: true },
+    });
+    const nextNum = lastEmployee
+      ? parseInt(lastEmployee.employeeCode.replace(/\D/g, ""), 10) + 1
+      : 1;
+    const employeeCode = `SG${String(nextNum).padStart(4, "0")}`;
 
     const { whatsapp, birthDate, bloodType, city, address, personalEmail } = parsed.data;
 
