@@ -149,7 +149,10 @@ function toDateInput(d: Date | string | null | undefined): string {
   return String(d).slice(0, 10);
 }
 
-function parseLocalDate(iso: string): Date {
+function parseLocalDate(iso: string | Date): Date {
+  if (iso instanceof Date) {
+    return new Date(iso.getUTCFullYear(), iso.getUTCMonth(), iso.getUTCDate());
+  }
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(y, m - 1, d);
 }

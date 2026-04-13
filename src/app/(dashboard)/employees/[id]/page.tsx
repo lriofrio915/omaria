@@ -12,7 +12,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DocumentList } from "@/components/documents/DocumentList";
 
-function parseLocalDate(iso: string): Date {
+function parseLocalDate(iso: string | Date): Date {
+  if (iso instanceof Date) {
+    return new Date(iso.getUTCFullYear(), iso.getUTCMonth(), iso.getUTCDate());
+  }
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(y, m - 1, d);
 }
