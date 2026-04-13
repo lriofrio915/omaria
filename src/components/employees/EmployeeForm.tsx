@@ -194,7 +194,7 @@ const EMPRESA_DATA: Record<string, { cargos: string[]; areas: string[] }> = {
       "Tesorería",
     ],
   },
-  "SERVICIOS PROFESIONALES SG": {
+  "ESPARTANS": {
     cargos: [],
     areas: [],
   },
