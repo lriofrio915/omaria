@@ -194,17 +194,37 @@ const EMPRESA_DATA: Record<string, { cargos: string[]; areas: string[] }> = {
       "Tesorería",
     ],
   },
-  "ESPARTANS": {
-    cargos: [],
-    areas: [],
+  "CLUB DEPORTIVO SPARTANS": {
+    cargos: [
+      "Asesora Comercial / Commercial Advisor",
+      "Asistente Operativa / Operations Assistant",
+      "Director Deportivo / Sports Director",
+    ],
+    areas: [
+      "Administración",
+      "Operaciones",
+    ],
   },
   "INCOOP": {
     cargos: [],
     areas: [],
   },
   "HEUREKA": {
-    cargos: [],
-    areas: [],
+    cargos: [
+      "Coordinador Financiero y Presupuesto / Financial and Budget Coordinator",
+      "Ejecutiva de Captaciones Master / Master Acquisitions Executive",
+      "Ejecutivo de Inversiones / Investment Executive",
+      "Especialista de Servicio al Cliente / Customer Service Specialist",
+      "Estratega Nacional de Negocios / National Business Strategist",
+      "Subgerente / Deputy Manager",
+    ],
+    areas: [
+      "Captaciones",
+      "Financiero",
+      "Gerencia General",
+      "Negocios",
+      "Servicio al Cliente",
+    ],
   },
 };
 
