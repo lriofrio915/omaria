@@ -36,13 +36,6 @@ import {
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
-interface Company {
-  id: string;
-  name: string;
-  slug: string;
-  primaryColor: string;
-}
-
 interface Employee {
   id: string;
   employeeCode: string;
@@ -51,13 +44,27 @@ interface Employee {
   email: string;
   city: string | null;
   status: string;
+  companyName: string | null;
+  positionTitle: string | null;
+  departmentName: string | null;
   department: {
     id: string;
     name: string;
-    company: Company | null;
-  };
-  position: { id: string; title: string };
+    company: { id: string; name: string; slug: string; primaryColor: string } | null;
+  } | null;
+  position: { id: string; title: string } | null;
 }
+
+// ── EMPRESA_DATA (company names for filter) ───────────────────────────────────
+
+const EMPRESA_NAMES = [
+  "EMPORIUM",
+  "SG - FINTECH",
+  "CLUB DEPORTIVO SPARTANS",
+  "ADWA",
+  "INCOOP",
+  "HEUREKA",
+] as const;
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -98,7 +105,6 @@ export function EmployeeList() {
   // Data
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [total, setTotal] = useState(0);
-  const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Filters
@@ -116,20 +122,12 @@ export function EmployeeList() {
   const [deleteName, setDeleteName] = useState("");
   const [deleting, setDeleting] = useState(false);
 
-  // ── Fetch companies once ──────────────────────────────────────────────────
-  useEffect(() => {
-    fetch("/api/companies")
-      .then((r) => r.json())
-      .then((data: Company[]) => setCompanies(data))
-      .catch(() => {});
-  }, []);
-
   // ── Fetch employees ───────────────────────────────────────────────────────
   const fetchEmployees = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams();
     if (search) params.set("search", search);
-    if (filterCompany !== "all") params.set("companyId", filterCompany);
+    if (filterCompany !== "all") params.set("companyName", filterCompany);
     if (filterStatus !== "all") params.set("status", filterStatus);
     params.set("page", String(page));
     params.set("pageSize", String(pageSize));
@@ -246,8 +244,8 @@ export function EmployeeList() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas las empresas</SelectItem>
-                {companies.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                {EMPRESA_NAMES.map((name) => (
+                  <SelectItem key={name} value={name}>{name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -380,9 +378,12 @@ export function EmployeeList() {
               ) : (
                 paginated.map((emp, idx) => {
                   const globalIdx = (safePage - 1) * pageSize + idx + 1;
-                  const company = emp.department.company;
+                  const company = emp.department?.company ?? null;
                   const avatarColor = company?.primaryColor ?? colorFromString(emp.firstName + emp.lastName);
                   const initials = getInitials(emp.firstName, emp.lastName);
+                  const cargoDisplay = emp.positionTitle ?? emp.position?.title ?? "—";
+                  const areaDisplay = emp.departmentName ?? emp.department?.name ?? "—";
+                  const empresaDisplay = emp.companyName ?? company?.name ?? "—";
 
                   return (
                     <TableRow
@@ -422,9 +423,9 @@ export function EmployeeList() {
                       <TableCell className="py-3 max-w-[120px] text-center">
                         <span
                           className="text-sm text-foreground/80 leading-tight truncate block"
-                          title={emp.position.title}
+                          title={cargoDisplay}
                         >
-                          {emp.position.title}
+                          {cargoDisplay}
                         </span>
                       </TableCell>
 
@@ -432,30 +433,26 @@ export function EmployeeList() {
                       <TableCell className="py-3 max-w-[100px] text-center">
                         <span
                           className="text-sm text-muted-foreground truncate block"
-                          title={emp.department.name}
+                          title={areaDisplay}
                         >
-                          {emp.department.name}
+                          {areaDisplay}
                         </span>
                       </TableCell>
 
                       {/* Empresa */}
                       <TableCell className="py-3 max-w-[130px]">
-                        {company ? (
-                          <div className="flex items-center justify-center gap-1.5 min-w-0">
-                            <span
-                              className="inline-block h-2 w-2 rounded-full shrink-0"
-                              style={{ backgroundColor: company.primaryColor }}
-                            />
-                            <span
-                              className="text-sm text-foreground/80 truncate"
-                              title={company.name}
-                            >
-                              {company.name}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-sm text-muted-foreground text-center block">—</span>
-                        )}
+                        <div className="flex items-center justify-center gap-1.5 min-w-0">
+                          <span
+                            className="inline-block h-2 w-2 rounded-full shrink-0"
+                            style={{ backgroundColor: company?.primaryColor ?? colorFromString(empresaDisplay) }}
+                          />
+                          <span
+                            className="text-sm text-foreground/80 truncate"
+                            title={empresaDisplay}
+                          >
+                            {empresaDisplay}
+                          </span>
+                        </div>
                       </TableCell>
 
                       {/* Estado */}

@@ -41,6 +41,7 @@ export async function GET(request: Request) {
   const search = searchParams.get("search") ?? "";
   const status = searchParams.get("status");
   const companyId = searchParams.get("companyId");
+  const companyName = searchParams.get("companyName");
   const departmentId = searchParams.get("departmentId");
   const showTerminated = searchParams.get("showTerminated") === "true";
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
@@ -64,13 +65,24 @@ export async function GET(request: Request) {
         status ? { status: status as never } : {},
         departmentId ? { departmentId } : {},
         companyId ? { department: { companyId } } : {},
+        companyName ? { companyName } : {},
       ],
     };
 
     const [employees, total] = await prisma.$transaction([
       prisma.employee.findMany({
         where,
-        include: {
+        select: {
+          id: true,
+          employeeCode: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          city: true,
+          status: true,
+          companyName: true,
+          positionTitle: true,
+          departmentName: true,
           department: {
             select: {
               id: true,

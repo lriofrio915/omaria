@@ -20,28 +20,30 @@ interface PageProps {
   searchParams: Promise<{ company?: string }>;
 }
 
-async function getCompanies() {
-  try {
-    return await prisma.company.findMany({ where: { isActive: true }, orderBy: { name: "asc" } });
-  } catch { return []; }
+const EMPRESA_NAMES = [
+  "EMPORIUM",
+  "SG - FINTECH",
+  "CLUB DEPORTIVO SPARTANS",
+  "ADWA",
+  "INCOOP",
+  "HEUREKA",
+] as const;
+
+function colorFromName(name: string) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return `hsl(${Math.abs(hash) % 360} 55% 48%)`;
 }
 
-async function getStats(companySlug?: string) {
+async function getStats(companyName?: string) {
   try {
-    const companyFilter = companySlug
-      ? { department: { company: { slug: companySlug } } }
-      : {};
-    const deptFilter = companySlug
-      ? { company: { slug: companySlug } }
-      : {};
+    const empWhere = companyName ? { companyName } : {};
 
-    const [totalColaboradores, totalDepartamentos, totalCargos, employees, statusGroups, depts] =
+    const [totalColaboradores, employees, statusGroups, deptGroups, posGroups] =
       await Promise.all([
-        prisma.employee.count({ where: companyFilter }),
-        prisma.department.count({ where: { ...deptFilter, companyId: { not: null } } }),
-        prisma.position.count({ where: { department: deptFilter } }),
+        prisma.employee.count({ where: empWhere }),
         prisma.employee.findMany({
-          where: companyFilter,
+          where: empWhere,
           include: {
             position: { include: { competencies: true } },
             competencies: true,
@@ -50,15 +52,24 @@ async function getStats(companySlug?: string) {
         prisma.employee.groupBy({
           by: ["status"],
           _count: { id: true },
-          where: companyFilter,
+          where: empWhere,
         }),
-        prisma.department.findMany({
-          where: { ...deptFilter, companyId: { not: null } },
-          include: { _count: { select: { employees: true } } },
-          orderBy: { employees: { _count: "desc" } },
+        prisma.employee.groupBy({
+          by: ["departmentName"],
+          _count: { id: true },
+          where: { ...empWhere, departmentName: { not: null } },
+          orderBy: { _count: { id: "desc" } },
           take: 7,
         }),
+        prisma.employee.groupBy({
+          by: ["positionTitle"],
+          _count: { id: true },
+          where: { ...empWhere, positionTitle: { not: null } },
+        }),
       ]);
+
+    const totalDepartamentos = deptGroups.length;
+    const totalCargos = posGroups.length;
 
     const LEVELS: Record<string, number> = { NONE: 0, BASIC: 1, INTERMEDIATE: 2, ADVANCED: 3, EXPERT: 4 };
     let conBrecha = 0;
@@ -73,9 +84,9 @@ async function getStats(companySlug?: string) {
     const statusMap: Record<string, number> = {};
     for (const g of statusGroups) statusMap[g.status] = g._count.id;
 
-    const deptData = depts
-      .filter((d) => d._count.employees > 0)
-      .map((d) => ({ name: d.name, colaboradores: d._count.employees }));
+    const deptData = deptGroups
+      .filter((d) => d.departmentName)
+      .map((d) => ({ name: d.departmentName as string, colaboradores: d._count.id }));
 
     return {
       totalColaboradores,
@@ -105,22 +116,11 @@ async function getStats(companySlug?: string) {
   }
 }
 
-async function getSelectedCompany(slug?: string) {
-  if (!slug) return null;
-  try {
-    return await prisma.company.findUnique({ where: { slug } });
-  } catch { return null; }
-}
-
 export default async function AdminDashboard({ searchParams }: PageProps) {
-  const { company: companySlug } = await searchParams;
-  const [companies, stats, selectedCompany] = await Promise.all([
-    getCompanies(),
-    getStats(companySlug),
-    getSelectedCompany(companySlug),
-  ]);
+  const { company: selectedCompanyName } = await searchParams;
+  const stats = await getStats(selectedCompanyName);
 
-  const primaryColor = selectedCompany?.primaryColor ?? "#1B52B5";
+  const primaryColor = selectedCompanyName ? colorFromName(selectedCompanyName) : "#1B52B5";
   const actividadPct = stats.totalColaboradores > 0
     ? Math.round((stats.activos / stats.totalColaboradores) * 100)
     : 0;
@@ -132,7 +132,7 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
       icon: Users,
       accentColor: "#1B52B5",
       bgColor: "#1B52B5",
-      hint: companySlug ? selectedCompany?.name ?? companySlug : "total en el holding",
+      hint: selectedCompanyName ?? "total en el holding",
       badge: `${stats.activos} activos`,
       badgeIcon: CheckCircle2,
     },
@@ -178,12 +178,12 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Dashboard</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {companySlug && selectedCompany
-              ? `Métricas de ${selectedCompany.name}`
+            {selectedCompanyName
+              ? `Métricas de ${selectedCompanyName}`
               : "SG Consulting Group — Gestión de Talento Humano"}
           </p>
         </div>
-        {companySlug && (
+        {selectedCompanyName && (
           <Link
             href="/admin"
             className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-1.5 transition-colors hover:bg-muted"
@@ -194,44 +194,43 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
       </div>
 
       {/* ── Selector de empresa (pills) ── */}
-      {companies.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-muted-foreground mr-1">Empresa:</span>
-          <Link
-            href="/admin"
-            className={cn(
-              "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-all border",
-              !companySlug
-                ? "bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white"
-                : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
-            )}
-          >
-            Todo el holding
-          </Link>
-          {companies.map((company) => {
-            const isSelected = companySlug === company.slug;
-            return (
-              <Link
-                key={company.id}
-                href={`/admin?company=${company.slug}`}
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all border",
-                  isSelected
-                    ? "text-white border-transparent"
-                    : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
-                )}
-                style={isSelected ? { backgroundColor: company.primaryColor, borderColor: company.primaryColor } : {}}
-              >
-                <span
-                  className="h-1.5 w-1.5 rounded-full shrink-0"
-                  style={{ backgroundColor: isSelected ? "rgba(255,255,255,0.8)" : company.primaryColor }}
-                />
-                {company.name}
-              </Link>
-            );
-          })}
-        </div>
-      )}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs text-muted-foreground mr-1">Empresa:</span>
+        <Link
+          href="/admin"
+          className={cn(
+            "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-all border",
+            !selectedCompanyName
+              ? "bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white"
+              : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+          )}
+        >
+          Todo el holding
+        </Link>
+        {EMPRESA_NAMES.map((name) => {
+          const isSelected = selectedCompanyName === name;
+          const color = colorFromName(name);
+          return (
+            <Link
+              key={name}
+              href={`/admin?company=${encodeURIComponent(name)}`}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all border",
+                isSelected
+                  ? "text-white border-transparent"
+                  : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+              )}
+              style={isSelected ? { backgroundColor: color, borderColor: color } : {}}
+            >
+              <span
+                className="h-1.5 w-1.5 rounded-full shrink-0"
+                style={{ backgroundColor: isSelected ? "rgba(255,255,255,0.8)" : color }}
+              />
+              {name}
+            </Link>
+          );
+        })}
+      </div>
 
       {/* ── Stat cards ── */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -285,7 +284,7 @@ export default async function AdminDashboard({ searchParams }: PageProps) {
               </CardTitle>
             </div>
             <p className="text-xs text-muted-foreground">
-              {companySlug && selectedCompany ? selectedCompany.name : "Todo el holding"} — top áreas
+              {selectedCompanyName ?? "Todo el holding"} — top áreas
             </p>
           </CardHeader>
           <CardContent className="pt-2 pb-5">
